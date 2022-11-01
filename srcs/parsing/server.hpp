@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 16:00:26 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/01 12:05:49 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/01 12:08:25 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ private:
 	std::vector<std::string>				methods;
 	std::pair<unsigned int, std::string>	http_redirect;
 	bool									autoindex;
-
 
 public:
 	directory();
