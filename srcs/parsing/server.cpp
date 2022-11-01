@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 14:04:18 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/01 15:06:47 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/01 16:53:46 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,15 @@
 ///    SERVER    ///
 ////////////////////
 
-/*___ constructors / destructor ___*/
+/*___ canonical form ___*/
 
 server::server(void) {}
 
+server::server(const server &src) {}
+
 server::~server(void) {}
+
+server	&server::operator=(const server &src) {}
 
 /*___ setters ___*/
 
@@ -55,11 +59,15 @@ std::pair<unsigned int, std::string>	server::getErrorPages(void) const { return 
 ///  DIRECTORY   ///
 ////////////////////
 
-/*___ constructors / destructor ___*/
+/*___ canonical form ___*/
 
 directory::directory(void) {}
 
+directory::directory(const directory &src) {}
+
 directory::~directory(void) {}
+
+directory	&directory::operator=(const directory &src) {}
 
 /*___ setters ___*/
 

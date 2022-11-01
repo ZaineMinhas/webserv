@@ -6,7 +6,11 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 15:59:32 by ctirions          #+#    #+#             */
-/*   Updated: 2022/10/31 16:08:08 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/01 16:13:30 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+int	check_conf_file(std::string file)
+{
+	return (0);
+}

@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 16:00:26 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/01 14:54:23 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/01 16:50:15 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,12 @@ private:
 
 public:
 
-	/*___ constructors / destructor ___*/
+	/*___ canonical form ___*/
 
 	server(void);
+	server(const server &src);
 	~server(void);
+	server	&operator=(const server &src);
 
 	/*___ setters ___*/
 
@@ -83,10 +85,12 @@ private:
 
 public:
 
-	/*___ constructors / destructor ___*/
+	/*___ canonical form ___*/
 
-	directory();
-	~directory();
+	directory(void);
+	directory(const directory &src);
+	~directory(void);
+	directory	&operator=(const directory &src);
 
 	/*___ setters ___*/
 
