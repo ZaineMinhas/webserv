@@ -1,0 +1,20 @@
+body {
+	background-color: brown;
+	align-items: center;
+}
+
+h1 {
+	display: flex;
+	font-size: 100px;
+	color: orangered;
+	display: flex;
+	align-items: center;
+}
+
+p {
+	color: darkorange;
+}
+
+.test {
+	color: blue;
+}
