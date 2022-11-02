@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:09 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/01 17:29:08 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/02 14:42:32 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,20 @@ webserv::webserv(const webserv &src) {}
 
 webserv::~webserv(void) {}
 
-webserv	&webserv::operator=(const webserv &src) {}
+webserv	&webserv::operator=(const webserv &src) {
+	return (*this);
+}
 
-ß/*___ utils ___*/
+/*___ utils ___*/
 
-void	webserv::check_conf_files(std::string file) {}ß
+void	webserv::check_conf_file(std::string file)
+{
+	std::string		txt = file_to_string(file);
+	if (txt.empty() || trim(txt, "\n ").empty())
+		throw (webserv::emptyConfFile());
+
+	std::cout << txt << std::endl;
+}
 
 /*___ exceptions ___*/
 
@@ -36,6 +45,14 @@ const char	*webserv::badConfFile::what() const throw() {
 	return ("Bad configuration file.");
 }
 
-const char	*webserv::badInitialization::what() const throw {
-	return ("Erro occuring when initialize our webserv.")
+const char	*webserv::emptyConfFile::what() const throw() {
+	return ("Empty configuration file.");
+}
+
+const char	*webserv::badFileName::what() const throw() {
+	return ("Put a correct file name!");
+}
+
+const char	*webserv::badInitialization::what() const throw() {
+	return ("Erro occuring when initialize our webserv.");
 }

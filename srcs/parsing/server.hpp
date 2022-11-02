@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 16:00:26 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/01 16:50:15 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/02 14:50:52 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,11 @@
 # include <string>
 # include <iostream>
 # include <vector>
+# include <map>
 # include <utility>
+# include <exception>
+# include <fstream>
+# include <sstream>
 
 	/*___  ___*/
 
@@ -35,7 +39,7 @@ private:
 	unsigned int							_body_size;
 	std::vector<directory>					_directories;
 	std::vector<std::string>				_methods;
-	std::pair<unsigned int, std::string>	_error_pages;
+	std::map<unsigned int, std::string>	_error_pages;
 
 public:
 
@@ -55,7 +59,7 @@ public:
 	void	setBodySize(unsigned int &size);
 	void	setDirectories(std::vector<directory> &directories);
 	void	setMethods(std::vector<std::string> &methods);
-	void	setErrorPages(std::pair<unsigned int, std::string> &error_pages);
+	void	setErrorPages(std::map<unsigned int, std::string> &error_pages);
 
 	/*___ getters ___*/
 
@@ -66,7 +70,7 @@ public:
 	unsigned int							getBodySize(void) const;
 	std::vector<directory>					getDirectories(void) const;
 	std::vector<std::string>				getMethods(void) const;
-	std::pair<unsigned int, std::string>	getErrorPages(void) const;
+	std::map<unsigned int, std::string>	getErrorPages(void) const;
 
 };
 

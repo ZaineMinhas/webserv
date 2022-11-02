@@ -6,14 +6,15 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:28 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/01 17:29:15 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/02 14:45:23 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef WEBSERV_HPP
 # define WEBSERV_HPP
 
-# include "parsing/server.hpp"
+# include "server.hpp"
+# include "utils.hpp"
 
 ////////////////////
 ///   WEBSERV    ///
@@ -21,7 +22,8 @@
 
 class webserv {
 private:
-	std::vector<server>	servers;
+	std::vector<server>			_servers;
+	std::vector<std::string>	_srvs_content;
 
 public:
 
@@ -34,11 +36,21 @@ public:
 
 	/*___ utils ___*/
 
-	void	check_conf_files(std::string file);
+	void	check_conf_file(std::string file);
 
 	/*___ exceptions ___*/
 
 	class	badConfFile : public std::exception {
+	public:
+		virtual const char	*what() const throw();
+	};
+
+	class	emptyConfFile : public std::exception {
+	public:
+		virtual const char	*what() const throw();
+	};
+
+	class	badFileName : public std::exception {
 	public:
 		virtual const char	*what() const throw();
 	};
