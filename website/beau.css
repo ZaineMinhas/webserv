@@ -1,0 +1,49 @@
+body
+{
+	background-color: #f6a06b;
+	align-items: center;
+}
+
+h1
+{
+	text-align: center;
+	font-size: 5em;
+	color: rgb(129, 36, 36);
+	border: 3px brown double;
+	border-radius: 20px / 10px;
+	box-shadow: 6px 6px 15px black;
+	text-shadow: 1px 1px 10px black;
+}
+
+h2
+{
+	text-decoration: underline;
+}
+
+figure
+{
+	text-align: left;
+}
+
+figcaption
+{
+	text-align: left;
+}
+
+p
+{
+	color: #c11a1e;
+}
+
+lol { text-decoration: line-through; }
+
+.test
+{
+	color: blue;
+	font-weight: bold; /* pour mettre en gras */
+}
+
+.float
+{
+	float: right;
+}
