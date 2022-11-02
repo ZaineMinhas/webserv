@@ -10,54 +10,35 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iostream>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include "socket.hpp"
 
 int main()
 {
-	int srv_sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (!srv_sock) {
-		std::cout << "socket_error" << std::endl;
-		return (-1);
-	}
+	tcpSocket	srv_sock;
+	char		buffer[1024] = {0};
+	int			bufferlen = 1023;
 
-	struct sockaddr_in	addr;
-	addr.sin_addr.s_addr = INADDR_ANY;
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(8080);
-
-	if (bind(srv_sock, (sockaddr *)&addr, sizeof(addr)) < 0) {
-		std::cout << "bind_error" << std::endl;
-		return (-1);
+	try {
+		srv_sock.initSocket(AF_INET, SOCK_STREAM, 0);
+		srv_sock.bindSocket(AF_INET, 8080);
+		srv_sock.listenSocket();
 	}
-
-	if (listen(srv_sock, SOMAXCONN) < 0) {
-		std::cout << "listen_error" << std::endl;
-		return (-1);
-	}
+	catch (std::exception &e) { std::cout << e.what() << std::endl; }
 
 	std::cout << "OK server" << std::endl;
 
-	while (1)
-	{	
-		socklen_t	addrlen = sizeof(addr);
-	
-		int cli_sock;
-		if ((cli_sock = accept(srv_sock, (sockaddr *)&addr, &addrlen)) < 0) {
-			std::cout << "accept_error" << std::endl;
-			break ;
+	while (1) {	
+		client cli_sock;
+		try {
+			srv_sock.acceptSocket(&cli_sock);
+			srv_sock.recvSocket(&cli_sock, buffer, bufferlen);
 		}
-	
-		char	buffer[500] = {0};
-		if (!(recv(cli_sock, buffer, 499, 0)))
-			break ;
+		catch (std::exception &e) { std::cout << e.what() << std::endl; }
+
 		std::cout << buffer << std::endl;
 	}
 	
-	close(srv_sock);
+	srv_sock.closeSocket();
 	
 	return (0);
 }

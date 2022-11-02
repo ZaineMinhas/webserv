@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:02:19 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/02 10:13:07 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/02 13:53:53 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,44 +21,42 @@
 
 #include <iostream>
 
-struct client
-{
-	tcpSocket	_cli;
-	sockaddr_in	_srv;
-};
+struct client;
 
-class tcpSocket {
-private:
-	int			_socket = 0;
-	sockaddr_in	_addr = {0};
-	socklen_t	_addrlen = 0;
+struct tcpSocket {
+	int			_socket;
+	sockaddr_in	_addr;
+	socklen_t	_addrlen;
 	
-public:
-	tcpSocket(int domain = AF_INET, int port = 8080);
+	tcpSocket(bool client = false, int domain = AF_INET, int port = 8080);
 	~tcpSocket();
 
-	bool	initSocket(int domain, int type, int protocol);
+	void	initSocket(int domain, int type, int protocol);
 	void	closeSocket();
 
-	bool	bindSocket(int domain, int port);
-	bool	listenSocket();
+	void	bindSocket(int domain, int port);
+	void	listenSocket();
 	
-	bool	connectSocket(int domain, const std::string &addr, int port);
-	bool	acceptSocket(client *client);
+	void	connectSocket(int domain, const std::string &addr, int port);
+	void	acceptSocket(client *client);
 
-	int		recvSocket(char *buffer, unsigned int len);
+	int		recvSocket(client *client, char *buffer, unsigned int len);
 	int		sendSocket(const char *data, unsigned int len);
 
-	class errorSocket : public std::exception {
-	public:
-		virtual const char	*bindError() const throw();
-		virtual const char	*recvError() const throw();
-		virtual const char	*sendError() const throw();
-		virtual const char	*listenError() const throw();
-		virtual const char	*acceptError() const throw();
-		
-	};
-	
+	struct initError : public std::exception { virtual const char	*what() const throw(); };
+	struct bindError : public std::exception { virtual const char	*what() const throw(); };
+	struct recvError : public std::exception { virtual const char	*what() const throw(); };
+	struct sendError : public std::exception { virtual const char	*what() const throw(); };
+	struct listenError : public std::exception { virtual const char	*what() const throw(); };
+	struct acceptError : public std::exception { virtual const char	*what() const throw(); };
+	struct connectError : public std::exception { virtual const char	*what() const throw(); };
+
+};
+
+struct client {
+	tcpSocket	_cli;
+
+	const char	*getAddr();
 };
 
 #endif
