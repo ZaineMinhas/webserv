@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:28 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/02 14:45:23 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/03 12:18:14 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@
 class webserv {
 private:
 	std::vector<server>			_servers;
-	std::vector<std::string>	_srvs_content;
 
 public:
 
@@ -36,7 +35,7 @@ public:
 
 	/*___ utils ___*/
 
-	void	check_conf_file(std::string file);
+	void	check_conf_file(std::string file, webserv &srv);
 
 	/*___ exceptions ___*/
 

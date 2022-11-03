@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 16:00:26 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/03 11:25:17 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/03 16:21:45 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,9 @@ public:
 	std::vector<std::string>				getMethods(void) const;
 	std::map<unsigned int, std::string>	getErrorPages(void) const;
 
+	/*___ utils ___*/
+
+	void	set(std::string &key, std::string &value);
 };
 
 ////////////////////
@@ -101,9 +104,9 @@ public:
 	void	setName(std::string &name);
 	void	setRoot(std::string &root);
 	void	setIndex(std::string &index);
-	void	setMethods(std::vector<std::string> &methods);
-	void	setHttpRedirect(std::pair<unsigned int, std::string> &redirects);
-	void	setAutoindex(bool &autoindex);
+	void	setMethods(std::string &methods);
+	void	setHttpRedirect(std::string &redirects);
+	void	setAutoindex(std::string &autoindex);
 
 	/*___ getters ___*/
 
@@ -113,6 +116,10 @@ public:
 	std::vector<std::string>				getMethods(void) const;
 	std::pair<unsigned int, std::string>	getHttpRedirect(void) const;
 	bool									getAutoindex(void) const;
+
+	/*___ utils ___*/
+
+	void	set(std::string &key, std::string &value);
 };
 
 #endif
