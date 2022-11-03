@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:02:19 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/03 11:45:11 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/03 17:50:31 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,6 @@
 #include <arpa/inet.h>
 
 #include <iostream>
-
-struct client;
 
 struct tcpSocket {
 	int			_socket;
@@ -54,5 +52,12 @@ struct tcpSocket {
 	struct connectError : public std::exception { virtual const char	*what() const throw(); };
 
 };
+
+// struct client {
+// 	int			_cli;
+// 	sockaddr_in	_from;
+// 	socklen_t	_fromlen;
+	
+// };
 
 #endif
