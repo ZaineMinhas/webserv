@@ -1,0 +1,60 @@
+body
+{
+	background-image: url("../images/Aliens\ arrivent\ sur\ terre\ avec\ toute\ sa\ clique\ de\ bras\ cassé.jpg");
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+h1
+{
+	position: absolute;
+	top: -50px;
+	right: 250px;
+	color:rgba(255, 255, 255, 1);
+	text-align: center;
+	font-size: 6em;
+	text-shadow: 1px 1px 1px black;
+	border: 3px rgba(255, 255, 255, 0.1) solid;
+	box-shadow: 1px 1px 1px black;
+	border-radius: 20px / 20px;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+p
+{
+	color: white;
+	font-size: 3em;
+	text-align: center;
+}
+
+.message
+{
+	position: absolute;
+	top: 15vh;
+	left: 28vw;
+}
+
+.credit
+{
+	position: absolute;
+	top: 33vh;
+	right: 1vw;
+	border: 3px white solid;
+	border-color: white;
+	box-shadow: 6px 6px 0px black;
+	border-radius: 40px / 50px;
+	font-size: 2.5em;
+	color: white;
+}
+
+/*.credit
+{
+	position: absolute;
+	top: 30vh;
+	right: 10vw;
+	z-index: 1;
+	background-color: var(--surface);
+	padding: 2px 4px;
+	border-radius: 5px;
+	box-shadow: var(--box_shadow);
+}*/

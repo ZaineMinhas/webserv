@@ -1,7 +1,7 @@
 body
 {
 	text-shadow: 1px 1px 1px black;
-	background-image: url("images/pizza-back2.jpg");
+	background-image: url("../images/pizza-back2.jpg");
 	background-position: right;
 	background-color: #f6a06b;
 	align-items: center;
