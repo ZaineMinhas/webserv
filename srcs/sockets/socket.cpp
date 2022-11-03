@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:06:34 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/02 13:55:43 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/03 11:47:19 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,13 @@
 
 tcpSocket::tcpSocket(bool client, int domain, int port)
 {
-	if (!client)
+	if (!client) {
 		this->_addr.sin_family = domain;
 		this->_addr.sin_addr.s_addr = INADDR_ANY;
 		this->_addr.sin_port = htons(port);
+		this->_addrlen = sizeof(this->_addr);
+	}
+	else
 		this->_addrlen = sizeof(this->_addr);
 }
 
@@ -64,18 +67,18 @@ void	tcpSocket::connectSocket(int domain, const std::string &addr, int port)
 	throw (tcpSocket::connectError());
 }
 
-void	tcpSocket::acceptSocket(client *client)
+void	tcpSocket::acceptSocket(tcpSocket *client)
 {
-	if ((client->_cli._socket = accept(this->_socket, (sockaddr *)&client->_cli._addr, &client->_cli._addrlen)))
+	if ((client->_socket = accept(this->_socket, (sockaddr *)&client->_addr, &client->_addrlen)))
 		return ;
 	throw (tcpSocket::acceptError());
 }
 
 
 
-int		tcpSocket::recvSocket(client *client, char *buffer, unsigned int len)
+int		tcpSocket::recvSocket(tcpSocket *client, char *buffer, unsigned int len)
 {
-	int	ret = recv(client->_cli._socket, buffer, len, 0);
+	int	ret = recv(client->_socket, buffer, len, 0);
 	if (ret == -1)
 		throw (tcpSocket::recvError());
 	return (ret);
@@ -87,6 +90,14 @@ int		tcpSocket::sendSocket(const char *data, unsigned int len)
 	if (ret == -1)
 		throw(tcpSocket::sendError());
 	return (ret);
+}
+
+
+
+const char	*tcpSocket::getAddr()
+{
+	char buffer[INET_ADDRSTRLEN] = {0};
+	return (inet_ntop(this->_addr.sin_family, (const void *)&(this->_addr.sin_addr), buffer, INET_ADDRSTRLEN));
 }
 
 
@@ -103,8 +114,3 @@ const char	*tcpSocket::connectError::what() const throw() { return ("socket: err
 
 
 
-const char	*client::getAddr()
-{
-	char buffer[INET_ADDRSTRLEN] = {0};
-	return (inet_ntop(this->_cli._addr.sin_family, (const void *)&(this->_cli._addr.sin_addr), buffer, INET_ADDRSTRLEN));
-}

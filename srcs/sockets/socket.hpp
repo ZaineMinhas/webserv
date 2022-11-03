@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:02:19 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/02 13:53:53 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/03 11:45:11 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,12 @@ struct tcpSocket {
 	void	listenSocket();
 	
 	void	connectSocket(int domain, const std::string &addr, int port);
-	void	acceptSocket(client *client);
+	void	acceptSocket(tcpSocket *client);
 
-	int		recvSocket(client *client, char *buffer, unsigned int len);
+	int		recvSocket(tcpSocket *client, char *buffer, unsigned int len);
 	int		sendSocket(const char *data, unsigned int len);
+
+	const char	*getAddr();
 
 	struct initError : public std::exception { virtual const char	*what() const throw(); };
 	struct bindError : public std::exception { virtual const char	*what() const throw(); };
@@ -51,12 +53,6 @@ struct tcpSocket {
 	struct acceptError : public std::exception { virtual const char	*what() const throw(); };
 	struct connectError : public std::exception { virtual const char	*what() const throw(); };
 
-};
-
-struct client {
-	tcpSocket	_cli;
-
-	const char	*getAddr();
 };
 
 #endif
