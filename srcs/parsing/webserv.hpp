@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:28 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/03 12:18:14 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/04 14:21:21 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ public:
 	/*___ utils ___*/
 
 	void	check_conf_file(std::string file, webserv &srv);
+	void	add_server(server to_add);
 
 	/*___ exceptions ___*/
 

@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:20:04 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/03 15:11:48 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/04 13:29:05 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,13 @@ struct parsing
 {
 	parsing(void);
 
+	const t_parsing	&operator=(const t_parsing &rhs);
+
 	std::string	key;
 	std::string	value;
 	std::string	name;
 	bool		i;
+	size_t		next_val;
 };
-
 
 #endif

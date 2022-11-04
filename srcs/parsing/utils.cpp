@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:19:12 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/03 16:13:04 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/04 13:37:24 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +46,10 @@ t_parsing	get_next_value(std::string &value)
 	std::istringstream	f(value);
 	std::string			line;
 
-	while (trim(line, WHITESPACE).empty())
+	while (trim(line, WHITESPACE).empty() && ++ret.next_val)
 		std::getline(f, line);
 
+	ret.next_val += line.size() + 1;
 	if (line.find_first_of('{') == std::string::npos)
 	{
 		ret.key = trim(line.substr(0, line.find_first_of(' ')), WHITESPACE);
@@ -64,6 +65,7 @@ t_parsing	get_next_value(std::string &value)
 		ret.name = trim(line.substr(line.find_first_of(' '), line.find_first_of('{') - line.find_first_of(' ')), WHITESPACE);
 		while (std::getline(f, line) && !(!bracket && line.find_first_of('}') != std::string::npos))
 		{
+			ret.next_val += line.size() + 1;
 			if (line.find_first_of('{') != std::string::npos)
 				bracket++;
 			if (line.find_first_of('}') != std::string::npos)
@@ -74,4 +76,14 @@ t_parsing	get_next_value(std::string &value)
 	return (ret);
 }
 
-parsing::parsing(void) { i = true; }
+parsing::parsing(void) { i = true; next_val = 0; }
+
+const t_parsing	&t_parsing::operator=(const t_parsing &rhs)
+{
+	key = rhs.key;
+	value = rhs.value;
+	name = rhs.name;
+	i = rhs.i;
+	next_val = rhs.next_val;
+	return (*this);
+}

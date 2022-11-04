@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:09 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/03 16:20:25 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/04 14:31:42 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	webserv::check_conf_file(std::string file, webserv &srv)
 		throw (webserv::emptyConfFile());
 
 	t_parsing	main;
-	t_parsing	server;
+	t_parsing	serv;
 	t_parsing	location;
 
 	while (!main.key.empty() || main.i)
@@ -46,29 +46,47 @@ void	webserv::check_conf_file(std::string file, webserv &srv)
 		main = get_next_value(txt);
 		if (main.key == "server")
 		{
-			while (!server.key.empty() || server.i)
+			srv.add_server(server());
+			while (!serv.key.empty() || serv.i)
 			{
-				server.i = false;
-				server = get_next_value(main.value);
-				std::cout << "KEY : " << server.key << std::endl;
-				std::cout << "VAL : " << server.value << std::endl;
-				if (server.key == "location")
+				serv.i = false;
+				serv = get_next_value(main.value);
+				std::cout << "KEY : " << serv.key << std::endl;
+				std::cout << "VAL : " << serv.value << std::endl;
+				if (serv.key == "location")
 				{
+					srv._servers.back().add_directory(directory());
 					while (!location.key.empty() || location.i)
 					{
 						location.i = false;
-						location = get_next_value(server.value);
+						location = get_next_value(serv.value);
+						std::cout << "KEY : " << location.key << std::endl;
+						std::cout << "VAL : " << location.value << std::endl;
 						srv._servers.back().getDirectories().back().set(location.key, location.value);
+						if (serv.value.size() > location.next_val)
+							serv.value = serv.value.substr(location.next_val);
+						else
+							break;
 					}
 				}
 				else
-					srv._servers.back().set(server.key, server.value);
+					srv._servers.back().set(serv.key, serv.value);
+				if (main.value.size() > serv.next_val)
+					main.value = main.value.substr(serv.next_val);
+				else
+					break ;
 			}
 		}
+		if (txt.size() > main.value.size())
+			txt = txt.substr(main.next_val);
+		else
+			break;
 	}
 
 	std::cout << txt << std::endl;
 }
+
+void	webserv::add_server(server to_add) { _servers.push_back(to_add); }
 
 /*___ exceptions ___*/
 

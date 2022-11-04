@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 16:00:26 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/03 16:21:45 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/04 14:21:48 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,14 @@ class	directory;
 
 class server {
 private:
-	std::string								_name;
-	std::string								_root;
-	bool									_autoindex;
-	unsigned int							_port;
-	unsigned int							_body_size;
-	std::vector<directory>					_directories;
-	std::vector<std::string>				_methods;
-	std::map<unsigned int, std::string>	_error_pages;
+	std::string						_name;
+	std::string						_root;
+	bool							_autoindex;
+	size_t							_port;
+	size_t							_body_size;
+	std::vector<directory>			_directories;
+	std::vector<std::string>		_methods;
+	std::map<size_t, std::string>	_error_pages;
 
 public:
 
@@ -54,27 +54,29 @@ public:
 
 	void	setName(std::string &name);
 	void	setRoot(std::string &root);
-	void	setAutoindex(bool &autoindex);
-	void	setPort(unsigned int &port);
-	void	setBodySize(unsigned int &size);
+	void	setAutoindex(std::string &autoindex);
+	void	setPort(std::string &port);
+	void	setBodySize(std::string &size);
 	void	setDirectories(std::vector<directory> &directories);
-	void	setMethods(std::vector<std::string> &methods);
-	void	setErrorPages(std::map<unsigned int, std::string> &error_pages);
+	void	setMethods(std::string &methods);
+	void	setErrorPages(std::string &error_pages);
 
 	/*___ getters ___*/
 
-	std::string								getName(void) const;
-	std::string								getRoot(void) const;
-	bool									getAutoindex(void) const;
-	unsigned int							getPort(void) const;
-	unsigned int							getBodySize(void) const;
-	std::vector<directory>					getDirectories(void) const;
-	std::vector<std::string>				getMethods(void) const;
-	std::map<unsigned int, std::string>	getErrorPages(void) const;
+	std::string						getName(void) const;
+	std::string						getRoot(void) const;
+	bool							getAutoindex(void) const;
+	size_t							getPort(void) const;
+	size_t							getBodySize(void) const;
+	std::vector<directory>			getDirectories(void) const;
+	std::vector<std::string>		getMethods(void) const;
+	std::map<size_t, std::string>	getErrorPages(void) const;
 
 	/*___ utils ___*/
 
 	void	set(std::string &key, std::string &value);
+	void	add_directory(directory to_add);
+
 };
 
 ////////////////////
@@ -87,7 +89,7 @@ private:
 	std::string								_root;
 	std::string								_index;
 	std::vector<std::string>				_methods;
-	std::pair<unsigned int, std::string>	_http_redirect;
+	std::pair<size_t, std::string>			_http_redirect;
 	bool									_autoindex;
 
 public:
@@ -114,7 +116,7 @@ public:
 	std::string								getRoot(void) const;
 	std::string								getIndex(void) const;
 	std::vector<std::string>				getMethods(void) const;
-	std::pair<unsigned int, std::string>	getHttpRedirect(void) const;
+	std::pair<size_t, std::string>			getHttpRedirect(void) const;
 	bool									getAutoindex(void) const;
 
 	/*___ utils ___*/

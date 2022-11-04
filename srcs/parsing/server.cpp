@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 14:04:18 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/03 16:28:55 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/04 14:39:50 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 
 /*___ canonical form ___*/
 
-server::server(void) {}
+server::server(void) : _autoindex(false), _port(0), _body_size(0) {}
 
 server::server(const server &src) {}
 
@@ -39,43 +39,78 @@ server	&server::operator=(const server &src) {
 
 void	server::setName(std::string &name) { _name = name; }
 void	server::setRoot(std::string &root) { _root = root; }
-void	server::setAutoindex(bool &autoindex) { _autoindex = autoindex; }
-void	server::setPort(unsigned int &port) { _port = port; }
-void	server::setBodySize(unsigned int &size) { _body_size = size; }
+
+void	server::setAutoindex(std::string &autoindex)
+{
+	if (autoindex == "on")
+		_autoindex = true;
+	else if (autoindex == "off")
+		_autoindex = false;
+	else
+		throw (webserv::badConfFile());
+}
+
+void	server::setPort(std::string &port) { _port = atol(port.c_str()); }
+void	server::setBodySize(std::string &size) { _body_size = atol(size.c_str()); }
 void	server::setDirectories(std::vector<directory> &directories) { _directories = directories; }
-void	server::setMethods(std::vector<std::string> &methods) { _methods = methods; }
-void	server::setErrorPages(std::map<unsigned int, std::string> &error_pages) { _error_pages = error_pages; }
+
+void	server::setMethods(std::string &methods)
+{
+	std::istringstream	f(methods);
+	std::string			s;
+	while (getline(f, s, ' '))
+	{
+		if (s != "GET" && s != "POST" && s != "DELETE")
+			throw (webserv::badConfFile());
+		_methods.push_back(s);
+	}
+}
+
+void	server::setErrorPages(std::string &error_pages)
+{
+	std::istringstream	f(error_pages);
+	std::string			s;
+	std::string			url;
+	size_t				nb = 0;
+	if (getline(f, s, ' '))
+		nb = atol(s.c_str());
+	if (getline(f, s, ' '))
+		url = s;
+	_error_pages.insert(std::make_pair<size_t, std::string>(nb, url));
+}
 
 /*___ getters ___*/
 
-std::string							server::getName(void) const { return (_name); }
-std::string							server::getRoot(void) const { return (_root); }
-bool								server::getAutoindex(void) const { return (_autoindex); }
-unsigned int						server::getPort(void) const {return (_port); }
-unsigned int						server::getBodySize(void) const { return (_body_size); }
-std::vector<directory>				server::getDirectories(void) const { return (_directories); }
-std::vector<std::string>			server::getMethods(void) const { return (_methods); }
-std::map<unsigned int, std::string>	server::getErrorPages(void) const { return (_error_pages); }
+std::string						server::getName(void) const { return (_name); }
+std::string						server::getRoot(void) const { return (_root); }
+bool							server::getAutoindex(void) const { return (_autoindex); }
+size_t							server::getPort(void) const {return (_port); }
+size_t							server::getBodySize(void) const { return (_body_size); }
+std::vector<directory>			server::getDirectories(void) const { return (_directories); }
+std::vector<std::string>		server::getMethods(void) const { return (_methods); }
+std::map<size_t, std::string>	server::getErrorPages(void) const { return (_error_pages); }
 
 /*___ utils ___*/
 
 void	server::set(std::string &key, std::string &value)
 {
 	if (key == "server_name")
-		this->setName(value);
+		setName(value);
 	else if (key == "root")
-		this->setRoot(value);
+		setRoot(value);
 	else if (key == "autoindex")
-		this->setAutoindex(value);
+		setAutoindex(value);
 	else if (key == "listen")
-		this->setPort(value);
+		setPort(value);
 	else if (key == "body_size")
-		this->setBodySize(value);
+		setBodySize(value);
 	else if (key == "method")
-		this->setMethods(value);
-	else if (key == error_page)
-		this->setErrorPages(value);
+		setMethods(value);
+	else if (key == "error_page")
+		setErrorPages(value);
 }
+
+void	server::add_directory(directory to_add) { _directories.push_back(to_add); }
 
 ////////////////////
 ///  DIRECTORY   ///
@@ -107,7 +142,7 @@ void	directory::setMethods(std::string &methods)
 	{
 		if (s != "GET" && s != "POST" && s != "DELETE")
 			throw (webserv::badConfFile());
-		this->_methods.push_back(s);
+		_methods.push_back(s);
 	}
 }
 
@@ -116,54 +151,48 @@ void	directory::setHttpRedirect(std::string &redirects)
 	std::istringstream	f(redirects);
 	std::string			s;
 	std::string			url;
-	unsigned int		val = 0;
+	size_t				val = 0;
 	if (getline(f, s, ' '))
-	{
-		std::istringstream	fval(s);
-		fval >> val;
-	}
-	else
-		throw (webserv::badConfFile());
+		val = atol(s.c_str());
 	if (getline(f, s, ' '))
 		url = s;
-	else
-		throw (webserv::badConfFile());
-	this->_http_redirect = std::make_pair<unsigned int, std::string>(val, url);
+	_http_redirect = std::make_pair<size_t, std::string>(val, url);
 }
 void	directory::setAutoindex(std::string &autoindex)
 {
 	if (autoindex == "on")
-		this->_autoindex = true;
+		_autoindex = true;
 	else if (autoindex == "off")
-		this->_autoindex = false;
+		_autoindex = false;
 	else
 		throw (webserv::badConfFile());
 }
 
 /*___ getters ___*/
 
-std::string								directory::getName(void) const { return (_name); }
-std::string								directory::getRoot(void) const { return (_root); }
-std::string								directory::getIndex(void) const { return (_index); }
-std::vector<std::string>				directory::getMethods(void) const { return (_methods); }
-std::pair<unsigned int, std::string>	directory::getHttpRedirect(void) const { return (_http_redirect); }
-bool									directory::getAutoindex(void) const { return (_autoindex); }
+std::string						directory::getName(void) const { return (_name); }
+std::string						directory::getRoot(void) const { return (_root); }
+std::string						directory::getIndex(void) const { return (_index); }
+std::vector<std::string>		directory::getMethods(void) const { return (_methods); }
+std::pair<size_t, std::string>	directory::getHttpRedirect(void) const { return (_http_redirect); }
+bool							directory::getAutoindex(void) const { return (_autoindex); }
 
 /*___ utils ___*/
 
 void	directory::set(std::string &key, std::string &value)
 {
 	if (key == "server_name")
-		this->setName(value);
+		setName(value);
 	else if (key == "root")
-		this->setRoot(value);
+		setRoot(value);
 	else if (key == "index")
-		this->setIndex(value);
+		setIndex(value);
 	else if (key == "methods")
-		setMethods(value);		//faire un constructor methods(std::string)
+		setMethods(value);
 	else if (key == "redirect")
 		setHttpRedirect(value);		//faire un splitter dans setHttpRedirect
 	else if (key == "autoindex")
 		setAutoindex(value);
+	else
+		throw (webserv::badConfFile());
 }
-
