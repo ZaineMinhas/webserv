@@ -1,24 +1,91 @@
+@font-face {
+    font-family: 'ostrich_sansbold';
+    src: url('../fonts/Ostrich_Sans/ostrichsans-bold-webfont.woff2') format('woff2'),
+         url('../fonts/Ostrich_Sans/ostrichsans-bold-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
 body
 {
 	text-align: center;
-	background-image: url("../images/bc4.gif");
 	background-size: cover;
+	font-family: ostrich_sansbold;
+	object-fit: cover;
+}
+
+body img {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: -1;
+	height: 100vh;
+	object-fit: cover;
+	overflow: hidden;
 }
 
 h1
 {
+	font-weight: normal;
 	font-size: 5em;
 	color: white;
-	text-shadow:	4px 4px red,
-					8px 8px orange,
-					12px 12px yellow,
-					16px 16px green,
-					20px 20px cyan,
-					24px 24px blue,
-					28px 28px purple;
+	text-shadow:	2px 2px magenta,
+					4px 4px orange,
+					6px 6px yellow,
+					8px 8px green,
+					10px 10px cyan;
+	animation: 4s example infinite;
 }
 
 p
 {
 	font-size: 7em;
+	transition: 1s;
+}
+
+a
+{
+	text-shadow:	2px 2px red,
+					6px 6px blue;
+}
+
+.aliens
+{
+	text-decoration: none;
+		text-decoration-line: none;
+
+}
+
+ a {
+	text-decoration: none;
+
+}
+
+p:hover {
+	scale: 1.6;
+	animation: 1s rot infinite;
+	animation-delay: 1;
+}
+
+@keyframes rot {
+	0% {
+		transform: rotate(0);
+	}
+	50% {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes example {
+	0% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(calc(100vh - 180px));
+	}
+	100% {
+		transform: translateY(0);
+	}
 }
