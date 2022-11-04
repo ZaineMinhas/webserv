@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:23:06 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/02 13:47:33 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/04 13:46:03 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,19 +15,14 @@
 
 #include "socket.hpp"
 
-#include <poll.h>
-
 #include <vector>
 
-class server {
-private:
-	tcpSocket			_srv_sock;
-	std::vector<client>	_cli_socks;
-	pollfd				poll_srv;
+struct server {
+	srvSocket				_srv_sock;
+	std::vector<client>		_cli_socks;
+
+	void	initServer(int port);
 	
-public:
-	server();
-	~server();
 };
 
 #endif
