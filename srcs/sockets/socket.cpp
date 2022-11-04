@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:06:34 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/03 17:27:06 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/03 18:52:19 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@ tcpSocket::tcpSocket(bool client, int domain, int port)
 	}
 	else
 		this->_addrlen = sizeof(this->_addr);
+	if (fcntl(this->_socket, F_SETFL, O_NONBLOCK) == -1)
+		throw (tcpSocket::fcntlError());
 }
 
 tcpSocket::~tcpSocket() {}
@@ -106,6 +108,7 @@ const char	*tcpSocket::initError::what() const throw() { return ("socket: error:
 const char	*tcpSocket::bindError::what() const throw() { return ("socket: error: bind"); }
 const char	*tcpSocket::recvError::what() const throw() { return ("socket: error: recv"); }
 const char	*tcpSocket::sendError::what() const throw() { return ("socket: error: send"); }
+const char	*tcpSocket::fcntlError::what() const throw() { return ("socket: error: fcntl"); }
 const char	*tcpSocket::listenError::what() const throw() { return ("socket: error: listen"); }
 const char	*tcpSocket::acceptError::what() const throw() { return ("socket: error: accept"); }
 const char	*tcpSocket::connectError::what() const throw() { return ("socket: error: connect"); }

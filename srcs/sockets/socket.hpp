@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:02:19 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/03 17:50:31 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/03 18:53:03 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
 
 #include <iostream>
 
@@ -43,13 +44,14 @@ struct tcpSocket {
 
 	const char	*getAddr();
 
-	struct initError : public std::exception { virtual const char	*what() const throw(); };
-	struct bindError : public std::exception { virtual const char	*what() const throw(); };
-	struct recvError : public std::exception { virtual const char	*what() const throw(); };
-	struct sendError : public std::exception { virtual const char	*what() const throw(); };
-	struct listenError : public std::exception { virtual const char	*what() const throw(); };
-	struct acceptError : public std::exception { virtual const char	*what() const throw(); };
-	struct connectError : public std::exception { virtual const char	*what() const throw(); };
+	struct initError : public std::exception { virtual const char *what() const throw(); };
+	struct bindError : public std::exception { virtual const char *what() const throw(); };
+	struct recvError : public std::exception { virtual const char *what() const throw(); };
+	struct sendError : public std::exception { virtual const char *what() const throw(); };
+	struct fcntlError : public std::exception { virtual const char *what() const throw(); };
+	struct listenError : public std::exception { virtual const char *what() const throw(); };
+	struct acceptError : public std::exception { virtual const char *what() const throw(); };
+	struct connectError : public std::exception { virtual const char *what() const throw(); };
 
 };
 
