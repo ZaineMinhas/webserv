@@ -40,7 +40,7 @@
 
 body
 {
-	background-image: url("../images/bc3.gif");
+	background-image: url(../images/star1.gif);
 	text-align: center;
 	font-family: ostrich_sansbold;
 }
@@ -61,7 +61,7 @@ p
 
 .credit
 {
-	background-image: url("../images/bc4.gif");
+	background-image: url("../images/star2.gif");
 	position: absolute;
 	bottom: -2vh;
 	right: 1vw;
@@ -76,15 +76,3 @@ p
 	font-size: 3px;
 	position: absolute;
 }
-
-/*.credit
-{
-	position: absolute;
-	top: 30vh;
-	right: 10vw;
-	z-index: 1;
-	background-color: var(--surface);
-	padding: 2px 4px;
-	border-radius: 5px;
-	box-shadow: var(--box_shadow);
-}*/

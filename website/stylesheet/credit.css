@@ -9,19 +9,19 @@
 
 body
 {
+	font-family: ostrich_sansbold;
 	border: 0;
 	padding: 0;
 	box-sizing: border-box;
 	text-align: center;
 	background-size: cover;
-	font-family: ostrich_sansbold;
 	object-fit: cover;
-	display: flex;
 	flex-direction: column;
 	align-items: center;
 }
 
-body img {
+body img
+{
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -42,7 +42,7 @@ h1
 					6px 6px yellow,
 					8px 8px green,
 					10px 10px cyan;
-	animation: 4s example infinite;
+	animation: 4s up_down infinite;
 }
 
 p
@@ -51,27 +51,16 @@ p
 	transition: 1s;
 }
 
+p:hover
+{
+	scale: 1.6;
+}
+
 a
 {
+	text-decoration: none;
 	text-shadow:	2px 2px red,
 					6px 6px blue;
-}
-
-.aliens
-{
-	text-decoration: none;
-		text-decoration-line: none;
-
-}
-
- a {
-	text-decoration: none;
-
-}
-
-p:hover {
-	scale: 1.6;
-	animation: 5s rot infinite;
 }
 
 @keyframes rot {
@@ -86,7 +75,7 @@ p:hover {
 	}
 }
 
-@keyframes example {
+@keyframes up_down {
 	0% {
 		transform: translateY(0);
 	}
