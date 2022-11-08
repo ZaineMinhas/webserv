@@ -38,41 +38,69 @@
 	font-style: normal;
 }
 
-body
-{
+body {
 	background-image: url(../images/star1.gif);
 	text-align: center;
 	font-family: ostrich_sansbold;
 }
 
-h1
-{
+h1 {
 	color:rgb(252, 223, 1);
 	font-weight: normal;
 	font-size: 8em;
 	text-shadow: 1px 1px 1px black;
 }
 
-p
-{
+p {
 	color: white;
 	font-size: 3em;
 }
 
-.credit
-{
-	background-image: url("../images/star2.gif");
+.credit {
+	background-image: url("../images/star3.gif");
+	text-decoration: none;
+	text-shadow: 2px 2px 5px red;
 	position: absolute;
-	bottom: -2vh;
-	right: 1vw;
+	bottom: 0.5vh;
+	right: 0.5vw;
 	box-shadow: 0px 0px 5px 2px purple, -0px -0px 5px 2px purple;
 	border-radius: 10px / 10px;
-	font-size: 2.5em;
+	font-size: 1em;
 }
 
+.credit:hover {
+	animation: 2s neon infinite;
+}
 
-.mangue
-{
+.mangue {
 	font-size: 3px;
 	position: absolute;
+	left: 1vw;
+}
+
+@keyframes neon {
+	0% {
+		text-shadow: 2px 2px 5px cyan;
+	}
+	69% {
+		text-shadow: 2px 2px 5px cyan;
+	}
+	70% {
+		text-shadow: 2px 2px 5px red;
+	}
+	75% {
+		text-shadow: 2px 2px 5px cyan;
+	}
+	76% {
+		text-shadow: 2px 2px 5px red;
+	}
+	80% {
+		text-shadow: 2px 2px 5px cyan;
+	}
+	95% {
+		text-shadow: 2px 2px 5px red;
+	}
+	100% {
+		text-shadow: 2px 2px 5px cyan;
+	}
 }

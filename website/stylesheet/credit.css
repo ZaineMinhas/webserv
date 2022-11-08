@@ -7,8 +7,7 @@
 
 }
 
-body
-{
+body {
 	font-family: ostrich_sansbold;
 	border: 0;
 	padding: 0;
@@ -20,8 +19,7 @@ body
 	align-items: center;
 }
 
-body img
-{
+body img {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -32,8 +30,7 @@ body img
 	overflow: hidden;
 }
 
-h1
-{
+h1 {
 	font-weight: normal;
 	font-size: 5em;
 	color: white;
@@ -45,19 +42,16 @@ h1
 	animation: 4s up_down infinite;
 }
 
-p
-{
+p {
 	font-size: 7em;
 	transition: 1s;
 }
 
-p:hover
-{
+p:hover {
 	scale: 1.6;
 }
 
-a
-{
+a {
 	text-decoration: none;
 	text-shadow:	2px 2px red,
 					6px 6px blue;
