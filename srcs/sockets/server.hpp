@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:23:06 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/04 13:46:03 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/09 21:30:19 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +15,23 @@
 
 #include "socket.hpp"
 
+#include <string.h>
+
 #include <vector>
 
 struct server {
-	srvSocket				_srv_sock;
-	std::vector<client>		_cli_socks;
+	std::vector<srvSocket>		_servers;
+	std::vector<client>			_clients;
+	fd_set						_cli_set;
+	fd_set						_srv_set;
+	timeval						_timeout;
 
-	void	initServer(int port);
+	void	init_server(std::vector<size_t>	ports);
 	
+	void	handle_client();
+
+	struct selectError : public std::exception { virtual const char *what() const throw(); };
+	struct acceptError : public std::exception { virtual const char *what() const throw(); };
 };
 
 #endif

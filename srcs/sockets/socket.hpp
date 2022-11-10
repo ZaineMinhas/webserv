@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:02:19 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/04 14:46:01 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/09 21:14:52 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,11 @@ struct srvSocket {
 	sockaddr_in	_addr;
 	socklen_t	_addrlen;
 
-	void	initSocket(int port);
-	void	bindSocket();
-	void	listenSocket();
-	void	closeSocket();
-
+	srvSocket(int port);
+	~srvSocket();
+	
 	struct initError : public std::exception { virtual const char *what() const throw(); };
+	struct fcntlError : public std::exception { virtual const char *what() const throw(); };
 	struct bindError : public std::exception { virtual const char *what() const throw(); };
 	struct listenError : public std::exception { virtual const char *what() const throw(); };
 
@@ -41,7 +40,8 @@ struct srvSocket {
 struct client {
 	int			_cli;
 	sockaddr_in	_from;
-	
+	socklen_t	_fromlen;
 };
+
 
 #endif
