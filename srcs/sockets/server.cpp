@@ -14,40 +14,40 @@
 
 void	server::init_server(std::vector<size_t> ports)
 {
+	FD_ZERO(&this->_srv_set);
 	for (std::vector<size_t>::iterator it = ports.begin(); it != ports.end(); it++)
 	{
-		srvSocket	server(*it);
+		try {
+
+		}
+		server.init_srvSocket(*it);
+		FD_SET(server._socket, &this->_srv_set);
 		this->_servers.push_back(server);
 	}
 
 	std::cout << " WEBSERV START " << std::endl;
 }
-
+#include <cerrno>
 void	server::handle_client()
 {
-	FD_ZERO(&this->_srv_set);
-	for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
-		FD_SET(it->_socket, &this->_srv_set);
-
-	this->_timeout = {0};
-	int select_socket = this->_servers.at(this->_servers.size() - 1)._socket;
+	this->_timeout.tv_sec = 3 * 60;
+	this->_timeout.tv_usec = 0;
+	int select_socket = this->_servers.back()._socket;
 
 	while (1)
 	{
-		std::cout << "coucou" << std::endl;
 		this->_cli_set = this->_srv_set;
-		if (select(select_socket + 1, &this->_cli_set, NULL, NULL, &this->_timeout) < 0)
+		if (select(select_socket + 1, &this->_cli_set, NULL, NULL, &this->_timeout) == -1)
 			throw (server::selectError());
-
 
 		for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
 		{
+			std::cout << it->_socket << std::endl;
 			if (FD_ISSET(it->_socket, &this->_srv_set))
 			{
 				client	cli;
-				cli._fromlen = sizeof(cli._from);
-				if ((cli._cli = accept(it->_socket, (sockaddr *)&(cli._from), &(cli._fromlen))) < 0)
-					throw (server::acceptError());
+				if (!cli.init_client(it->_socket))
+					throw (server::clientError());
 				FD_SET(cli._cli, &this->_cli_set);
 				this->_clients.push_back(cli);
 				if (select_socket < cli._cli)
@@ -56,16 +56,18 @@ void	server::handle_client()
 		}
 		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 		{
+			std::cout << it->_cli << std::endl;
 			if (FD_ISSET(it->_cli, &this->_cli_set))
 			{
-				char	buffer[200] = {0};
+				std::cout << "coucou" << std::endl;
+				char	buffer[200];
+				memset(buffer, 0, 199);
 				while (recv(it->_cli, buffer, 199, 0) > 0)
 					std::cout << buffer;
-				std::cout << std::endl;
 			}
 		}
 	}
 }
 
-const char	*server::selectError::what() const throw() { return ("socket: error: select"); }
-const char	*server::acceptError::what() const throw() { return ("socket: error: accept"); }
+const char	*server::selectError::what() const throw() { return ("server: error: select"); }
+const char	*server::clientError::what() const throw() { return ("server: error: init client"); }
