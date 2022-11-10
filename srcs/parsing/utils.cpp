@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:19:12 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/04 13:37:24 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/10 13:59:03 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,16 +60,18 @@ t_parsing	get_next_value(std::string &value)
 	}
 	else
 	{
-		int	bracket = 0;
+		int	bracket = 1;
 		ret.key = trim(line.substr(0, line.find_first_of(' ')), WHITESPACE);
 		ret.name = trim(line.substr(line.find_first_of(' '), line.find_first_of('{') - line.find_first_of(' ')), WHITESPACE);
-		while (std::getline(f, line) && !(!bracket && line.find_first_of('}') != std::string::npos))
+		while (std::getline(f, line))
 		{
 			ret.next_val += line.size() + 1;
 			if (line.find_first_of('{') != std::string::npos)
 				bracket++;
 			if (line.find_first_of('}') != std::string::npos)
 				bracket--;
+			if (!bracket)
+				break ;
 			ret.value += line + "\n";
 		}
 	}

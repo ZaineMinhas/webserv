@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:09 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/04 14:31:42 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/10 15:00:50 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,8 @@ void	webserv::check_conf_file(std::string file, webserv &srv)
 	{
 		main.i = false;
 		main = get_next_value(txt);
+		std::cout << "KEY : " << main.key << std::endl;
+		std::cout << "VAL : " << main.value << std::endl;
 		if (main.key == "server")
 		{
 			srv.add_server(server());
@@ -52,6 +54,7 @@ void	webserv::check_conf_file(std::string file, webserv &srv)
 				serv.i = false;
 				serv = get_next_value(main.value);
 				std::cout << "KEY : " << serv.key << std::endl;
+				std::cout << "NAME : " << serv.name << std::endl;
 				std::cout << "VAL : " << serv.value << std::endl;
 				if (serv.key == "location")
 				{
@@ -65,35 +68,44 @@ void	webserv::check_conf_file(std::string file, webserv &srv)
 						srv._servers.back().getDirectories().back().set(location.key, location.value);
 						if (serv.value.size() > location.next_val)
 							serv.value = serv.value.substr(location.next_val);
-						else
-							break;
+						else {
+							srv._servers.back().getDirectories().back().checkValues();
+							break ;
+						}
 					}
 				}
 				else
 					srv._servers.back().set(serv.key, serv.value);
 				if (main.value.size() > serv.next_val)
 					main.value = main.value.substr(serv.next_val);
-				else
+				else {
+					srv._servers.back().checkValues();
 					break ;
+				}
 			}
 		}
-		if (txt.size() > main.value.size())
+		try {
 			txt = txt.substr(main.next_val);
-		else
-			break;
+		}
+		catch (std::exception &e) {
+			break ;
+		}
 	}
-
-	std::cout << txt << std::endl;
 }
 
-void	webserv::add_server(server to_add) { _servers.push_back(to_add); }
+void	webserv::add_server(server to_add) { this->_servers.push_back(to_add); }
+
+void	webserv::stack_ports(void)
+{
+	for (std::vector<server>::iterator it = _servers.begin(); it != _servers.end(); it++)
+		_ports.push_back(it->getListen().second);
+	for (std::vector<size_t>::iterator it = _ports.begin(); it != _ports.end(); it++)
+		std::cout << *it << std::endl;
+}
 
 /*___ exceptions ___*/
 
 const char	*webserv::badConfFile::what() const throw() { return ("Bad configuration file."); }
-
 const char	*webserv::emptyConfFile::what() const throw() { return ("Empty configuration file."); }
-
 const char	*webserv::badFileName::what() const throw() { return ("Put a correct file name!"); }
-
 const char	*webserv::badInitialization::what() const throw() { return ("Erro occuring when initialize our webserv."); }

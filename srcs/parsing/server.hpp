@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 16:00:26 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/04 14:21:48 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/10 11:44:54 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ class server {
 private:
 	std::string						_name;
 	std::string						_root;
+	std::pair<std::string, size_t>	_listen;
 	bool							_autoindex;
-	size_t							_port;
 	size_t							_body_size;
 	std::vector<directory>			_directories;
 	std::vector<std::string>		_methods;
@@ -55,7 +55,7 @@ public:
 	void	setName(std::string &name);
 	void	setRoot(std::string &root);
 	void	setAutoindex(std::string &autoindex);
-	void	setPort(std::string &port);
+	void	setListen(std::string &listen);
 	void	setBodySize(std::string &size);
 	void	setDirectories(std::vector<directory> &directories);
 	void	setMethods(std::string &methods);
@@ -65,8 +65,8 @@ public:
 
 	std::string						getName(void) const;
 	std::string						getRoot(void) const;
+	std::pair<std::string, size_t>	getListen(void) const;
 	bool							getAutoindex(void) const;
-	size_t							getPort(void) const;
 	size_t							getBodySize(void) const;
 	std::vector<directory>			getDirectories(void) const;
 	std::vector<std::string>		getMethods(void) const;
@@ -76,6 +76,7 @@ public:
 
 	void	set(std::string &key, std::string &value);
 	void	add_directory(directory to_add);
+	void	checkValues(void);
 
 };
 
@@ -122,6 +123,7 @@ public:
 	/*___ utils ___*/
 
 	void	set(std::string &key, std::string &value);
+	void	checkValues(void);
 };
 
 #endif

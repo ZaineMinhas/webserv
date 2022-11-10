@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:28 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/04 14:21:21 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/10 12:05:06 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 class webserv {
 private:
 	std::vector<server>			_servers;
+	std::vector<size_t>			_ports;
 
 public:
 
@@ -37,28 +38,14 @@ public:
 
 	void	check_conf_file(std::string file, webserv &srv);
 	void	add_server(server to_add);
+	void	stack_ports(void);
 
 	/*___ exceptions ___*/
 
-	class	badConfFile : public std::exception {
-	public:
-		virtual const char	*what() const throw();
-	};
-
-	class	emptyConfFile : public std::exception {
-	public:
-		virtual const char	*what() const throw();
-	};
-
-	class	badFileName : public std::exception {
-	public:
-		virtual const char	*what() const throw();
-	};
-
-	class	badInitialization : public std::exception {
-	public:
-		virtual const char	*what() const throw();
-	};
+	struct	badConfFile : public std::exception { virtual const char	*what() const throw(); };
+	struct	emptyConfFile : public std::exception { virtual const char	*what() const throw(); };
+	struct	badFileName : public std::exception { virtual const char	*what() const throw(); };
+	struct	badInitialization : public std::exception { virtual const char	*what() const throw(); };
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 14:04:18 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/04 14:39:50 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/10 14:59:20 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,21 @@
 
 /*___ canonical form ___*/
 
-server::server(void) : _autoindex(false), _port(0), _body_size(0) {}
+server::server(void) : _autoindex(false), _body_size(0) {}
 
-server::server(const server &src) {}
+server::server(const server &src) { *this = src; }
 
 server::~server(void) {}
 
 server	&server::operator=(const server &src) {
+	_name = src._name;
+	_root = src._root;
+	_listen = src._listen;
+	_autoindex = src._autoindex;
+	_body_size = src._body_size;
+	_directories = src._directories;
+	_methods = src._methods;
+	_error_pages = src._error_pages;
 	return (*this);
 }
 
@@ -50,7 +58,19 @@ void	server::setAutoindex(std::string &autoindex)
 		throw (webserv::badConfFile());
 }
 
-void	server::setPort(std::string &port) { _port = atol(port.c_str()); }
+void	server::setListen(std::string &listen)
+{
+	std::istringstream	f(listen);
+	std::string			s;
+	while (getline(f, s, ':'))
+	{
+		if (s.find('.') != std::string::npos)
+			_listen.first = s;
+		else
+			_listen.second = atol(s.c_str());
+	}
+}
+
 void	server::setBodySize(std::string &size) { _body_size = atol(size.c_str()); }
 void	server::setDirectories(std::vector<directory> &directories) { _directories = directories; }
 
@@ -83,8 +103,8 @@ void	server::setErrorPages(std::string &error_pages)
 
 std::string						server::getName(void) const { return (_name); }
 std::string						server::getRoot(void) const { return (_root); }
+std::pair<std::string, size_t>	server::getListen(void) const {return (_listen); }
 bool							server::getAutoindex(void) const { return (_autoindex); }
-size_t							server::getPort(void) const {return (_port); }
 size_t							server::getBodySize(void) const { return (_body_size); }
 std::vector<directory>			server::getDirectories(void) const { return (_directories); }
 std::vector<std::string>		server::getMethods(void) const { return (_methods); }
@@ -101,16 +121,26 @@ void	server::set(std::string &key, std::string &value)
 	else if (key == "autoindex")
 		setAutoindex(value);
 	else if (key == "listen")
-		setPort(value);
+		setListen(value);
 	else if (key == "body_size")
 		setBodySize(value);
 	else if (key == "method")
 		setMethods(value);
 	else if (key == "error_page")
 		setErrorPages(value);
+	else
+		throw (webserv::badConfFile());
 }
 
 void	server::add_directory(directory to_add) { _directories.push_back(to_add); }
+
+void	server::checkValues(void) {
+	if (this->_name.empty())
+		this->_name.assign("localhost");
+	if (this->_listen.first.empty())
+		this->_listen.first.assign("0.0.0.0:80");
+
+}
 
 ////////////////////
 ///  DIRECTORY   ///
@@ -187,12 +217,16 @@ void	directory::set(std::string &key, std::string &value)
 		setRoot(value);
 	else if (key == "index")
 		setIndex(value);
-	else if (key == "methods")
+	else if (key == "method")
 		setMethods(value);
 	else if (key == "redirect")
-		setHttpRedirect(value);		//faire un splitter dans setHttpRedirect
+		setHttpRedirect(value);
 	else if (key == "autoindex")
 		setAutoindex(value);
 	else
 		throw (webserv::badConfFile());
+}
+
+void	directory::checkValues(void) {
+	return ;
 }
