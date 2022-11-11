@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 16:00:26 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/10 11:44:54 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/10 17:42:27 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ public:
 	/*___ utils ___*/
 
 	void	set(std::string &key, std::string &value);
-	void	add_directory(directory to_add);
+	void	add_directory(directory to_add, std::string &name);
 	void	checkValues(void);
 
 };

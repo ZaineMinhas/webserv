@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:19:12 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/10 13:59:03 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/11 12:52:29 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,10 +53,8 @@ t_parsing	get_next_value(std::string &value)
 	if (line.find_first_of('{') == std::string::npos)
 	{
 		ret.key = trim(line.substr(0, line.find_first_of(' ')), WHITESPACE);
-		// std::cout << "key : " << ret.key << std::endl;
 		if (line.find_first_of(' ') != std::string::npos)
 			ret.value = trim(line.substr(line.find_first_of(' ')), WHITESPACE);
-		// std::cout << "value : " << ret.value << std::endl;
 	}
 	else
 	{

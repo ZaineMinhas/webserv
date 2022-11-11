@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:09 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/10 15:00:50 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/11 13:11:05 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,6 @@ void	webserv::check_conf_file(std::string file, webserv &srv)
 	{
 		main.i = false;
 		main = get_next_value(txt);
-		std::cout << "KEY : " << main.key << std::endl;
-		std::cout << "VAL : " << main.value << std::endl;
 		if (main.key == "server")
 		{
 			srv.add_server(server());
@@ -53,18 +51,13 @@ void	webserv::check_conf_file(std::string file, webserv &srv)
 			{
 				serv.i = false;
 				serv = get_next_value(main.value);
-				std::cout << "KEY : " << serv.key << std::endl;
-				std::cout << "NAME : " << serv.name << std::endl;
-				std::cout << "VAL : " << serv.value << std::endl;
 				if (serv.key == "location")
 				{
-					srv._servers.back().add_directory(directory());
+					srv._servers.back().add_directory(directory(), serv.name);
 					while (!location.key.empty() || location.i)
 					{
 						location.i = false;
 						location = get_next_value(serv.value);
-						std::cout << "KEY : " << location.key << std::endl;
-						std::cout << "VAL : " << location.value << std::endl;
 						srv._servers.back().getDirectories().back().set(location.key, location.value);
 						if (serv.value.size() > location.next_val)
 							serv.value = serv.value.substr(location.next_val);
@@ -84,10 +77,14 @@ void	webserv::check_conf_file(std::string file, webserv &srv)
 				}
 			}
 		}
+		else
+			throw (webserv::badConfFile(std::string("bad block name: ") + main.key));
 		try {
 			txt = txt.substr(main.next_val);
 		}
 		catch (std::exception &e) {
+			check_double();
+			stack_ports();
 			break ;
 		}
 	}
@@ -99,13 +96,24 @@ void	webserv::stack_ports(void)
 {
 	for (std::vector<server>::iterator it = _servers.begin(); it != _servers.end(); it++)
 		_ports.push_back(it->getListen().second);
-	for (std::vector<size_t>::iterator it = _ports.begin(); it != _ports.end(); it++)
-		std::cout << *it << std::endl;
+}
+
+void	webserv::check_double(void)
+{
+	for (std::vector<server>::iterator it = _servers.begin(); it != _servers.end() - 1; it++)
+	{
+		std::vector<server>::iterator it2 = it + 1;
+		for (; it2 != _servers.end(); it2++) {
+			if (it->getListen().second == it2->getListen().second && it->getName() == it2->getName()) {
+				it2--;
+				_servers.erase(it2 + 1);
+			}
+		}
+	}
 }
 
 /*___ exceptions ___*/
 
-const char	*webserv::badConfFile::what() const throw() { return ("Bad configuration file."); }
 const char	*webserv::emptyConfFile::what() const throw() { return ("Empty configuration file."); }
 const char	*webserv::badFileName::what() const throw() { return ("Put a correct file name!"); }
 const char	*webserv::badInitialization::what() const throw() { return ("Erro occuring when initialize our webserv."); }

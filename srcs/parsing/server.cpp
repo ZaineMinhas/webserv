@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 14:04:18 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/10 14:59:20 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/11 12:20:04 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void	server::setAutoindex(std::string &autoindex)
 	else if (autoindex == "off")
 		_autoindex = false;
 	else
-		throw (webserv::badConfFile());
+		throw (webserv::badConfFile("autoindex"));
 }
 
 void	server::setListen(std::string &listen)
@@ -81,7 +81,7 @@ void	server::setMethods(std::string &methods)
 	while (getline(f, s, ' '))
 	{
 		if (s != "GET" && s != "POST" && s != "DELETE")
-			throw (webserv::badConfFile());
+			throw (webserv::badConfFile("methods"));
 		_methods.push_back(s);
 	}
 }
@@ -129,17 +129,21 @@ void	server::set(std::string &key, std::string &value)
 	else if (key == "error_page")
 		setErrorPages(value);
 	else
-		throw (webserv::badConfFile());
+		throw (webserv::badConfFile(std::string("bad key: ") + key));
 }
 
-void	server::add_directory(directory to_add) { _directories.push_back(to_add); }
+void	server::add_directory(directory to_add, std::string &name) {
+	_directories.push_back(to_add);
+	_directories.back().setName(name);
+}
 
 void	server::checkValues(void) {
 	if (this->_name.empty())
 		this->_name.assign("localhost");
 	if (this->_listen.first.empty())
-		this->_listen.first.assign("0.0.0.0:80");
-
+		this->_listen.first.assign("127.0.0.1");
+	if (!this->_listen.second)
+		this->_listen.second = 8080;
 }
 
 ////////////////////
@@ -150,7 +154,15 @@ void	server::checkValues(void) {
 
 directory::directory(void) {}
 
-directory::directory(const directory &src) {}
+directory::directory(const directory &src)
+{
+	_name = src._name;
+	_root = src._root;
+	_index = src._index;
+	_methods = src._methods;
+	_http_redirect = src._http_redirect;
+	_autoindex = src._autoindex;
+}
 
 directory::~directory(void) {}
 
@@ -171,7 +183,7 @@ void	directory::setMethods(std::string &methods)
 	while (getline(f, s, ' '))
 	{
 		if (s != "GET" && s != "POST" && s != "DELETE")
-			throw (webserv::badConfFile());
+			throw (webserv::badConfFile("methods"));
 		_methods.push_back(s);
 	}
 }
@@ -195,7 +207,7 @@ void	directory::setAutoindex(std::string &autoindex)
 	else if (autoindex == "off")
 		_autoindex = false;
 	else
-		throw (webserv::badConfFile());
+		throw (webserv::badConfFile("autoindex"));
 }
 
 /*___ getters ___*/
@@ -224,9 +236,10 @@ void	directory::set(std::string &key, std::string &value)
 	else if (key == "autoindex")
 		setAutoindex(value);
 	else
-		throw (webserv::badConfFile());
+		throw (webserv::badConfFile(std::string("bad key: ") + key));
 }
 
 void	directory::checkValues(void) {
-	return ;
+	if (_name.empty())
+		throw (webserv::badConfFile("location name"));
 }
