@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:20:04 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/02 13:35:40 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/04 13:29:05 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,23 @@
 
 # include "server.hpp"
 
-std::string	file_to_string(std::string file);
-std::string	trim(std::string &txt, std::string to_trim);
+typedef struct	parsing t_parsing;
+
+std::string			file_to_string(std::string file);
+std::string	trim(const std::string &txt, std::string to_trim);
+t_parsing			get_next_value(std::string &value);
+
+struct parsing
+{
+	parsing(void);
+
+	const t_parsing	&operator=(const t_parsing &rhs);
+
+	std::string	key;
+	std::string	value;
+	std::string	name;
+	bool		i;
+	size_t		next_val;
+};
 
 #endif
