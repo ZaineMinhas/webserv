@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:02:19 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/14 14:22:30 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/14 18:25:36 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,11 @@ struct srvSocket {
 	
 	srvSocket	&operator=(const srvSocket &srv);
 
-	void	close_srvSocket();
+	void	close_srvSocket(fd_set *set);
 	
 	struct initError : public std::exception { virtual const char *what() const throw(); };
 	struct fcntlError : public std::exception { virtual const char *what() const throw(); };
+	struct optError : public std::exception { virtual const char *what() const throw(); };
 	struct bindError : public std::exception { virtual const char *what() const throw(); };
 	struct listenError : public std::exception { virtual const char *what() const throw(); };
 
@@ -53,11 +54,11 @@ struct client {
 
 	client	&operator=(const client &cli);
 
-	void	close_client();
+	void	close_client(fd_set *set);
 
 	struct initError : public std::exception { virtual const char *what() const throw(); };
 	struct fcntlError : public std::exception { virtual const char *what() const throw(); };
+	struct optError : public std::exception { virtual const char *what() const throw(); };
 };
-
 
 #endif

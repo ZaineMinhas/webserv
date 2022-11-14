@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:06:34 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/14 14:26:18 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/14 18:27:05 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 srvSocket::srvSocket(size_t port)
 {
+	int opt = 1;
 	this->_addr.sin_family = AF_INET;
 	this->_addr.sin_addr.s_addr = INADDR_ANY;
 	this->_addr.sin_port = htons(port);
@@ -24,6 +25,9 @@ srvSocket::srvSocket(size_t port)
 	if (fcntl(this->_socket, F_SETFL, O_NONBLOCK) == -1)
 		throw (srvSocket::fcntlError());
 
+	if (setsockopt(this->_socket, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) == -1)
+		throw (srvSocket::optError());
+
 	if (bind(this->_socket, (const sockaddr *)&this->_addr, this->_addrlen) == -1)
 		throw (srvSocket::bindError());
 
@@ -31,7 +35,11 @@ srvSocket::srvSocket(size_t port)
 		throw (srvSocket::listenError());
 }
 
-void	srvSocket::close_srvSocket() { close(this->_socket); }
+void	srvSocket::close_srvSocket(fd_set *set)
+{
+	close(this->_socket);
+	FD_CLR(this->_socket, set);
+}
 
 srvSocket::srvSocket(const srvSocket &srv)
 {
@@ -54,17 +62,22 @@ srvSocket	&srvSocket::operator=(const srvSocket &srv)
 
 const char	*srvSocket::initError::what() const throw() { return ("server socket: error: init"); }
 const char	*srvSocket::fcntlError::what() const throw() { return ("server socket: error: fcntl"); }
+const char	*srvSocket::optError::what() const throw() { return ("server socket: error: setsockopt"); }
 const char	*srvSocket::bindError::what() const throw() { return ("server socket: error: bind"); }
 const char	*srvSocket::listenError::what() const throw() { return ("server socket: error: listen"); }
 
 client::client(int srv)
 {
+	int opt = 1;
 	this->_fromlen = sizeof(this->_from);
 	if ((this->_cli = accept(srv, (sockaddr *)&this->_from, &this->_fromlen)) == -1)
 		throw (client::initError());
 	
 	if (fcntl(this->_cli, F_SETFL, O_NONBLOCK) == -1)
 		throw (client::fcntlError());
+
+	if (setsockopt(this->_cli, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) == -1)
+		throw (client::optError());
 }
 
 client::client(const client &cli)
@@ -86,7 +99,12 @@ client	&client::operator=(const client &cli)
 	return (*this);
 }
 
-void	client::close_client() { close(this->_cli); }
+void	client::close_client(fd_set *set)
+{
+	close(this->_cli);
+	FD_CLR(this->_cli, set);
+}
 
 const char	*client::initError::what() const throw() { return ("client socket: error: init"); }
 const char	*client::fcntlError::what() const throw() { return ("client socket: error: fcntl"); }
+const char	*client::optError::what() const throw() { return ("client socket: error: setsockopt"); }

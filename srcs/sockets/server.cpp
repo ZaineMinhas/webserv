@@ -52,37 +52,40 @@ server	&server::operator=(const server &srv)
 
 void	server::handle_client()
 {
-	this->_timeout.tv_sec = 3 * 60;
-	this->_timeout.tv_usec = 0;
 	int select_socket = this->_servers.back()._socket;
 
 	while (1)
 	{
+		this->_timeout.tv_sec = 3 * 60;
+		this->_timeout.tv_usec = 0;
+
 		this->_cli_set = this->_srv_set;
-		if (select(select_socket + 1, &this->_cli_set, NULL, NULL, &this->_timeout) == -1)
+		if (select(select_socket + 1, &this->_cli_set, NULL, NULL, &this->_timeout) <= 0)
 			throw (server::selectError());
 
-		for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
-		{
-			if (FD_ISSET(it->_socket, &this->_srv_set))
-			{
-				client	cli(it->_socket);
-				FD_SET(cli._cli, &this->_cli_set);
-				this->_clients.push_back(cli);
-				if (select_socket < cli._cli)
-					select_socket = cli._cli;
-			}
-		}
 		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 		{
 			if (FD_ISSET(it->_cli, &this->_cli_set))
 			{
-				std::cout << "coucou" << std::endl;
-				ssize_t	ret;
 				char	buffer[200];
-				memset(buffer, 0, 199);
-				while ((ret = recv(it->_cli, buffer, 199, 0)) > 0)
+				while (recv(it->_cli, buffer, 199, 0) > 0)
 					std::cout << buffer;
+				std::cout << std::endl;
+				it->close_client(&this->_srv_set);
+				this->_clients.erase(it);
+				break ;
+			}
+		}
+		for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+		{
+			if (FD_ISSET(it->_socket, &this->_srv_set))
+			{
+				std::cout << it->_socket << std::endl;
+				client	cli(it->_socket);
+				FD_SET(cli._cli, &this->_srv_set);
+				this->_clients.push_back(cli);
+				if (select_socket < cli._cli)
+					select_socket = cli._cli;
 			}
 		}
 	}
