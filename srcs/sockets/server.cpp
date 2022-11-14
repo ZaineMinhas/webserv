@@ -77,8 +77,10 @@ void	server::handle_client()
 		{
 			if (FD_ISSET(it->_cli, &this->_cli_set))
 			{
+				std::cout << "coucou" << std::endl;
 				ssize_t	ret;
-				char	buffer[200] = {0};
+				char	buffer[200];
+				memset(buffer, 0, 199);
 				while ((ret = recv(it->_cli, buffer, 199, 0)) > 0)
 					std::cout << buffer;
 			}

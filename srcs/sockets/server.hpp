@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:23:06 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/14 14:00:30 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/14 14:22:34 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,8 @@ struct server {
 	timeval						_timeout;
 
 	server(std::vector<size_t> ports);
-	~server();
-
 	server(const server &srv);
+	~server();
 
 	server	&operator=(const server &srv);
 	

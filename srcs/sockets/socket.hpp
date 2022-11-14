@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:02:19 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/14 13:53:01 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/14 14:22:30 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ struct srvSocket {
 
 	srvSocket(size_t port);
 	srvSocket(const srvSocket &srv);
+	~srvSocket() {}
 	
 	srvSocket	&operator=(const srvSocket &srv);
 
@@ -48,6 +49,7 @@ struct client {
 
 	client(int srv);
 	client(const client &cli);
+	~client() {}
 
 	client	&operator=(const client &cli);
 
