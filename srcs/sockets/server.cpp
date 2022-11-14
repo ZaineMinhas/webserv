@@ -12,24 +12,49 @@
 
 #include "server.hpp"
 
-void	server::init_server(std::vector<size_t> ports)
+server::server(std::vector<size_t> ports)
 {
 	FD_ZERO(&this->_srv_set);
 	for (std::vector<size_t>::iterator it = ports.begin(); it != ports.end(); it++)
 	{
-		try {
-
-		}
-		server.init_srvSocket(*it);
-		FD_SET(server._socket, &this->_srv_set);
-		this->_servers.push_back(server);
+		srvSocket	srv(*it);
+		FD_SET(srv._socket, &this->_srv_set);
+		this->_servers.push_back(srv);
 	}
 
 	std::cout << " WEBSERV START " << std::endl;
 }
-#include <cerrno>
+
+server::~server()
+{
+	for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+		FD_CLR(it->_socket, &this->_srv_set);
+}
+
+server::server(const server& srv)
+{
+	this->_servers = srv._servers;
+	this->_clients = srv._clients;
+	this->_cli_set = srv._cli_set;
+	this->_srv_set = srv._srv_set;
+	this->_timeout = srv._timeout;
+}
+
+server	&server::operator=(const server &srv)
+{
+	this->_servers = srv._servers;
+	this->_clients = srv._clients;
+	this->_cli_set = srv._cli_set;
+	this->_srv_set = srv._srv_set;
+	this->_timeout = srv._timeout;
+	return (*this);
+}
+
 void	server::handle_client()
 {
+	for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+		FD_SET(it->_socket, &this->_srv_set);
+
 	this->_timeout.tv_sec = 3 * 60;
 	this->_timeout.tv_usec = 0;
 	int select_socket = this->_servers.back()._socket;

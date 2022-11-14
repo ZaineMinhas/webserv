@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:02:19 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/10 15:22:03 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/14 11:06:23 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,16 +27,12 @@ struct srvSocket {
 	sockaddr_in	_addr;
 	socklen_t	_addrlen;
 
-	srvSocket() {}
+	srvSocket(size_t port);
+	~srvSocket();
 
-	srvSocket(const srvSocket &srv) {
-		this->_socket = srv._socket;
-		this->_addr = srv._addr;
-		this->_addrlen = srv._addrlen;
-	}
+	srvSocket(const srvSocket &srv);
 
-	void	init_srvSocket(int port);
-	void	close_srvSocket();
+	srvSocket	&operator=(const srvSocket &srv);
 	
 	struct initError : public std::exception { virtual const char *what() const throw(); };
 	struct fcntlError : public std::exception { virtual const char *what() const throw(); };

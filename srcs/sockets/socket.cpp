@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:06:34 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/10 15:15:13 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/14 11:06:14 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "socket.hpp"
 
-void	srvSocket::init_srvSocket(int port)
+srvSocket::srvSocket(size_t port)
 {
 	this->_addr.sin_family = AF_INET;
 	this->_addr.sin_addr.s_addr = INADDR_ANY;
@@ -31,7 +31,26 @@ void	srvSocket::init_srvSocket(int port)
 		throw (srvSocket::listenError());
 }
 
-void	srvSocket::close_srvSocket() { close(this->_socket); }
+srvSocket::~srvSocket() { close(this->_socket); }
+
+srvSocket::srvSocket(const srvSocket &srv)
+{
+	this->_socket = srv._socket;
+	this->_addr.sin_family = srv._addr.sin_family;
+	this->_addr.sin_addr.s_addr = srv._addr.sin_addr.s_addr;
+	this->_addr.sin_port = srv._addr.sin_port;
+	this->_addrlen = srv._addrlen;
+}
+
+srvSocket	&srvSocket::operator=(const srvSocket &srv)
+{
+	this->_socket = srv._socket;
+	this->_addr.sin_family = srv._addr.sin_family;
+	this->_addr.sin_addr.s_addr = srv._addr.sin_addr.s_addr;
+	this->_addr.sin_port = srv._addr.sin_port;
+	this->_addrlen = srv._addrlen;
+	return (*this);
+}
 
 const char	*srvSocket::initError::what() const throw() { return ("socket: error: init"); }
 const char	*srvSocket::fcntlError::what() const throw() { return ("socket: error: fcntl"); }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:23:06 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/10 15:21:50 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/14 11:24:15 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,17 +28,12 @@ struct server {
 	fd_set						_srv_set;
 	timeval						_timeout;
 
-	server() {}
+	server(std::vector<size_t> ports);
+	~server();
 
-	server(const server &srv) {
-		this->_servers = srv._servers;
-		this->_clients = srv._clients;
-		this->_cli_set = srv._cli_set;
-		this->_srv_set = srv._srv_set;
-		this->_timeout = srv._timeout;
-	}
+	server(const server &srv);
 
-	void	init_server(std::vector<size_t>	ports);
+	server	&operator=(const server &srv);
 	
 	void	handle_client();
 
