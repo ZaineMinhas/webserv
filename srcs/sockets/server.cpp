@@ -52,9 +52,6 @@ server	&server::operator=(const server &srv)
 
 void	server::handle_client()
 {
-	for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
-		FD_SET(it->_socket, &this->_srv_set);
-
 	this->_timeout.tv_sec = 3 * 60;
 	this->_timeout.tv_usec = 0;
 	int select_socket = this->_servers.back()._socket;
