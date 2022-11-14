@@ -64,12 +64,9 @@ void	server::handle_client()
 
 		for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
 		{
-			std::cout << it->_socket << std::endl;
 			if (FD_ISSET(it->_socket, &this->_srv_set))
 			{
-				client	cli;
-				if (!cli.init_client(it->_socket))
-					throw (server::clientError());
+				client	cli(it->_socket);
 				FD_SET(cli._cli, &this->_cli_set);
 				this->_clients.push_back(cli);
 				if (select_socket < cli._cli)
@@ -78,13 +75,11 @@ void	server::handle_client()
 		}
 		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 		{
-			std::cout << it->_cli << std::endl;
 			if (FD_ISSET(it->_cli, &this->_cli_set))
 			{
-				std::cout << "coucou" << std::endl;
-				char	buffer[200];
-				memset(buffer, 0, 199);
-				while (recv(it->_cli, buffer, 199, 0) > 0)
+				ssize_t	ret;
+				char	buffer[200] = {0};
+				while ((ret = recv(it->_cli, buffer, 199, 0)) > 0)
 					std::cout << buffer;
 			}
 		}
@@ -92,4 +87,3 @@ void	server::handle_client()
 }
 
 const char	*server::selectError::what() const throw() { return ("server: error: select"); }
-const char	*server::clientError::what() const throw() { return ("server: error: init client"); }

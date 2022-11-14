@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:23:06 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/14 11:24:15 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/14 14:00:30 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ struct server {
 	void	handle_client();
 
 	struct selectError : public std::exception { virtual const char *what() const throw(); };
-	struct clientError : public std::exception { virtual const char *what() const throw(); };
 };
 
 #endif

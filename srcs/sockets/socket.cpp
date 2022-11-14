@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:06:34 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/14 11:06:14 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/14 14:01:24 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ srvSocket::srvSocket(size_t port)
 		throw (srvSocket::listenError());
 }
 
-srvSocket::~srvSocket() { close(this->_socket); }
+void	srvSocket::close_srvSocket() { close(this->_socket); }
 
 srvSocket::srvSocket(const srvSocket &srv)
 {
@@ -52,19 +52,41 @@ srvSocket	&srvSocket::operator=(const srvSocket &srv)
 	return (*this);
 }
 
-const char	*srvSocket::initError::what() const throw() { return ("socket: error: init"); }
-const char	*srvSocket::fcntlError::what() const throw() { return ("socket: error: fcntl"); }
-const char	*srvSocket::bindError::what() const throw() { return ("socket: error: bind"); }
-const char	*srvSocket::listenError::what() const throw() { return ("socket: error: listen"); }
+const char	*srvSocket::initError::what() const throw() { return ("server socket: error: init"); }
+const char	*srvSocket::fcntlError::what() const throw() { return ("server socket: error: fcntl"); }
+const char	*srvSocket::bindError::what() const throw() { return ("server socket: error: bind"); }
+const char	*srvSocket::listenError::what() const throw() { return ("server socket: error: listen"); }
 
-bool	client::init_client(int srv)
+client::client(int srv)
 {
 	this->_fromlen = sizeof(this->_from);
 	if ((this->_cli = accept(srv, (sockaddr *)&this->_from, &this->_fromlen)) == -1)
-		return (false);
+		throw (client::initError());
 	
 	if (fcntl(this->_cli, F_SETFL, O_NONBLOCK) == -1)
-		return (false);
-
-	return (true);
+		throw (client::fcntlError());
 }
+
+client::client(const client &cli)
+{
+	this->_cli = cli._cli;
+	this->_from.sin_family = cli._from.sin_family;
+	this->_from.sin_addr.s_addr = cli._from.sin_addr.s_addr;
+	this->_from.sin_port = cli._from.sin_port;
+	this->_fromlen = cli._fromlen;
+}
+
+client	&client::operator=(const client &cli)
+{
+	this->_cli = cli._cli;
+	this->_from.sin_family = cli._from.sin_family;
+	this->_from.sin_addr.s_addr = cli._from.sin_addr.s_addr;
+	this->_from.sin_port = cli._from.sin_port;
+	this->_fromlen = cli._fromlen;
+	return (*this);
+}
+
+void	client::close_client() { close(this->_cli); }
+
+const char	*client::initError::what() const throw() { return ("client socket: error: init"); }
+const char	*client::fcntlError::what() const throw() { return ("client socket: error: fcntl"); }
