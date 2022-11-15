@@ -3,108 +3,104 @@
 /*                                                        :::      ::::::::   */
 /*   socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:06:34 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/02 13:55:43 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/15 14:14:42 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "socket.hpp"
 
-tcpSocket::tcpSocket(bool client, int domain, int port)
+srvSocket::srvSocket(size_t port)
 {
-	if (!client)
-		this->_addr.sin_family = domain;
-		this->_addr.sin_addr.s_addr = INADDR_ANY;
-		this->_addr.sin_port = htons(port);
-		this->_addrlen = sizeof(this->_addr);
+	int opt = 1;
+	this->_addr.sin_family = AF_INET;
+	this->_addr.sin_addr.s_addr = INADDR_ANY;
+	this->_addr.sin_port = htons(port);
+	this->_addrlen = sizeof(this->_addr);
+	if ((this->_socket = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+		throw (srvSocket::initError());
+
+	if (fcntl(this->_socket, F_SETFL, O_NONBLOCK) == -1)
+		throw (srvSocket::fcntlError());
+
+	if (setsockopt(this->_socket, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) == -1)
+		throw (srvSocket::optError());
+
+	if (bind(this->_socket, (const sockaddr *)&this->_addr, this->_addrlen) == -1)
+		throw (srvSocket::bindError());
+
+	if (listen(this->_socket, SOMAXCONN) == -1)
+		throw (srvSocket::listenError());
 }
 
-tcpSocket::~tcpSocket() {}
-
-
-
-void	tcpSocket::initSocket(int domain, int type, int protocol)
+void	srvSocket::close_srvSocket(fd_set *set)
 {
-	if ((this->_socket = socket(domain, type, protocol)))
-		return ;
-	throw (tcpSocket::initError());
+	close(this->_socket);
+	FD_CLR(this->_socket, set);
 }
 
-void	tcpSocket::closeSocket() { close(this->_socket); }
-
-
-
-void	tcpSocket::bindSocket(int domain, int port)
+srvSocket::srvSocket(const srvSocket &srv)
 {
-	if (!bind(this->_socket, (const sockaddr *)&this->_addr, this->_addrlen))
-		return ;
-	throw (tcpSocket::bindError());
+	this->_socket = srv._socket;
+	this->_addr.sin_family = srv._addr.sin_family;
+	this->_addr.sin_addr.s_addr = srv._addr.sin_addr.s_addr;
+	this->_addr.sin_port = srv._addr.sin_port;
+	this->_addrlen = srv._addrlen;
 }
 
-void	tcpSocket::listenSocket()
+srvSocket	&srvSocket::operator=(const srvSocket &srv)
 {
-	if (!listen(this->_socket, SOMAXCONN))
-		return ;
-	throw (tcpSocket::listenError());
+	this->_socket = srv._socket;
+	this->_addr.sin_family = srv._addr.sin_family;
+	this->_addr.sin_addr.s_addr = srv._addr.sin_addr.s_addr;
+	this->_addr.sin_port = srv._addr.sin_port;
+	this->_addrlen = srv._addrlen;
+	return (*this);
 }
 
+const char	*srvSocket::initError::what() const throw() { return ("server socket: error: init"); }
+const char	*srvSocket::fcntlError::what() const throw() { return ("server socket: error: fcntl"); }
+const char	*srvSocket::optError::what() const throw() { return ("server socket: error: setsockopt"); }
+const char	*srvSocket::bindError::what() const throw() { return ("server socket: error: bind"); }
+const char	*srvSocket::listenError::what() const throw() { return ("server socket: error: listen"); }
 
-
-void	tcpSocket::connectSocket(int domain, const std::string &addr, int port)
+client::client(int srv, fd_set *set)
 {
-	sockaddr_in	srv;
-	inet_pton(domain, addr.c_str(), &srv.sin_addr.s_addr);
-	srv.sin_family = domain;
-	srv.sin_port = htons(port);
+	int opt = 1;
+	this->_fromlen = sizeof(this->_from);
+	if ((this->_cli = accept(srv, (sockaddr *)&this->_from, &this->_fromlen)) == -1)
+		throw (client::initError());
 	
-	if (!(connect(this->_socket, (const sockaddr *)&srv, sizeof(srv))))
-		return ;
-	throw (tcpSocket::connectError());
+	FD_SET(this->_cli, set);
 }
 
-void	tcpSocket::acceptSocket(client *client)
+client::client(const client &cli)
 {
-	if ((client->_cli._socket = accept(this->_socket, (sockaddr *)&client->_cli._addr, &client->_cli._addrlen)))
-		return ;
-	throw (tcpSocket::acceptError());
+	this->_cli = cli._cli;
+	this->_from.sin_family = cli._from.sin_family;
+	this->_from.sin_addr.s_addr = cli._from.sin_addr.s_addr;
+	this->_from.sin_port = cli._from.sin_port;
+	this->_fromlen = cli._fromlen;
 }
 
-
-
-int		tcpSocket::recvSocket(client *client, char *buffer, unsigned int len)
+client	&client::operator=(const client &cli)
 {
-	int	ret = recv(client->_cli._socket, buffer, len, 0);
-	if (ret == -1)
-		throw (tcpSocket::recvError());
-	return (ret);
+	this->_cli = cli._cli;
+	this->_from.sin_family = cli._from.sin_family;
+	this->_from.sin_addr.s_addr = cli._from.sin_addr.s_addr;
+	this->_from.sin_port = cli._from.sin_port;
+	this->_fromlen = cli._fromlen;
+	return (*this);
 }
 
-int		tcpSocket::sendSocket(const char *data, unsigned int len)
+void	client::close_client(fd_set *set)
 {
-	int ret = send(this->_socket, data, len, 0);
-	if (ret == -1)
-		throw(tcpSocket::sendError());
-	return (ret);
+	close(this->_cli);
+	FD_CLR(this->_cli, set);
 }
 
-
-
-const char	*tcpSocket::initError::what() const throw() { return ("socket: error: init"); }
-const char	*tcpSocket::bindError::what() const throw() { return ("socket: error: bind"); }
-const char	*tcpSocket::recvError::what() const throw() { return ("socket: error: recv"); }
-const char	*tcpSocket::sendError::what() const throw() { return ("socket: error: send"); }
-const char	*tcpSocket::listenError::what() const throw() { return ("socket: error: listen"); }
-const char	*tcpSocket::acceptError::what() const throw() { return ("socket: error: accept"); }
-const char	*tcpSocket::connectError::what() const throw() { return ("socket: error: connect"); }
-
-
-
-
-
-const char	*client::getAddr()
-{
-	char buffer[INET_ADDRSTRLEN] = {0};
-	return (inet_ntop(this->_cli._addr.sin_family, (const void *)&(this->_cli._addr.sin_addr), buffer, INET_ADDRSTRLEN));
-}
+const char	*client::initError::what() const throw() { return ("client socket: error: init"); }
+const char	*client::fcntlError::what() const throw() { return ("client socket: error: fcntl"); }
+const char	*client::optError::what() const throw() { return ("client socket: error: setsockopt"); }

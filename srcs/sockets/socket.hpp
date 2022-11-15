@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:02:19 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/02 13:53:53 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/15 14:12:09 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,45 +18,47 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
 
 #include <iostream>
 
-struct client;
-
-struct tcpSocket {
-	int			_socket;
+struct srvSocket {
+	int	_socket;
 	sockaddr_in	_addr;
 	socklen_t	_addrlen;
+
+	srvSocket(size_t port);
+	srvSocket(const srvSocket &srv);
+	~srvSocket() {}
 	
-	tcpSocket(bool client = false, int domain = AF_INET, int port = 8080);
-	~tcpSocket();
+	srvSocket	&operator=(const srvSocket &srv);
 
-	void	initSocket(int domain, int type, int protocol);
-	void	closeSocket();
-
-	void	bindSocket(int domain, int port);
-	void	listenSocket();
+	void	close_srvSocket(fd_set *set);
 	
-	void	connectSocket(int domain, const std::string &addr, int port);
-	void	acceptSocket(client *client);
-
-	int		recvSocket(client *client, char *buffer, unsigned int len);
-	int		sendSocket(const char *data, unsigned int len);
-
-	struct initError : public std::exception { virtual const char	*what() const throw(); };
-	struct bindError : public std::exception { virtual const char	*what() const throw(); };
-	struct recvError : public std::exception { virtual const char	*what() const throw(); };
-	struct sendError : public std::exception { virtual const char	*what() const throw(); };
-	struct listenError : public std::exception { virtual const char	*what() const throw(); };
-	struct acceptError : public std::exception { virtual const char	*what() const throw(); };
-	struct connectError : public std::exception { virtual const char	*what() const throw(); };
+	struct initError : public std::exception { virtual const char *what() const throw(); };
+	struct fcntlError : public std::exception { virtual const char *what() const throw(); };
+	struct optError : public std::exception { virtual const char *what() const throw(); };
+	struct bindError : public std::exception { virtual const char *what() const throw(); };
+	struct listenError : public std::exception { virtual const char *what() const throw(); };
 
 };
 
 struct client {
-	tcpSocket	_cli;
+	int			_cli;
+	sockaddr_in	_from;
+	socklen_t	_fromlen;
 
-	const char	*getAddr();
+	client(int srv, fd_set *set);
+	client(const client &cli);
+	~client() {}
+
+	client	&operator=(const client &cli);
+
+	void	close_client(fd_set *set);
+
+	struct initError : public std::exception { virtual const char *what() const throw(); };
+	struct fcntlError : public std::exception { virtual const char *what() const throw(); };
+	struct optError : public std::exception { virtual const char *what() const throw(); };
 };
 
 #endif

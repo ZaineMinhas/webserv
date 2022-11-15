@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:23:06 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/02 13:47:33 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/14 14:22:34 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,19 +15,28 @@
 
 #include "socket.hpp"
 
-#include <poll.h>
+#include <string.h>
+#include <sys/select.h>
+#include <sys/time.h>
 
 #include <vector>
 
-class server {
-private:
-	tcpSocket			_srv_sock;
-	std::vector<client>	_cli_socks;
-	pollfd				poll_srv;
-	
-public:
-	server();
+struct server {
+	std::vector<srvSocket>		_servers;
+	std::vector<client>			_clients;
+	fd_set						_cli_set;
+	fd_set						_srv_set;
+	timeval						_timeout;
+
+	server(std::vector<size_t> ports);
+	server(const server &srv);
 	~server();
+
+	server	&operator=(const server &srv);
+	
+	void	handle_client();
+
+	struct selectError : public std::exception { virtual const char *what() const throw(); };
 };
 
 #endif
