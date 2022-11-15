@@ -73,19 +73,19 @@ void	server::handle_client()
 				std::cout << std::endl;
 				it->close_client(&this->_srv_set);
 				this->_clients.erase(it);
-				break ;
+				break;
 			}
 		}
 		for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
 		{
-			if (FD_ISSET(it->_socket, &this->_srv_set))
+			if (FD_ISSET(it->_socket, &this->_cli_set))
 			{
 				std::cout << it->_socket << std::endl;
-				client	cli(it->_socket);
-				FD_SET(cli._cli, &this->_srv_set);
+				client	cli(it->_socket, &this->_srv_set);
 				this->_clients.push_back(cli);
 				if (select_socket < cli._cli)
 					select_socket = cli._cli;
+				break;
 			}
 		}
 	}

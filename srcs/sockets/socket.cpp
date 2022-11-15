@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:06:34 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/14 18:27:05 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/15 14:14:42 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,18 +66,14 @@ const char	*srvSocket::optError::what() const throw() { return ("server socket: 
 const char	*srvSocket::bindError::what() const throw() { return ("server socket: error: bind"); }
 const char	*srvSocket::listenError::what() const throw() { return ("server socket: error: listen"); }
 
-client::client(int srv)
+client::client(int srv, fd_set *set)
 {
 	int opt = 1;
 	this->_fromlen = sizeof(this->_from);
 	if ((this->_cli = accept(srv, (sockaddr *)&this->_from, &this->_fromlen)) == -1)
 		throw (client::initError());
 	
-	if (fcntl(this->_cli, F_SETFL, O_NONBLOCK) == -1)
-		throw (client::fcntlError());
-
-	if (setsockopt(this->_cli, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) == -1)
-		throw (client::optError());
+	FD_SET(this->_cli, set);
 }
 
 client::client(const client &cli)

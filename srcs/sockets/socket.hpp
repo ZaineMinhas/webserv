@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:02:19 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/14 18:25:36 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/15 14:12:09 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ struct client {
 	sockaddr_in	_from;
 	socklen_t	_fromlen;
 
-	client(int srv);
+	client(int srv, fd_set *set);
 	client(const client &cli);
 	~client() {}
 
