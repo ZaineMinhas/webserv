@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:19:12 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/11 12:52:29 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/16 17:23:30 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "utils.hpp"
-#include "webserv.hpp"
+#include "config.hpp"
 
 const std::string WHITESPACE = " \n\r\t\f\v";
 
@@ -25,7 +24,7 @@ std::string	file_to_string(std::string file)
 		txt = ss.str();
 	}
 	else
-		throw (webserv::badFileName());
+		throw (config::badFileName());
 	return (txt);
 }
 

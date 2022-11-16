@@ -1,43 +1,48 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   webserv.hpp                                        :+:      :+:    :+:   */
+/*   config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:28 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/11 12:56:48 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/16 17:22:04 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef WEBSERV_HPP
-# define WEBSERV_HPP
+#ifndef CONFIG_HPP
+# define CONFIG_HPP
 
-# include "server.hpp"
+# include "serverBlock.hpp"
 # include "utils.hpp"
 
 ////////////////////
 ///   WEBSERV    ///
 ////////////////////
 
-class webserv {
+class config {
 private:
-	std::vector<server>			_servers;
+	std::vector<serverBlock>	_servers;
 	std::vector<size_t>			_ports;
 
 public:
 
 	/*___ canonical form ___*/
 
-	webserv(void);
-	webserv(const webserv &src);
-	~webserv(void);
-	webserv	&operator=(const webserv &src);
+	config(void);
+	config(const config &src);
+	~config(void);
+	config	&operator=(const config &src);
+
+	/*___ getters ___*/
+
+	std::vector<serverBlock>	getServers(void) const;
+	std::vector<size_t>			getPorts(void) const;
 
 	/*___ utils ___*/
 
-	void	check_conf_file(std::string file, webserv &srv);
-	void	add_server(server to_add);
+	void	check_conf_file(std::string file, config &srv);
+	void	add_server(serverBlock to_add);
 	void	stack_ports(void);
 	void	check_double(void);
 

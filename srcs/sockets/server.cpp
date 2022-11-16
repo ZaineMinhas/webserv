@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "server.hpp"
+#include <sstream>
+#include <iterator>
 
 server::server(std::vector<size_t> ports)
 {
@@ -52,6 +54,7 @@ server	&server::operator=(const server &srv)
 
 void	server::handle_client()
 {
+	std::string	buff;
 	int select_socket = this->_servers.back()._socket;
 
 	while (1)
@@ -68,11 +71,24 @@ void	server::handle_client()
 			if (FD_ISSET(it->_cli, &this->_cli_set))
 			{
 				char	buffer[200];
-				while (recv(it->_cli, buffer, 199, 0) > 0)
-					std::cout << buffer;
-				std::cout << std::endl;
-				it->close_client(&this->_srv_set);
-				this->_clients.erase(it);
+				
+				ssize_t	ret = recv(it->_cli, buffer, 199, 0);
+				if (ret < 0)
+					throw (server::selectError());
+				
+				buff += std::string(buffer, ret);
+				if (buff.find("\r\n\r\n") != std::string::npos)
+				{
+					// request	request(buff, )
+					std::stringstream ss(buff);
+					std::istream_iterator<std::string>	begin(ss);
+					std::istream_iterator<std::string>	end;
+					std::vector<std::string>			request(begin, end);
+					std::cout << buff;
+					buff.clear();
+					it->close_client(&this->_srv_set);
+					this->_clients.erase(it);
+				}
 				break;
 			}
 		}
@@ -80,7 +96,6 @@ void	server::handle_client()
 		{
 			if (FD_ISSET(it->_socket, &this->_cli_set))
 			{
-				std::cout << it->_socket << std::endl;
 				client	cli(it->_socket, &this->_srv_set);
 				this->_clients.push_back(cli);
 				if (select_socket < cli._cli)

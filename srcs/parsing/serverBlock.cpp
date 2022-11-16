@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.cpp                                         :+:      :+:    :+:   */
+/*   serverBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 14:04:18 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/11 12:20:04 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/16 17:23:17 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.hpp"
-#include "webserv.hpp"
+#include "config.hpp"
 
 /*___  ___*/
+
 ////////////////////
 ///              ///
 ////////////////////
@@ -25,13 +25,13 @@
 
 /*___ canonical form ___*/
 
-server::server(void) : _autoindex(false), _body_size(0) {}
+serverBlock::serverBlock(void) : _autoindex(false), _body_size(0) {}
 
-server::server(const server &src) { *this = src; }
+serverBlock::serverBlock(const serverBlock &src) { *this = src; }
 
-server::~server(void) {}
+serverBlock::~serverBlock(void) {}
 
-server	&server::operator=(const server &src) {
+serverBlock	&serverBlock::operator=(const serverBlock &src) {
 	_name = src._name;
 	_root = src._root;
 	_listen = src._listen;
@@ -45,20 +45,20 @@ server	&server::operator=(const server &src) {
 
 /*___ setters ___*/
 
-void	server::setName(std::string &name) { _name = name; }
-void	server::setRoot(std::string &root) { _root = root; }
+void	serverBlock::setName(std::string &name) { _name = name; }
+void	serverBlock::setRoot(std::string &root) { _root = root; }
 
-void	server::setAutoindex(std::string &autoindex)
+void	serverBlock::setAutoindex(std::string &autoindex)
 {
 	if (autoindex == "on")
 		_autoindex = true;
 	else if (autoindex == "off")
 		_autoindex = false;
 	else
-		throw (webserv::badConfFile("autoindex"));
+		throw (config::badConfFile("autoindex"));
 }
 
-void	server::setListen(std::string &listen)
+void	serverBlock::setListen(std::string &listen)
 {
 	std::istringstream	f(listen);
 	std::string			s;
@@ -71,22 +71,22 @@ void	server::setListen(std::string &listen)
 	}
 }
 
-void	server::setBodySize(std::string &size) { _body_size = atol(size.c_str()); }
-void	server::setDirectories(std::vector<directory> &directories) { _directories = directories; }
+void	serverBlock::setBodySize(std::string &size) { _body_size = atol(size.c_str()); }
+void	serverBlock::setDirectories(std::vector<directory> &directories) { _directories = directories; }
 
-void	server::setMethods(std::string &methods)
+void	serverBlock::setMethods(std::string &methods)
 {
 	std::istringstream	f(methods);
 	std::string			s;
 	while (getline(f, s, ' '))
 	{
 		if (s != "GET" && s != "POST" && s != "DELETE")
-			throw (webserv::badConfFile("methods"));
+			throw (config::badConfFile("methods"));
 		_methods.push_back(s);
 	}
 }
 
-void	server::setErrorPages(std::string &error_pages)
+void	serverBlock::setErrorPages(std::string &error_pages)
 {
 	std::istringstream	f(error_pages);
 	std::string			s;
@@ -96,23 +96,23 @@ void	server::setErrorPages(std::string &error_pages)
 		nb = atol(s.c_str());
 	if (getline(f, s, ' '))
 		url = s;
-	_error_pages.insert(std::make_pair<size_t, std::string>(nb, url));
+	_error_pages.insert(std::make_pair(nb, url));
 }
 
 /*___ getters ___*/
 
-std::string						server::getName(void) const { return (_name); }
-std::string						server::getRoot(void) const { return (_root); }
-std::pair<std::string, size_t>	server::getListen(void) const {return (_listen); }
-bool							server::getAutoindex(void) const { return (_autoindex); }
-size_t							server::getBodySize(void) const { return (_body_size); }
-std::vector<directory>			server::getDirectories(void) const { return (_directories); }
-std::vector<std::string>		server::getMethods(void) const { return (_methods); }
-std::map<size_t, std::string>	server::getErrorPages(void) const { return (_error_pages); }
+std::string						serverBlock::getName(void) const { return (_name); }
+std::string						serverBlock::getRoot(void) const { return (_root); }
+std::pair<std::string, size_t>	serverBlock::getListen(void) const {return (_listen); }
+bool							serverBlock::getAutoindex(void) const { return (_autoindex); }
+size_t							serverBlock::getBodySize(void) const { return (_body_size); }
+std::vector<directory>			serverBlock::getDirectories(void) const { return (_directories); }
+std::vector<std::string>		serverBlock::getMethods(void) const { return (_methods); }
+std::map<size_t, std::string>	serverBlock::getErrorPages(void) const { return (_error_pages); }
 
 /*___ utils ___*/
 
-void	server::set(std::string &key, std::string &value)
+void	serverBlock::set(std::string &key, std::string &value)
 {
 	if (key == "server_name")
 		setName(value);
@@ -129,15 +129,15 @@ void	server::set(std::string &key, std::string &value)
 	else if (key == "error_page")
 		setErrorPages(value);
 	else
-		throw (webserv::badConfFile(std::string("bad key: ") + key));
+		throw (config::badConfFile(std::string("bad key: ") + key));
 }
 
-void	server::add_directory(directory to_add, std::string &name) {
+void	serverBlock::add_directory(directory to_add, std::string &name) {
 	_directories.push_back(to_add);
 	_directories.back().setName(name);
 }
 
-void	server::checkValues(void) {
+void	serverBlock::checkValues(void) {
 	if (this->_name.empty())
 		this->_name.assign("localhost");
 	if (this->_listen.first.empty())
@@ -183,7 +183,7 @@ void	directory::setMethods(std::string &methods)
 	while (getline(f, s, ' '))
 	{
 		if (s != "GET" && s != "POST" && s != "DELETE")
-			throw (webserv::badConfFile("methods"));
+			throw (config::badConfFile("methods"));
 		_methods.push_back(s);
 	}
 }
@@ -198,7 +198,7 @@ void	directory::setHttpRedirect(std::string &redirects)
 		val = atol(s.c_str());
 	if (getline(f, s, ' '))
 		url = s;
-	_http_redirect = std::make_pair<size_t, std::string>(val, url);
+	_http_redirect = std::make_pair(val, url);
 }
 void	directory::setAutoindex(std::string &autoindex)
 {
@@ -207,7 +207,7 @@ void	directory::setAutoindex(std::string &autoindex)
 	else if (autoindex == "off")
 		_autoindex = false;
 	else
-		throw (webserv::badConfFile("autoindex"));
+		throw (config::badConfFile("autoindex"));
 }
 
 /*___ getters ___*/
@@ -236,10 +236,10 @@ void	directory::set(std::string &key, std::string &value)
 	else if (key == "autoindex")
 		setAutoindex(value);
 	else
-		throw (webserv::badConfFile(std::string("bad key: ") + key));
+		throw (config::badConfFile(std::string("bad key: ") + key));
 }
 
 void	directory::checkValues(void) {
 	if (_name.empty())
-		throw (webserv::badConfFile("location name"));
+		throw (config::badConfFile("location name"));
 }
