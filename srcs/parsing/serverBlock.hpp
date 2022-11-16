@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.hpp                                         :+:      :+:    :+:   */
+/*   serverBlock.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 16:00:26 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/10 17:42:27 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/16 17:10:13 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-# define SERVER_HPP
+#ifndef SERVERBLOCK_HPP
+# define SERVERBLOCK_HPP
 
 # include <string>
 # include <iostream>
@@ -30,7 +30,7 @@ class	directory;
 ///    SERVER    ///
 ////////////////////
 
-class server {
+class serverBlock {
 private:
 	std::string						_name;
 	std::string						_root;
@@ -45,10 +45,10 @@ public:
 
 	/*___ canonical form ___*/
 
-	server(void);
-	server(const server &src);
-	~server(void);
-	server	&operator=(const server &src);
+	serverBlock(void);
+	serverBlock(const serverBlock &src);
+	~serverBlock(void);
+	serverBlock	&operator=(const serverBlock &src);
 
 	/*___ setters ___*/
 

@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   webserv.cpp                                        :+:      :+:    :+:   */
+/*   config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:09 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/11 13:11:05 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/16 17:22:35 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "webserv.hpp"
+#include "config.hpp"
 
 ////////////////////
 ///   WEBSERV    ///
@@ -18,23 +18,29 @@
 
 /*___ canonical form ___*/
 
-webserv::webserv(void) {}
+config::config(void) {}
 
-webserv::webserv(const webserv &src) {}
+config::config(const config &src) {}
 
-webserv::~webserv(void) {}
+config::~config(void) {}
 
-webserv	&webserv::operator=(const webserv &src) {
+config	&config::operator=(const config &src) {
 	return (*this);
 }
 
+/*___ getters ___*/
+
+std::vector<serverBlock>	config::getServers(void) const { return (_servers); }
+std::vector<size_t>			config::getPorts(void) const { return (_ports); }
+
+
 /*___ utils ___*/
 
-void	webserv::check_conf_file(std::string file, webserv &srv)
+void	config::check_conf_file(std::string file, config &srv)
 {
 	std::string		txt = file_to_string(file);
 	if (txt.empty() || trim(txt, "\n ").empty())
-		throw (webserv::emptyConfFile());
+		throw (config::emptyConfFile());
 
 	t_parsing	main;
 	t_parsing	serv;
@@ -46,7 +52,7 @@ void	webserv::check_conf_file(std::string file, webserv &srv)
 		main = get_next_value(txt);
 		if (main.key == "server")
 		{
-			srv.add_server(server());
+			srv.add_server(serverBlock());
 			while (!serv.key.empty() || serv.i)
 			{
 				serv.i = false;
@@ -78,7 +84,7 @@ void	webserv::check_conf_file(std::string file, webserv &srv)
 			}
 		}
 		else
-			throw (webserv::badConfFile(std::string("bad block name: ") + main.key));
+			throw (config::badConfFile(std::string("bad block name: ") + main.key));
 		try {
 			txt = txt.substr(main.next_val);
 		}
@@ -90,19 +96,19 @@ void	webserv::check_conf_file(std::string file, webserv &srv)
 	}
 }
 
-void	webserv::add_server(server to_add) { this->_servers.push_back(to_add); }
+void	config::add_server(serverBlock to_add) { this->_servers.push_back(to_add); }
 
-void	webserv::stack_ports(void)
+void	config::stack_ports(void)
 {
-	for (std::vector<server>::iterator it = _servers.begin(); it != _servers.end(); it++)
+	for (std::vector<serverBlock>::iterator it = _servers.begin(); it != _servers.end(); it++)
 		_ports.push_back(it->getListen().second);
 }
 
-void	webserv::check_double(void)
+void	config::check_double(void)
 {
-	for (std::vector<server>::iterator it = _servers.begin(); it != _servers.end() - 1; it++)
+	for (std::vector<serverBlock>::iterator it = _servers.begin(); it != _servers.end() - 1; it++)
 	{
-		std::vector<server>::iterator it2 = it + 1;
+		std::vector<serverBlock>::iterator it2 = it + 1;
 		for (; it2 != _servers.end(); it2++) {
 			if (it->getListen().second == it2->getListen().second && it->getName() == it2->getName()) {
 				it2--;
@@ -114,6 +120,6 @@ void	webserv::check_double(void)
 
 /*___ exceptions ___*/
 
-const char	*webserv::emptyConfFile::what() const throw() { return ("Empty configuration file."); }
-const char	*webserv::badFileName::what() const throw() { return ("Put a correct file name!"); }
-const char	*webserv::badInitialization::what() const throw() { return ("Erro occuring when initialize our webserv."); }
+const char	*config::emptyConfFile::what() const throw() { return ("Empty configuration file."); }
+const char	*config::badFileName::what() const throw() { return ("Put a correct file name!"); }
+const char	*config::badInitialization::what() const throw() { return ("Erro occuring when initialize our webserv."); }
