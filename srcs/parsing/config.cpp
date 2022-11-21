@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:09 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/16 17:22:35 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/21 14:12:52 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,13 @@
 
 config::config(void) {}
 
-config::config(const config &src) {}
+config::config(const config &src) { *this = src; }
 
 config::~config(void) {}
 
 config	&config::operator=(const config &src) {
+	_servers = src._servers;
+	_ports = src._ports;
 	return (*this);
 }
 

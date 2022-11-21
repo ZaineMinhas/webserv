@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:06:34 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/15 14:14:42 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/21 14:25:18 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 srvSocket::srvSocket(size_t port)
 {
-	int opt = 1;
 	this->_addr.sin_family = AF_INET;
 	this->_addr.sin_addr.s_addr = INADDR_ANY;
 	this->_addr.sin_port = htons(port);
@@ -24,9 +23,6 @@ srvSocket::srvSocket(size_t port)
 
 	if (fcntl(this->_socket, F_SETFL, O_NONBLOCK) == -1)
 		throw (srvSocket::fcntlError());
-
-	if (setsockopt(this->_socket, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) == -1)
-		throw (srvSocket::optError());
 
 	if (bind(this->_socket, (const sockaddr *)&this->_addr, this->_addrlen) == -1)
 		throw (srvSocket::bindError());
@@ -68,7 +64,6 @@ const char	*srvSocket::listenError::what() const throw() { return ("server socke
 
 client::client(int srv, fd_set *set)
 {
-	int opt = 1;
 	this->_fromlen = sizeof(this->_from);
 	if ((this->_cli = accept(srv, (sockaddr *)&this->_from, &this->_fromlen)) == -1)
 		throw (client::initError());
