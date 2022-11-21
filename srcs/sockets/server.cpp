@@ -26,10 +26,10 @@ static std::string	createResponse(std::vector<std::string> request, config &srv)
 			break ;
 		}
 	}
-	for (std::vector<serverBlock>::iterator it = srv.getServers().begin(); it != srv.getServers().end(); it++, i++)
+	std::vector<serverBlock>	serversTmp = srv.getServers();
+	for (std::vector<serverBlock>::iterator it = serversTmp.begin(); it != serversTmp.end(); it++, i++)
 		if (host == it->getListen())
 			break ;
-	
 	return("coucou");
 }
 

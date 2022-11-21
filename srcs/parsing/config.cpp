@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:09 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/21 18:25:44 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/21 18:39:50 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ config	&config::operator=(const config &src) {
 
 /*___ getters ___*/
 
-std::vector<serverBlock>	&config::getServers(void) { return (_servers); }
+std::vector<serverBlock>	config::getServers(void) const { return (_servers); }
 std::vector<size_t>			config::getPorts(void) const { return (_ports); }
 
 
