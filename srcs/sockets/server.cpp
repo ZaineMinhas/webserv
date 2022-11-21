@@ -11,8 +11,35 @@
 /* ************************************************************************** */
 
 #include "server.hpp"
-#include <sstream>
-#include <iterator>
+
+static std::string	createResponse(std::vector<std::string> request, config &srv)
+{
+	std::pair<std::string, size_t>	host;
+	size_t	i = 0;
+	for (std::vector<std::string>::iterator it = request.begin(); it != request.end(); it++)
+	{
+		if (*it == "Host: ")
+		{
+			it++;
+			host.first = it->substr(0, it->find(":"));
+			host.second = atol(it->substr(it->find(":"), it->size() - it->find(":")).c_str());
+			break ;
+		}
+	}
+	for (std::vector<serverBlock>::iterator it = srv.getServers().begin(); it != srv.getServers().end(); it++, i++)
+		if (host == it->getListen())
+			break ;
+	
+	return("coucou");
+}
+
+static std::vector<std::string>	split(std::string buff)
+{
+	std::stringstream ss(buff);
+	std::istream_iterator<std::string>	begin(ss);
+	std::istream_iterator<std::string>	end;
+	return (std::vector<std::string>(begin, end));
+}
 
 server::server(std::vector<size_t> ports)
 {
@@ -52,18 +79,18 @@ server	&server::operator=(const server &srv)
 	return (*this);
 }
 
-void	server::handle_client()
+void	server::handle_client(config &srv)
 {
 	std::string	buff;
 	int select_socket = this->_servers.back()._socket;
 
 	while (1)
 	{
-		this->_timeout.tv_sec = 3 * 60;
-		this->_timeout.tv_usec = 0;
+		// this->_timeout.tv_sec = 3 * 60;
+		// this->_timeout.tv_usec = 0;
 
 		this->_cli_set = this->_srv_set;
-		if (select(select_socket + 1, &this->_cli_set, NULL, NULL, &this->_timeout) <= 0)
+		if (select(select_socket + 1, &this->_cli_set, NULL, NULL, NULL) <= 0)
 			throw (server::selectError());
 
 		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
@@ -74,18 +101,16 @@ void	server::handle_client()
 				
 				ssize_t	ret = recv(it->_cli, buffer, 199, 0);
 				if (ret < 0)
-					throw (server::selectError());
+					throw (server::recvError());
 				
 				buff += std::string(buffer, ret);
 				if (buff.find("\r\n\r\n") != std::string::npos)
 				{
-					// request	request(buff, )
-					std::stringstream ss(buff);
-					std::istream_iterator<std::string>	begin(ss);
-					std::istream_iterator<std::string>	end;
-					std::vector<std::string>			request(begin, end);
 					std::cout << buff;
+					std::vector<std::string>	request = split(buff);
+					std::string					respond = createResponse(request, srv);
 					buff.clear();
+					send(it->_cli, "HTTP/1.1 200 Ok\r\nContent-Lenght: 6\r\n\r\n<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset=utf-8/>\n\t\t<title>salut</title>\n\t</head>\n\t<body>\n\t\t<h1>coucou</h1>\n\t</body>\n</html>", 167, 0);
 					it->close_client(&this->_srv_set);
 					this->_clients.erase(it);
 				}
@@ -107,3 +132,4 @@ void	server::handle_client()
 }
 
 const char	*server::selectError::what() const throw() { return ("server: error: select"); }
+const char	*server::recvError::what() const throw() { return ("server: error: recv"); }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/16 16:53:28 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/16 17:24:23 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/21 17:59:49 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,9 @@ int	main(int argc, char **argv) {
 			srv.check_conf_file(argv[1], srv);
 		else
 			srv.check_conf_file("./conf_files/file1.conf", srv);
-	}
-	catch (std::exception &e) { std::cout << e.what() << std::endl; }
 
-    try {
 		server webserv(srv.getPorts());
-		webserv.handle_client();
+		webserv.handle_client(srv);
 	}
 	catch (std::exception &e) { 
 		std::cout << e.what() << std::endl; 
