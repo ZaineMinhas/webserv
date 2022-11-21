@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   serverBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 14:04:18 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/16 17:23:17 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/21 14:14:09 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,19 +154,17 @@ void	serverBlock::checkValues(void) {
 
 directory::directory(void) {}
 
-directory::directory(const directory &src)
-{
+directory::directory(const directory &src) { *this = src; }
+
+directory::~directory(void) {}
+
+directory	&directory::operator=(const directory &src) {
 	_name = src._name;
 	_root = src._root;
 	_index = src._index;
 	_methods = src._methods;
 	_http_redirect = src._http_redirect;
 	_autoindex = src._autoindex;
-}
-
-directory::~directory(void) {}
-
-directory	&directory::operator=(const directory &src) {
 	return (*this);
 }
 
