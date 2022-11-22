@@ -14,23 +14,77 @@
 
 static std::string	createResponse(std::vector<std::string> request, config &srv)
 {
+
+	std::string						response;
+	std::vector<serverBlock>		serversTmp = srv.getServers();
 	std::pair<std::string, size_t>	host;
-	size_t	i = 0;
+	std::string						htmlFileName;
+	size_t							i_s = 0;
+	size_t							i_d = 0;
+
+	/* Get index of the server */
+
 	for (std::vector<std::string>::iterator it = request.begin(); it != request.end(); it++)
 	{
-		if (*it == "Host: ")
+		if (*it == "Host:")
 		{
 			it++;
 			host.first = it->substr(0, it->find(":"));
-			host.second = atol(it->substr(it->find(":"), it->size() - it->find(":")).c_str());
+			std::stringstream	ss(it->substr(it->find(":") + 1, it->size() - it->find(":") + 1));
+			ss >> host.second;
 			break ;
 		}
 	}
-	std::vector<serverBlock>	serversTmp = srv.getServers();
-	for (std::vector<serverBlock>::iterator it = serversTmp.begin(); it != serversTmp.end(); it++, i++)
+	for (std::vector<serverBlock>::iterator it = serversTmp.begin(); it != serversTmp.end(); it++, i_s++)
 		if (host == it->getListen())
 			break ;
-	return("coucou");
+
+	/* Find location index */
+
+	std::vector<directory>	directoriesTmp = serversTmp[i_s].getDirectories();
+
+	for (std::vector<directory>::iterator it = directoriesTmp.begin(); it != directoriesTmp.end(); it++, i_d++)
+		if (it->getName() == request[1])
+			break ;
+
+	/* Add response header */
+
+	if (i_d == directoriesTmp.size())
+	{
+		htmlFileName = serversTmp[i_s].getRoot() + request[1];
+		std::cout << htmlFileName << std::endl;
+	}
+	else
+	{
+		if (!directoriesTmp[i_d].getRoot().empty())
+			htmlFileName += directoriesTmp[i_d].getRoot();
+		else
+			htmlFileName += serversTmp[i_s].getRoot();
+		if (!directoriesTmp[i_d].getIndex().empty())
+			htmlFileName += "/" + directoriesTmp[i_d].getIndex();
+	}
+
+	std::cout << "File name : " << htmlFileName << std::endl;
+
+	response += request[2];
+	response += " 200 Ok";
+	response += ""; // size_t to string
+	response += "\r\n\r\n";
+
+	/* Add html content */
+	
+	std::string		htmlTxt;
+	std::ifstream	ftxt(htmlFileName);
+	if (ftxt) {
+		std::ostringstream	ss;
+		ss << ftxt.rdbuf();
+		htmlTxt = ss.str();
+	}
+	else
+		; // No page to return --> ERROR
+	response += htmlTxt;
+
+	return(response);
 }
 
 static std::vector<std::string>	split(std::string buff)
@@ -108,9 +162,9 @@ void	server::handle_client(config &srv)
 				{
 					std::cout << buff;
 					std::vector<std::string>	request = split(buff);
-					std::string					respond = createResponse(request, srv);
+					std::string					response = createResponse(request, srv);
 					buff.clear();
-					send(it->_cli, "HTTP/1.1 200 Ok\r\nContent-Lenght: 6\r\n\r\n<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset=utf-8/>\n\t\t<title>salut</title>\n\t</head>\n\t<body>\n\t\t<h1>coucou</h1>\n\t</body>\n</html>", 167, 0);
+					send(it->_cli, response.c_str(), response.size(), 0);
 					it->close_client(&this->_srv_set);
 					this->_clients.erase(it);
 				}

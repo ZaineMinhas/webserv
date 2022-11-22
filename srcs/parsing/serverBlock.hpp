@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   serverBlock.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 16:00:26 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/21 17:28:01 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/22 17:59:15 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,19 +63,19 @@ public:
 
 	/*___ getters ___*/
 
-	std::string						getName(void) const;
-	std::string						getRoot(void) const;
-	std::pair<std::string, size_t>	getListen(void) const;
-	bool							getAutoindex(void) const;
-	size_t							getBodySize(void) const;
-	std::vector<directory>			getDirectories(void) const;
-	std::vector<std::string>		getMethods(void) const;
-	std::map<size_t, std::string>	getErrorPages(void) const;
+	std::string						getName(void);
+	std::string						getRoot(void);
+	std::pair<std::string, size_t>	getListen(void);
+	bool							getAutoindex(void);
+	size_t							getBodySize(void);
+	std::vector<directory>			&getDirectories(void);
+	std::vector<std::string>		getMethods(void);
+	std::map<size_t, std::string>	getErrorPages(void);
 
 	/*___ utils ___*/
 
 	void	set(std::string &key, std::string &value);
-	void	add_directory(directory to_add, std::string &name);
+	void	add_directory(const directory &to_add, std::string &name);
 	void	checkValues(void);
 
 };
@@ -87,8 +87,8 @@ public:
 class directory {
 private:
 	std::string								_name;
-	std::string								_root;
 	std::string								_index;
+	std::string								_root;
 	std::vector<std::string>				_methods;
 	std::pair<size_t, std::string>			_http_redirect;
 	bool									_autoindex;
@@ -105,7 +105,7 @@ public:
 	/*___ setters ___*/
 
 	void	setName(std::string &name);
-	void	setRoot(std::string &root);
+	void	setRoot(const std::string &root);
 	void	setIndex(std::string &index);
 	void	setMethods(std::string &methods);
 	void	setHttpRedirect(std::string &redirects);
@@ -113,12 +113,12 @@ public:
 
 	/*___ getters ___*/
 
-	std::string								getName(void) const;
-	std::string								getRoot(void) const;
-	std::string								getIndex(void) const;
-	std::vector<std::string>				getMethods(void) const;
-	std::pair<size_t, std::string>			getHttpRedirect(void) const;
-	bool									getAutoindex(void) const;
+	std::string								getName(void);
+	std::string								getRoot(void);
+	std::string								getIndex(void);
+	std::vector<std::string>				getMethods(void);
+	std::pair<size_t, std::string>			getHttpRedirect(void);
+	bool									getAutoindex(void);
 
 	/*___ utils ___*/
 
