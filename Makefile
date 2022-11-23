@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+         #
+#    By: aliens <aliens@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/11/21 13:59:47 by ctirions          #+#    #+#              #
-#    Updated: 2022/11/22 14:46:21 by ctirions         ###   ########.fr        #
+#    Updated: 2022/11/23 15:00:09 by aliens           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,8 @@ SRCS =	webserv.cpp \
 		srcs/parsing/serverBlock.cpp \
 		srcs/parsing/utils.cpp \
 		srcs/sockets/server.cpp \
-		srcs/sockets/socket.cpp
+		srcs/sockets/socket.cpp \
+		srcs/sockets/responseHttp.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
