@@ -74,7 +74,7 @@ static std::string	createResponse(std::vector<std::string> request, config &srv)
 	/* Add html content */
 	
 	std::string		htmlTxt;
-	std::ifstream	ftxt(htmlFileName);
+	std::ifstream	ftxt(htmlFileName.c_str());
 	if (ftxt) {
 		std::ostringstream	ss;
 		ss << ftxt.rdbuf();
@@ -111,7 +111,7 @@ server::server(std::vector<size_t> ports)
 server::~server()
 {
 	for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
-		FD_CLR(it->_socket, &this->_srv_set);
+		it->close_srvSocket(&this->_srv_set);
 }
 
 server::server(const server& srv)
@@ -158,6 +158,7 @@ void	server::handle_client(config &srv)
 					throw (server::recvError());
 				
 				buff += std::string(buffer, ret);
+
 				if (buff.find("\r\n\r\n") != std::string::npos)
 				{
 					std::cout << buff;
@@ -168,6 +169,8 @@ void	server::handle_client(config &srv)
 					it->close_client(&this->_srv_set);
 					this->_clients.erase(it);
 				}
+				else
+					send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
 				break;
 			}
 		}

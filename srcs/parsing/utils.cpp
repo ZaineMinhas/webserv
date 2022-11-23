@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:19:12 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/22 15:19:24 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/23 01:08:46 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ const std::string WHITESPACE = " \n\r\t\f\v";
 std::string	file_to_string(std::string file)
 {
 	std::string		txt;
-	std::ifstream	ftxt(file);
+	std::ifstream	ftxt(file.c_str());
 	if (ftxt) {
 		std::ostringstream	ss;
 		ss << ftxt.rdbuf();

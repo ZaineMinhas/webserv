@@ -3,15 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   serverBlock.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 16:00:26 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/22 17:59:15 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/23 01:03:44 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVERBLOCK_HPP
 # define SERVERBLOCK_HPP
+
+#include <stdlib.h>
 
 # include <string>
 # include <iostream>
