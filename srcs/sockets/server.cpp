@@ -175,10 +175,7 @@ void	server::handle_client(config &srv)
 					this->_clients.erase(it);
 				}
 				else
-				{
-					std::cout << "HTTP/1.1 100 Continue" << std::endl;
 					send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
-				}
 				break;
 			}
 		}
