@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/27 18:14:53 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/27 18:47:13 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,15 +94,13 @@ bool    responseHttp::_createHeader()
 bool	responseHttp::_errorPage(std::string code)
 {
 	this->_htmlFileName.clear();
+	this->_response.clear();
 	
 	for (std::vector<directory>::iterator it = this->_servers[this->_i_s].getDirectories().begin(); it < this->_servers[this->_i_s].getDirectories().end(); it++ )
 	{
 		if (it->getName() == "error_pages")
 		{
-			if (!it->getRoot().empty())
-				this->_htmlFileName += it->getRoot();
-			else
-				this->_htmlFileName += this->_servers[this->_i_s].getRoot();
+			!it->getRoot().empty() ? this->_htmlFileName += it->getRoot() : this->_htmlFileName += this->_servers[this->_i_s].getRoot();
 			break;
 		}
 	}
@@ -129,7 +127,7 @@ bool    responseHttp::_addHtml()
 		htmlTxt = ss.str();
 	}
 	else
-		return (this->_errorPage("404")); // No page to return --> ERROR
+		return (false); // No page to return --> ERROR
 	
 	this->_response += htmlTxt;
 
@@ -152,5 +150,5 @@ void    responseHttp::createResponse()
     if (!this->_createHeader())
 		return ;
 	if (!this->_addHtml())
-		return ;
+		this->_errorPage("404");
 }
