@@ -11,8 +11,15 @@
 /* ************************************************************************** */
 
 #include "server.hpp"
-#include <sstream>
-#include <iterator>
+#include "responseHttp.hpp"
+
+static std::vector<std::string>	split(std::string buff)
+{
+	std::stringstream ss(buff);
+	std::istream_iterator<std::string>	begin(ss);
+	std::istream_iterator<std::string>	end;
+	return (std::vector<std::string>(begin, end));
+}
 
 server::server(std::vector<size_t> ports)
 {
@@ -30,7 +37,7 @@ server::server(std::vector<size_t> ports)
 server::~server()
 {
 	for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
-		FD_CLR(it->_socket, &this->_srv_set);
+		it->close_srvSocket(&this->_srv_set);
 }
 
 server::server(const server& srv)
@@ -52,18 +59,18 @@ server	&server::operator=(const server &srv)
 	return (*this);
 }
 
-void	server::handle_client()
+void	server::handle_client(config &srv)
 {
 	std::string	buff;
 	int select_socket = this->_servers.back()._socket;
 
 	while (1)
 	{
-		this->_timeout.tv_sec = 3 * 60;
-		this->_timeout.tv_usec = 0;
+		// this->_timeout.tv_sec = 3 * 60;
+		// this->_timeout.tv_usec = 0;
 
 		this->_cli_set = this->_srv_set;
-		if (select(select_socket + 1, &this->_cli_set, NULL, NULL, &this->_timeout) <= 0)
+		if (select(select_socket + 1, &this->_cli_set, NULL, NULL, NULL) <= 0)
 			throw (server::selectError());
 
 		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
@@ -74,21 +81,23 @@ void	server::handle_client()
 				
 				ssize_t	ret = recv(it->_cli, buffer, 199, 0);
 				if (ret < 0)
-					throw (server::selectError());
+					throw (server::recvError());
 				
 				buff += std::string(buffer, ret);
+
 				if (buff.find("\r\n\r\n") != std::string::npos)
 				{
-					// request	request(buff, )
-					std::stringstream ss(buff);
-					std::istream_iterator<std::string>	begin(ss);
-					std::istream_iterator<std::string>	end;
-					std::vector<std::string>			request(begin, end);
 					std::cout << buff;
+					std::vector<std::string>	request = split(buff);
+					responseHttp	response(request, srv.getServers());
+					response.createResponse();
 					buff.clear();
+					send(it->_cli, response.toSend(), response.size(), 0);
 					it->close_client(&this->_srv_set);
 					this->_clients.erase(it);
 				}
+				else
+					send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
 				break;
 			}
 		}
@@ -107,3 +116,4 @@ void	server::handle_client()
 }
 
 const char	*server::selectError::what() const throw() { return ("server: error: select"); }
+const char	*server::recvError::what() const throw() { return ("server: error: recv"); }
