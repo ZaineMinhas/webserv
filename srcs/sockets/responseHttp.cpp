@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/27 19:24:33 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/28 00:52:57 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,42 +51,58 @@ void    responseHttp::_getLocationIndex()
 
 bool    responseHttp::_createHeader()
 {
-	if (this->_i_d != this->_directories.size()) // if location
+    if (this->_i_d == this->_directories.size()) // if no location
 	{
-		std::string	root;
-		this->_directories[this->_i_d].getRoot().empty() ? root = this->_servers[this->_i_s].getRoot() : root = this->_directories[this->_i_d].getRoot();
-
-		this->_htmlFileName += root;
-		std::cout << "ROOT : " << root << std::endl;
-		if (this->_request[1].size() == this->_directories[this->_i_d].getName().size())
-		{
-			if (!this->_directories[this->_i_d].getIndex().empty())
-				this->_htmlFileName += "/" + this->_directories[this->_i_d].getIndex();
-			else if (this->_directories[this->_i_d].getAutoindex())
-				; // create autoindex
-			else if (this->_servers[this->_i_s].getAutoindex())
-				; // create autoindex
-			else
-				return (this->_errorPage("500"));
-		}
-		else
-			this->_htmlFileName += "/" + this->_request[1].substr(this->_directories[this->_i_d].getName().size(), this->_request[1].size() - this->_directories[this->_i_d].getName().size());
-		
-		std::cout << "File name : " << this->_htmlFileName << std::endl;
-		std::cout << std::endl << "---------------------" << std::endl;
-
-		this->_response += this->_request[2] + " 200 Ok" + ""/*size_t to string*/ + "\r\n\r\n";
-		return (true);
+		this->_htmlFileName = this->_servers[this->_i_s].getRoot() + this->_request[1];
+				
 	}
-	
-	size_t	untilSlash = this->_servers[this->_i_s].getRoot().find("/");
-	this->_htmlFileName += this->_servers[this->_i_s].getRoot();
-	if (this->_servers[this->_i_s].getRoot().substr(untilSlash, this->_servers[this->_i_s].getRoot().size() - untilSlash) == this->_request[1].substr(0, this->_servers[this->_i_s].getRoot().size() - 1))
-		this->_htmlFileName += "/" + this->_request[1].substr(this->_servers[this->_i_s].getRoot().size(), this->_request[1].size() - this->_servers[this->_i_s].getRoot().size());
-	else
-		this->_htmlFileName += this->_request[1];
+	else // if location
+	{
+		if (!this->_directories[this->_i_d].getRoot().empty()) // if root
+		{
+			this->_htmlFileName += this->_directories[this->_i_d].getRoot();
+			if (this->_request[1] == this->_directories[this->_i_d].getName())
+			{
+				if (!this->_directories[this->_i_d].getIndex().empty())
+					this->_htmlFileName += "/" + this->_directories[this->_i_d].getIndex();
+				else if (this->_directories[this->_i_d].getAutoindex())
+					; // create autoindex
+				else if (this->_servers[this->_i_s].getAutoindex())
+					; // create autoindex
+				else
+					return (this->_errorPage("500"));
+			}
+			else
+				this->_htmlFileName += this->_request[1].substr(this->_directories[this->_i_d].getName().size(), this->_request[1].size() - this->_directories[this->_i_d].getName().size());			
+		}
+		else // if no root
+		{
+			size_t	untilSlash = this->_servers[this->_i_s].getRoot().find("/");
+			this->_htmlFileName += this->_servers[this->_i_s].getRoot();
+			std::cout << _request[1] << std::endl;
+			if (this->_servers[this->_i_s].getRoot().substr(untilSlash, this->_servers[this->_i_s].getRoot().size() - untilSlash) == this->_request[1] || \
+				this->_directories[this->_i_d].getName() == this->_request[1])
+			{
+				if (!this->_directories[this->_i_d].getIndex().empty())
+					this->_htmlFileName += "/" + this->_directories[this->_i_d].getIndex();
+				else if (this->_directories[this->_i_d].getAutoindex())
+					; // create autoindex
+				else if (this->_servers[this->_i_s].getAutoindex())
+					; // create autoindex
+				else
+					return (this->_errorPage("500"));
+			}
+			else
+			{
+				if (this->_servers[this->_i_s].getRoot().substr(untilSlash, this->_servers[this->_i_s].getRoot().size() - untilSlash) == this->_request[1].substr(0, this->_servers[this->_i_s].getRoot().size() - untilSlash))
+					this->_htmlFileName += "/" + this->_request[1].substr(this->_servers[this->_i_s].getRoot().size(), this->_request[1].size() - this->_servers[this->_i_s].getRoot().size());
+				else
+					this->_htmlFileName += this->_request[1];
+			}
+		}
+	}
     
-	std::cout << "File name : " << this->_htmlFileName << std::endl;
+    std::cout << "File name : " << this->_htmlFileName << std::endl;
 	std::cout << std::endl << "---------------------" << std::endl;
 
 	this->_response += this->_request[2] + " 200 Ok" + ""/*size_t to string*/ + "\r\n\r\n";
@@ -129,7 +145,7 @@ bool    responseHttp::_addHtml()
 		htmlTxt = ss.str();
 	}
 	else
-		return (false); // No page to return --> ERROR
+		return (this->_errorPage("404")); // No page to return --> ERROR
 	
 	this->_response += htmlTxt;
 
@@ -152,5 +168,5 @@ void    responseHttp::createResponse()
     if (!this->_createHeader())
 		return ;
 	if (!this->_addHtml())
-		this->_errorPage("404");
+		return ;
 }
