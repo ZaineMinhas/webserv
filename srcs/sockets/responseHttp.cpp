@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/25 16:32:38 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/27 18:14:53 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,65 +35,91 @@ void    responseHttp::_getLocationIndex()
     this->_directories = this->_servers[this->_i_s].getDirectories();
 	int	id = -1;
 
-
 	for (std::vector<directory>::iterator it = this->_directories.begin(); it != this->_directories.end(); it++, this->_i_d++) {	
-		std::string	toCompare = this->_request[1].substr(0, it->getName().size());
-		if (it->getName() == toCompare)
+		if (it->getName() == this->_request[1])
 		{
 			if (id == -1)
 				id = this->_i_d;
 			else if (it->getName().size() > this->_directories[id].getName().size())
 				id = this->_i_d;
-			
 		}
 	}
 	id == -1 ? this->_directories.size() : this->_i_d = id;
 }
 
-void    responseHttp::_createHeader()
+bool    responseHttp::_createHeader()
 {
-    if (this->_i_d == this->_directories.size()) // if no location
+	if (this->_i_d != this->_directories.size()) // if location
 	{
-		this->_htmlFileName = this->_servers[this->_i_s].getRoot() + this->_request[1];
-				
-	}
-	else // if location
-	{
-		if (!this->_directories[this->_i_d].getRoot().empty()) // if root
+		std::string	root;
+		if (this->_directories[this->_i_d].getRoot().empty()) // if root
+			root = this->_servers[this->_i_s].getRoot();
+
+		this->_htmlFileName += root;
+		if (this->_request[1].size() == this->_directories[this->_i_d].getName().size())
 		{
-			this->_htmlFileName += this->_directories[this->_i_d].getRoot();
-			if (this->_request[1].size() == this->_directories[this->_i_d].getName().size())
-			{
-				if (!this->_directories[this->_i_d].getIndex().empty())
-					this->_htmlFileName += "/" + this->_directories[this->_i_d].getIndex();
-				else if (this->_directories[this->_i_d].getAutoindex())
-					; // create autoindex
-				else if (this->_servers[this->_i_s].getAutoindex())
-					; // create autoindex
-				else
-					; // send error page
-			}
+			if (!this->_directories[this->_i_d].getIndex().empty())
+				this->_htmlFileName += "/" + this->_directories[this->_i_d].getIndex();
+			else if (this->_directories[this->_i_d].getAutoindex())
+				; // create autoindex
+			else if (this->_servers[this->_i_s].getAutoindex())
+				; // create autoindex
 			else
-				this->_htmlFileName += this->_request[1].substr(this->_directories[this->_i_d].getName().size(), this->_request[1].size() - this->_directories[this->_i_d].getName().size());			
+				return (this->_errorPage("500"));
 		}
-		else // if no root
-		{
-			size_t	untilSlash = this->_servers[this->_i_s].getRoot().find("/");
-			this->_htmlFileName += this->_servers[this->_i_s].getRoot();
-			if (this->_servers[this->_i_s].getRoot().substr(untilSlash, this->_servers[this->_i_s].getRoot().size() - untilSlash) == this->_request[1].substr(0, this->_servers[this->_i_s].getRoot().size() - 1))
-				this->_htmlFileName += "/" + this->_request[1].substr(this->_servers[this->_i_s].getRoot().size(), this->_request[1].size() - this->_servers[this->_i_s].getRoot().size());
-			else
-				this->_htmlFileName += this->_request[1];
-		}
+		else
+			this->_htmlFileName += this->_request[1].substr(this->_directories[this->_i_d].getName().size(), this->_request[1].size() - this->_directories[this->_i_d].getName().size());
+		
+		std::cout << "File name : " << this->_htmlFileName << std::endl;
+		std::cout << std::endl << "---------------------" << std::endl;
+
+		this->_response += this->_request[2] + " 200 Ok" + ""/*size_t to string*/ + "\r\n\r\n";
+		return (true);
 	}
+	
+	size_t	untilSlash = this->_servers[this->_i_s].getRoot().find("/");
+	this->_htmlFileName += this->_servers[this->_i_s].getRoot();
+	if (this->_servers[this->_i_s].getRoot().substr(untilSlash, this->_servers[this->_i_s].getRoot().size() - untilSlash) == this->_request[1].substr(0, this->_servers[this->_i_s].getRoot().size() - 1))
+		this->_htmlFileName += "/" + this->_request[1].substr(this->_servers[this->_i_s].getRoot().size(), this->_request[1].size() - this->_servers[this->_i_s].getRoot().size());
+	else
+		this->_htmlFileName += this->_request[1];
     
-    std::cout << "File name : " << this->_htmlFileName << std::endl;
+	std::cout << "File name : " << this->_htmlFileName << std::endl;
 	std::cout << std::endl << "---------------------" << std::endl;
 
 	this->_response += this->_request[2] + " 200 Ok" + ""/*size_t to string*/ + "\r\n\r\n";
+	return (true);
 }
 
-void    responseHttp::_addHtml()
+bool	responseHttp::_errorPage(std::string code)
+{
+	this->_htmlFileName.clear();
+	
+	for (std::vector<directory>::iterator it = this->_servers[this->_i_s].getDirectories().begin(); it < this->_servers[this->_i_s].getDirectories().end(); it++ )
+	{
+		if (it->getName() == "error_pages")
+		{
+			if (!it->getRoot().empty())
+				this->_htmlFileName += it->getRoot();
+			else
+				this->_htmlFileName += this->_servers[this->_i_s].getRoot();
+			break;
+		}
+	}
+	if (this->_htmlFileName.empty())
+		this->_htmlFileName += "./error_pages";
+
+	this->_htmlFileName += "/" + code + ".html";
+	this->_response += this->_request[2] + " " + code + ""/*size_t to string*/ + "\r\n\r\n";
+	this->_addHtml();
+
+	std::cout << "Error page : " << this->_htmlFileName << std::endl;
+	std::cout << std::endl << "---------------------" << std::endl;
+
+	return (false);
+}
+
+bool    responseHttp::_addHtml()
 {
     std::string		htmlTxt;
 	std::ifstream	ftxt(this->_htmlFileName.c_str());
@@ -103,8 +129,11 @@ void    responseHttp::_addHtml()
 		htmlTxt = ss.str();
 	}
 	else
-		; // No page to return --> ERROR
+		return (this->_errorPage("404")); // No page to return --> ERROR
+	
 	this->_response += htmlTxt;
+
+	return (true);
 }
 
 /////////////////////////////////////////////////////////////////
@@ -120,6 +149,8 @@ void    responseHttp::createResponse()
 {
     this->_getServerIndex();
     this->_getLocationIndex();
-    this->_createHeader();
-    this->_addHtml();
+    if (!this->_createHeader())
+		return ;
+	if (!this->_addHtml())
+		return ;
 }

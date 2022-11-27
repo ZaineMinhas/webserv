@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.42.fr>              +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/23 15:05:16 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/27 16:50:26 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,10 @@ private:
     void    _getServerIndex();
     void    _getLocationIndex();
 
-    void    _createHeader();
+    bool    _createHeader();
+    bool    _errorPage(std::string code);
 
-    void    _addHtml();
+    bool    _addHtml();
 
 public:
     responseHttp(std::vector<std::string> request, std::vector<serverBlock> servers);
