@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/27 18:47:13 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/27 19:24:33 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,10 @@ void    responseHttp::_getLocationIndex()
     this->_directories = this->_servers[this->_i_s].getDirectories();
 	int	id = -1;
 
-	for (std::vector<directory>::iterator it = this->_directories.begin(); it != this->_directories.end(); it++, this->_i_d++) {	
-		if (it->getName() == this->_request[1])
+	for (std::vector<directory>::iterator it = this->_directories.begin(); it != this->_directories.end(); it++, this->_i_d++)
+	{	
+		std::string	toCompare = this->_request[1].substr(0, it->getName().size());
+		if (it->getName() == toCompare)
 		{
 			if (id == -1)
 				id = this->_i_d;
@@ -52,10 +54,10 @@ bool    responseHttp::_createHeader()
 	if (this->_i_d != this->_directories.size()) // if location
 	{
 		std::string	root;
-		if (this->_directories[this->_i_d].getRoot().empty()) // if root
-			root = this->_servers[this->_i_s].getRoot();
+		this->_directories[this->_i_d].getRoot().empty() ? root = this->_servers[this->_i_s].getRoot() : root = this->_directories[this->_i_d].getRoot();
 
 		this->_htmlFileName += root;
+		std::cout << "ROOT : " << root << std::endl;
 		if (this->_request[1].size() == this->_directories[this->_i_d].getName().size())
 		{
 			if (!this->_directories[this->_i_d].getIndex().empty())
@@ -68,7 +70,7 @@ bool    responseHttp::_createHeader()
 				return (this->_errorPage("500"));
 		}
 		else
-			this->_htmlFileName += this->_request[1].substr(this->_directories[this->_i_d].getName().size(), this->_request[1].size() - this->_directories[this->_i_d].getName().size());
+			this->_htmlFileName += "/" + this->_request[1].substr(this->_directories[this->_i_d].getName().size(), this->_request[1].size() - this->_directories[this->_i_d].getName().size());
 		
 		std::cout << "File name : " << this->_htmlFileName << std::endl;
 		std::cout << std::endl << "---------------------" << std::endl;
