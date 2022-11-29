@@ -18,15 +18,21 @@ body {
 h1 {
 	color:rgb(252, 223, 1);
 	font-weight: normal;
-	font-size: 8em;
+	font-size: 10em;
 	text-shadow: 1px 1px 1px black;
 	margin-bottom: 0px;
 }
 
 p {
 	color: white;
-	font-size: 3em;
+	font-size: 4em;
 	margin-top: -5px;
+}
+
+.lien {
+	color: wheat;
+	font-size: 3em;
+	text-decoration: none;
 }
 
 .credit {
@@ -46,8 +52,10 @@ p {
 }
 
 .mangue {
+	text-decoration: none;
 	font-size: 3px;
 	position: absolute;
+	top: 35vh;
 	left: 1vw;
 }
 
