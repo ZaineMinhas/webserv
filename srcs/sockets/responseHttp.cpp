@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/28 00:52:57 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/29 18:04:55 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,8 @@ void    responseHttp::_getLocationIndex()
 
 bool    responseHttp::_createHeader()
 {
+	// get File Name
+
     if (this->_i_d == this->_directories.size()) // if no location
 	{
 		this->_htmlFileName = this->_servers[this->_i_s].getRoot() + this->_request[1];
@@ -103,9 +105,35 @@ bool    responseHttp::_createHeader()
 	}
     
     std::cout << "File name : " << this->_htmlFileName << std::endl;
-	std::cout << std::endl << "---------------------" << std::endl;
+	std::cout << std::endl << "##################" << std::endl;
 
-	this->_response += this->_request[2] + " 200 Ok" + ""/*size_t to string*/ + "\r\n\r\n";
+	this->_response += this->_request[2] + " 200 OK";
+	std::string	mime;
+	size_t		pos = _htmlFileName.find_last_of(".");
+	if (pos != std::string::npos) // get Content-type
+	{
+		std::string	fileType = _htmlFileName.substr(pos, _htmlFileName.size() - pos);
+		if (fileType == ".css")
+			mime = "text/css";
+		else if (fileType == ".html")
+			mime = "text/html";
+		else if (fileType == ".gif")
+			mime = "image/gif";
+		else if (fileType == ".png")
+			mime = "image/png";
+		else if (fileType == ".jpeg" || fileType == ".jpg")
+			mime = "image/jpeg";
+		else if (fileType == ".json")
+			mime = "application/json";
+		else if (fileType == ".pdf")
+			mime = "application/pdf";
+		else if (fileType == ".ico")
+			mime = "image/vnd.microsoft.icon";
+		else if (fileType == ".woff2")
+			mime = "application/xhtml+xml";
+
+		_response += "\r\nContent-Type: " + mime;
+	}
 	return (true);
 }
 
@@ -147,7 +175,7 @@ bool    responseHttp::_addHtml()
 	else
 		return (this->_errorPage("404")); // No page to return --> ERROR
 	
-	this->_response += htmlTxt;
+	_htmlTxt = htmlTxt;
 
 	return (true);
 }
@@ -169,4 +197,12 @@ void    responseHttp::createResponse()
 		return ;
 	if (!this->_addHtml())
 		return ;
+	std::stringstream	ss;
+
+	// place content-lenght
+
+	ss << _htmlTxt.size();
+	std::string	size = ss.str();
+	_response += "\n\rContent-Lenght: " + size + "\r\n\r\n";
+	_response += _htmlTxt;
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/27 16:50:26 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/29 17:49:17 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ private:
     std::string						_response;
 	std::pair<std::string, size_t>	_host;
 	std::string						_htmlFileName;
+    std::string                     _htmlTxt;
 	size_t							_i_s;
 	size_t							_i_d;
 

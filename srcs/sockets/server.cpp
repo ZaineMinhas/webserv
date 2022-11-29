@@ -81,7 +81,7 @@ void	server::handle_client(config &srv)
 				
 				ssize_t	ret = recv(it->_cli, buffer, 199, 0);
 				if (ret < 0)
-					throw (server::recvError());
+					continue ;
 				
 				buff += std::string(buffer, ret);
 
@@ -92,6 +92,7 @@ void	server::handle_client(config &srv)
 					responseHttp	response(request, srv.getServers());
 					response.createResponse();
 					buff.clear();
+					std::cout << "\n" << response.toSend() << "\n-------------------\n";
 					send(it->_cli, response.toSend(), response.size(), 0);
 					it->close_client(&this->_srv_set);
 					this->_clients.erase(it);
