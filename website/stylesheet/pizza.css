@@ -39,6 +39,8 @@ a { text-decoration: none; }
 
 .autre { text-decoration: line-through; }
 
+.prix { margin-top: -28vh; }
+
 .test
 {
 	color: blue;
