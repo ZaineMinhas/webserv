@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:02:19 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/15 14:12:09 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/01 16:16:14 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 
+#include <vector>
 #include <iostream>
 
 struct srvSocket {
@@ -44,9 +45,10 @@ struct srvSocket {
 };
 
 struct client {
-	int			_cli;
-	sockaddr_in	_from;
-	socklen_t	_fromlen;
+	int							_cli;
+	sockaddr_in					_from;
+	socklen_t					_fromlen;
+	std::vector<std::string>	_response;
 
 	client(int srv, fd_set *set);
 	client(const client &cli);
