@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:23:06 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/16 13:30:12 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/29 17:47:52 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,14 @@
 #define SERVER_HPP
 
 #include "socket.hpp"
+#include "../parsing/config.hpp"
 
 #include <string.h>
 #include <sys/select.h>
 #include <sys/time.h>
 
+#include <sstream>
+#include <iterator>
 #include <vector>
 
 struct server {
@@ -34,9 +37,10 @@ struct server {
 
 	server	&operator=(const server &srv);
 	
-	void	handle_client();
+	void	handle_client(config &srv);
 
 	struct selectError : public std::exception { virtual const char *what() const throw(); };
+	struct recvError : public std::exception { virtual const char *what() const throw(); };
 };
 
 #endif
