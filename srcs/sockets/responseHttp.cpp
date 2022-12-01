@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/01 16:27:35 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/01 18:27:48 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,6 @@ bool	responseHttp::_findFileName(void)
 		{
 			size_t	untilSlash = this->_servers[this->_i_s].getRoot().find("/");
 			this->_fileName += this->_servers[this->_i_s].getRoot();
-			std::cout << _request[1] << std::endl;
 			if (this->_servers[this->_i_s].getRoot().substr(untilSlash, this->_servers[this->_i_s].getRoot().size() - untilSlash) == this->_request[1] || \
 				this->_directories[this->_i_d].getName() == this->_request[1])
 			{
@@ -104,7 +103,6 @@ bool	responseHttp::_findFileName(void)
 
 bool    responseHttp::_createHeader(void)
 {
-
 	this->_response += this->_request[2] + " 200 OK";
 
 	std::string	mime = "";
@@ -131,14 +129,16 @@ bool    responseHttp::_createHeader(void)
 			mime = "image/vnd.microsoft.icon";
 		else if (fileType == ".woff2")
 			mime = "application/xhtml+xml";
-		if (!mime.empty())
-			_response += "\r\nContent-Type: " + mime;
 	}
 
 	std::stringstream	length;
 
 	length << _htmlTxt.size();
-	_response += "\n\rContent-Lenght: " + length.str() + "\r\n\r\n" + _htmlTxt;
+	_response += "\nContent-Length: " + length.str();
+	if (!mime.empty())
+		_response += "\nContent-Type: " + mime + "\r\n\r\n" + _htmlTxt;
+	// for (size_t index = 0; _response.size() > index * 65536; index++)
+	// 	std::cout << _response.substr(index * 65536, (index + 1) * 65536).c_str() << std::endl;
 	return (true);
 }
 
@@ -162,9 +162,6 @@ bool	responseHttp::_errorPage(std::string code)
 	this->_response += this->_request[2] + " " + code + ""/*size_t to string*/ + "\r\n\r\n";
 	this->_addHtml();
 
-	std::cout << "Error page : " << this->_fileName << std::endl;
-	std::cout << std::endl << "---------------------" << std::endl;
-
 	return (false);
 }
 
@@ -186,13 +183,13 @@ bool    responseHttp::_addHtml(void)
 
 void	responseHttp::_makeResponseList(void)
 {
-	size_t	bufferSize = 1000;
+	size_t	bufferSize = 65536;
 
 	if (this->_response.size() < bufferSize)
 		this->_responseList.push_back(this->_response);
 	else
-		for (size_t	index = 0; this->_response.size() > index * bufferSize; index++)
-			this->_responseList.push_back(this->_response.substr(index * bufferSize, (index + 1) * bufferSize));
+		for (size_t index = 0; _response.size() > index * bufferSize; index++)
+			this->_responseList.push_back(_response.substr(index * bufferSize, (index + 1) * bufferSize).c_str());
 }
 
 /////////////////////////////////////////////////////////////////
@@ -209,12 +206,8 @@ std::vector<std::string>    responseHttp::createResponse(void)
 {
     this->_getServerIndex();
     this->_getLocationIndex();
-	if (!this->_findFileName())
-		return ;
-	if (!this->_addHtml())
-		return ;
-    if (!this->_createHeader())
-		return ;
+	if (this->_findFileName() && this->_addHtml() && this->_createHeader())
+		;
 	this->_makeResponseList();
 	return (this->_responseList);
 }
