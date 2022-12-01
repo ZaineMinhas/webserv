@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/01 16:25:21 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/01 16:27:35 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,7 +205,7 @@ const char  *responseHttp::toSend(void) const { return(this->_response.c_str());
 std::string	responseHttp::getResponse(void) const { return (this->_response); }
 int      	responseHttp::size(void) const { return(this->_response.size()); }
 
-void    responseHttp::createResponse(void)
+std::vector<std::string>    responseHttp::createResponse(void)
 {
     this->_getServerIndex();
     this->_getLocationIndex();
