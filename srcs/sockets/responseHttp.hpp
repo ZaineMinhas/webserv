@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/01 15:36:51 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/01 16:25:48 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,14 +35,15 @@ private:
     bool    _findFileName();
     bool    _createHeader();
     bool    _errorPage(std::string code);
-
     bool    _addHtml();
+
+    void     _makeResponseList();
 
 public:
     responseHttp(std::vector<std::string> request, std::vector<serverBlock> servers);
     ~responseHttp();
 
-    void    createResponse();
+    std::vector<std::string>    createResponse();
 
     const char  *toSend() const;
     int           size() const;

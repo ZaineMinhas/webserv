@@ -6,13 +6,13 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/01 15:31:12 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/01 16:27:35 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "responseHttp.hpp"
 
-void    responseHttp::_getServerIndex()
+void    responseHttp::_getServerIndex(void)
 {
 	for (std::vector<std::string>::iterator it = this->_request.begin(); it != this->_request.end(); it++)
 	{
@@ -30,7 +30,7 @@ void    responseHttp::_getServerIndex()
 			break ;
 }
 
-void    responseHttp::_getLocationIndex()
+void    responseHttp::_getLocationIndex(void)
 {
     this->_directories = this->_servers[this->_i_s].getDirectories();
 	int	id = -1;
@@ -50,7 +50,7 @@ void    responseHttp::_getLocationIndex()
 }
 
 
-bool	responseHttp::_findFileName()
+bool	responseHttp::_findFileName(void)
 {
 	if (this->_i_d == this->_directories.size()) // if no location
 		this->_fileName = this->_servers[this->_i_s].getRoot() + this->_request[1];
@@ -102,7 +102,7 @@ bool	responseHttp::_findFileName()
 	return (true);
 }
 
-bool    responseHttp::_createHeader()
+bool    responseHttp::_createHeader(void)
 {
 
 	this->_response += this->_request[2] + " 200 OK";
@@ -168,7 +168,7 @@ bool	responseHttp::_errorPage(std::string code)
 	return (false);
 }
 
-bool    responseHttp::_addHtml()
+bool    responseHttp::_addHtml(void)
 {
     std::string		htmlTxt;
 	std::ifstream	ftxt(this->_fileName.c_str());
@@ -184,17 +184,28 @@ bool    responseHttp::_addHtml()
 	return (true);
 }
 
+void	responseHttp::_makeResponseList(void)
+{
+	size_t	bufferSize = 1000;
+
+	if (this->_response.size() < bufferSize)
+		this->_responseList.push_back(this->_response);
+	else
+		for (size_t	index = 0; this->_response.size() > index * bufferSize; index++)
+			this->_responseList.push_back(this->_response.substr(index * bufferSize, (index + 1) * bufferSize));
+}
+
 /////////////////////////////////////////////////////////////////
 
 responseHttp::responseHttp(std::vector<std::string> request, std::vector<serverBlock> servers) : _servers(servers), _request(request), _i_s(0), _i_d(0) {}
 
-responseHttp::~responseHttp() {}
+responseHttp::~responseHttp(void) {}
 
-const char  *responseHttp::toSend() const { return(this->_response.c_str()); }
+const char  *responseHttp::toSend(void) const { return(this->_response.c_str()); }
 std::string	responseHttp::getResponse(void) const { return (this->_response); }
-int      	responseHttp::size() const { return(this->_response.size()); }
+int      	responseHttp::size(void) const { return(this->_response.size()); }
 
-void    responseHttp::createResponse()
+std::vector<std::string>    responseHttp::createResponse(void)
 {
     this->_getServerIndex();
     this->_getLocationIndex();
@@ -204,4 +215,6 @@ void    responseHttp::createResponse()
 		return ;
     if (!this->_createHeader())
 		return ;
+	this->_makeResponseList();
+	return (this->_responseList);
 }
