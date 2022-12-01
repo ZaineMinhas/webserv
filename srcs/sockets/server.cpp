@@ -92,7 +92,6 @@ void	server::handle_client(config &srv)
 					responseHttp	response(request, srv.getServers());
 					response.createResponse();
 					buff.clear();
-					std::cout << "\n" << response.toSend() << "\n-------------------\n";
 					send(it->_cli, response.toSend(), response.size(), 0);
 					it->close_client(&this->_srv_set);
 					this->_clients.erase(it);
