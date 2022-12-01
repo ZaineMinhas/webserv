@@ -81,7 +81,7 @@ void	server::handle_client(config &srv)
 				
 				ssize_t	ret = recv(it->_cli, buffer, 199, 0);
 				if (ret < 0)
-					throw (server::recvError());
+					continue ;
 				
 				buff += std::string(buffer, ret);
 
