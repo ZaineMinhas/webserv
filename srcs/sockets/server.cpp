@@ -90,11 +90,17 @@ void	server::handle_client(config &srv)
 					std::cout << buff;
 					std::vector<std::string>	request = split(buff);
 					responseHttp	response(request, srv.getServers());
-					response.createResponse();
+					it->_response = response.createResponse();
 					buff.clear();
-					send(it->_cli, response.toSend(), response.size(), 0);
-					it->close_client(&this->_srv_set);
-					this->_clients.erase(it);
+
+					send(it->_cli, it->_response[0].c_str(), it->_response[0].size(), 0);
+					if (it->_response.empty())
+					{
+						it->close_client(&this->_srv_set);
+						this->_clients.erase(it);
+					}
+					else
+						continue ;
 				}
 				else
 					send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
