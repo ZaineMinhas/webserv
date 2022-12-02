@@ -70,8 +70,14 @@ void	server::handle_client(config &srv)
 		// this->_timeout.tv_usec = 0;
 
 		this->_cli_set = this->_srv_set;
+		std::cout << "select_socket : " << select_socket << std::endl;
 		if (select(select_socket + 1, &this->_cli_set, NULL, NULL, NULL) <= 0)
 			throw (server::selectError());
+
+		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+			std::cout << it->_cli << std::endl;
+
+		std::cout <<  "######################" << std::endl;
 
 		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 		{
@@ -85,22 +91,30 @@ void	server::handle_client(config &srv)
 				
 				buff += std::string(buffer, ret);
 
+				std::cout << "HERE!!!!!!!!!!!!!!!  : " << it->_cli << std::endl;	
 				if (buff.find("\r\n\r\n") != std::string::npos)
 				{
-					std::cout << buff;
-					std::vector<std::string>	request = split(buff);
-					responseHttp	response(request, srv.getServers());
-					it->_response = response.createResponse();
-					buff.clear();
-
-					send(it->_cli, it->_response[0].c_str(), it->_response[0].size(), 0);
+					std::cout << buff << std::endl << " client : " << it->_cli << std::endl;
 					if (it->_response.empty())
 					{
+						std::vector<std::string>	request = split(buff);
+						responseHttp	response(request, srv.getServers());
+						it->_response = response.createResponse();
+					}
+					// for (std::vector<std::string>::iterator iter = it->_response.begin(); iter != it->_response.end(); iter++)
+					// 	std::cout << iter->c_str() << "\n----------------------" <<std::endl;
+					buff.clear();
+
+					int ret = send(it->_cli, it->_response[0].c_str(), it->_response[0].size(), 0);
+					std::cout << ret << std::endl;
+					it->_response.erase(it->_response.begin());
+					if (it->_response.empty())
+					{
+						std::cout << "SALUT\n ";
 						it->close_client(&this->_srv_set);
 						this->_clients.erase(it);
 					}
-					else
-						continue ;
+					std::cout << "------------------\n\n";
 				}
 				else
 					send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);

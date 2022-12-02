@@ -6,13 +6,13 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/01 15:31:12 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/01 18:27:48 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "responseHttp.hpp"
 
-void    responseHttp::_getServerIndex()
+void    responseHttp::_getServerIndex(void)
 {
 	for (std::vector<std::string>::iterator it = this->_request.begin(); it != this->_request.end(); it++)
 	{
@@ -30,7 +30,7 @@ void    responseHttp::_getServerIndex()
 			break ;
 }
 
-void    responseHttp::_getLocationIndex()
+void    responseHttp::_getLocationIndex(void)
 {
     this->_directories = this->_servers[this->_i_s].getDirectories();
 	int	id = -1;
@@ -50,7 +50,7 @@ void    responseHttp::_getLocationIndex()
 }
 
 
-bool	responseHttp::_findFileName()
+bool	responseHttp::_findFileName(void)
 {
 	if (this->_i_d == this->_directories.size()) // if no location
 		this->_fileName = this->_servers[this->_i_s].getRoot() + this->_request[1];
@@ -77,7 +77,6 @@ bool	responseHttp::_findFileName()
 		{
 			size_t	untilSlash = this->_servers[this->_i_s].getRoot().find("/");
 			this->_fileName += this->_servers[this->_i_s].getRoot();
-			std::cout << _request[1] << std::endl;
 			if (this->_servers[this->_i_s].getRoot().substr(untilSlash, this->_servers[this->_i_s].getRoot().size() - untilSlash) == this->_request[1] || \
 				this->_directories[this->_i_d].getName() == this->_request[1])
 			{
@@ -102,9 +101,8 @@ bool	responseHttp::_findFileName()
 	return (true);
 }
 
-bool    responseHttp::_createHeader()
+bool    responseHttp::_createHeader(void)
 {
-
 	this->_response += this->_request[2] + " 200 OK";
 
 	std::string	mime = "";
@@ -131,14 +129,16 @@ bool    responseHttp::_createHeader()
 			mime = "image/vnd.microsoft.icon";
 		else if (fileType == ".woff2")
 			mime = "application/xhtml+xml";
-		if (!mime.empty())
-			_response += "\r\nContent-Type: " + mime;
 	}
 
 	std::stringstream	length;
 
 	length << _htmlTxt.size();
-	_response += "\n\rContent-Lenght: " + length.str() + "\r\n\r\n" + _htmlTxt;
+	_response += "\nContent-Length: " + length.str();
+	if (!mime.empty())
+		_response += "\nContent-Type: " + mime + "\r\n\r\n" + _htmlTxt;
+	// for (size_t index = 0; _response.size() > index * 65536; index++)
+	// 	std::cout << _response.substr(index * 65536, (index + 1) * 65536).c_str() << std::endl;
 	return (true);
 }
 
@@ -162,13 +162,10 @@ bool	responseHttp::_errorPage(std::string code)
 	this->_response += this->_request[2] + " " + code + ""/*size_t to string*/ + "\r\n\r\n";
 	this->_addHtml();
 
-	std::cout << "Error page : " << this->_fileName << std::endl;
-	std::cout << std::endl << "---------------------" << std::endl;
-
 	return (false);
 }
 
-bool    responseHttp::_addHtml()
+bool    responseHttp::_addHtml(void)
 {
     std::string		htmlTxt;
 	std::ifstream	ftxt(this->_fileName.c_str());
@@ -184,24 +181,33 @@ bool    responseHttp::_addHtml()
 	return (true);
 }
 
+void	responseHttp::_makeResponseList(void)
+{
+	size_t	bufferSize = 65536;
+
+	if (this->_response.size() < bufferSize)
+		this->_responseList.push_back(this->_response);
+	else
+		for (size_t index = 0; _response.size() > index * bufferSize; index++)
+			this->_responseList.push_back(_response.substr(index * bufferSize, (index + 1) * bufferSize).c_str());
+}
+
 /////////////////////////////////////////////////////////////////
 
 responseHttp::responseHttp(std::vector<std::string> request, std::vector<serverBlock> servers) : _servers(servers), _request(request), _i_s(0), _i_d(0) {}
 
-responseHttp::~responseHttp() {}
+responseHttp::~responseHttp(void) {}
 
-const char  *responseHttp::toSend() const { return(this->_response.c_str()); }
+const char  *responseHttp::toSend(void) const { return(this->_response.c_str()); }
 std::string	responseHttp::getResponse(void) const { return (this->_response); }
-int      	responseHttp::size() const { return(this->_response.size()); }
+int      	responseHttp::size(void) const { return(this->_response.size()); }
 
-void    responseHttp::createResponse()
+std::vector<std::string>    responseHttp::createResponse(void)
 {
     this->_getServerIndex();
     this->_getLocationIndex();
-	if (!this->_findFileName())
-		return ;
-	if (!this->_addHtml())
-		return ;
-    if (!this->_createHeader())
-		return ;
+	if (this->_findFileName() && this->_addHtml() && this->_createHeader())
+		;
+	this->_makeResponseList();
+	return (this->_responseList);
 }
