@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/01 18:27:48 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/05 13:40:54 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,7 +183,7 @@ bool    responseHttp::_addHtml(void)
 
 void	responseHttp::_makeResponseList(void)
 {
-	size_t	bufferSize = 65536;
+	size_t	bufferSize = 500;
 
 	if (this->_response.size() < bufferSize)
 		this->_responseList.push_back(this->_response);

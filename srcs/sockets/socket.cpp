@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:06:34 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/27 23:29:32 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/05 13:48:28 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,10 +64,15 @@ const char	*srvSocket::listenError::what() const throw() { return ("server socke
 
 client::client(int srv, fd_set *set)
 {
+	this->_ret = 0;
+	
 	this->_fromlen = sizeof(this->_from);
 	if ((this->_cli = accept(srv, (sockaddr *)&this->_from, &this->_fromlen)) == -1)
 		throw (client::initError());
 	
+	if (fcntl(this->_cli, F_SETFL, O_NONBLOCK) == -1)
+		throw (client::fcntlError());
+
 	FD_SET(this->_cli, set);
 }
 
