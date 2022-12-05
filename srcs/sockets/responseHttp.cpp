@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/05 13:40:54 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/05 15:39:53 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,8 +127,10 @@ bool    responseHttp::_createHeader(void)
 			mime = "application/pdf";
 		else if (fileType == ".ico")
 			mime = "image/vnd.microsoft.icon";
+		else if (fileType == ".woff")
+			mime = "font/woff";
 		else if (fileType == ".woff2")
-			mime = "application/xhtml+xml";
+			mime = "font/woff2";
 	}
 
 	std::stringstream	length;
@@ -183,13 +185,23 @@ bool    responseHttp::_addHtml(void)
 
 void	responseHttp::_makeResponseList(void)
 {
-	size_t	bufferSize = 500;
+	size_t	bufferSize = 65536;
 
 	if (this->_response.size() < bufferSize)
 		this->_responseList.push_back(this->_response);
 	else
+	{
 		for (size_t index = 0; _response.size() > index * bufferSize; index++)
-			this->_responseList.push_back(_response.substr(index * bufferSize, (index + 1) * bufferSize).c_str());
+		{
+			// if ((index + 1) * bufferSize < _response.size())
+			this->_responseList.push_back(_response.substr(index * bufferSize, (index + 1) * bufferSize));
+			// else
+			// {
+			// 	std::cout << "coucou" << std::endl;
+			// 	this->_responseList.push_back(_response.substr(index * bufferSize));
+			// }
+		}
+	}
 }
 
 /////////////////////////////////////////////////////////////////

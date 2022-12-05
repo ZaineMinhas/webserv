@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:02:19 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/05 13:47:50 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/05 17:05:18 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ struct client {
 	sockaddr_in					_from;
 	socklen_t					_fromlen;
 	std::vector<std::string>	_response;
-	size_t						_ret;
+	ssize_t						_ret;
 
 	client(int srv, fd_set *set);
 	client(const client &cli);

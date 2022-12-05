@@ -80,15 +80,25 @@ void	server::handle_client(config &srv)
  
 		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 		{
+			std::cout << "maybe write client : " << it->_cli << std::endl;
 			if (FD_ISSET(it->_cli, &this->_write_set))
 			{
-				it->_ret += send(it->_cli, it->_response[0].c_str(), it->_response[0].size(), 0);
+				std::cout << "write client : " << it->_cli << std::endl; 
+				std::cout << "Line : " << it->_response[0].c_str() << " END" << std::endl;
+				it->_ret = send(it->_cli, it->_response[0].c_str(), it->_response[0].size(), 0);
+				std::cout << "COUCOU" << std::endl;
+				if (it->_ret <= 0)
+				{
+					it->close_client(&this->_tmp_set);
+					this->_clients.erase(it);
+					break ;
+				}
 				it->_response.erase(it->_response.begin());
 				if (it->_response.empty())
 				{
-					std::cout << "client : " << it->_cli << " disconnected afetr send : " << it->_ret << std::endl;
 					it->close_client(&this->_tmp_set);
 					this->_clients.erase(it);
+					std::cout << std::endl << "######################" << std::endl;
 				}
 				break ;
 			}
@@ -96,26 +106,34 @@ void	server::handle_client(config &srv)
 
 		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 		{
+			std::cout << "maybe read client : " << it->_cli << std::endl; 
 			if (FD_ISSET(it->_cli, &this->_read_set))
 			{
+				std::cout << "read client : " << it->_cli << std::endl; 
 				char	buffer[200];
 				
 				ssize_t	ret = recv(it->_cli, buffer, 199, 0);
-				
+				if (ret < 0)
+				{
+					it->close_client(&this->_tmp_set);
+					this->_clients.erase(it);
+					break ;
+				}
+
 				buff += std::string(buffer, ret);
 
 				if (buff.find("\r\n\r\n") != std::string::npos)
 				{
-					std::cout << "client : " << it->_cli << "\nrecv : \n" << buff << std::endl;
+					std::cout << buff << std::endl;
 					if (it->_response.empty())
 					{
 						std::vector<std::string>	request = split(buff);
 						responseHttp	response(request, srv.getServers());
 						it->_response = response.createResponse();
+						// for (std::vector<std::string>::iterator iter = it->_response.begin(); iter != it->_response.end(); iter++)
+						// 	std::cout << "LINE : " << iter->c_str() << " END" << std::endl;
 					}
 					buff.clear();
-
-					std::cout << "------------------\n\n";
 				}
 				else
 					send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
@@ -128,8 +146,8 @@ void	server::handle_client(config &srv)
 			if (FD_ISSET(it->_socket, &this->_read_set))
 			{
 				client	cli(it->_socket, &this->_tmp_set);
+				std::cout << "connexion de : " << cli._cli << std::endl; 
 				this->_clients.push_back(cli);
-				std::cout << "client : " << cli._cli << " connected" << std::endl;
 				if (select_socket < cli._cli)
 					select_socket = cli._cli;
 				break;
