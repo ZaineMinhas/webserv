@@ -61,6 +61,8 @@ server	&server::operator=(const server &srv)
 	return (*this);
 }
 
+#include <cerrno>
+
 void	server::handle_client(config &srv)
 {
 	std::string	buff;
@@ -87,13 +89,14 @@ void	server::handle_client(config &srv)
 				std::cout << "Line : " << it->_response[0].c_str() << " END" << std::endl;
 				it->_ret = send(it->_cli, it->_response[0].c_str(), it->_response[0].size(), 0);
 				std::cout << "COUCOU" << std::endl;
-				if (it->_ret <= 0)
+				it->_response.erase(it->_response.begin());
+				if (it->_ret < 0)
 				{
+					std::cout << "ICI : " << strerror(errno) << std::endl;
 					it->close_client(&this->_tmp_set);
 					this->_clients.erase(it);
 					break ;
 				}
-				it->_response.erase(it->_response.begin());
 				if (it->_response.empty())
 				{
 					it->close_client(&this->_tmp_set);
