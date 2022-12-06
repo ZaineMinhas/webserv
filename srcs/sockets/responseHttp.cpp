@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/05 18:38:21 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/06 18:13:44 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,8 @@ bool    responseHttp::_createHeader(void)
 			mime = "image/jpeg";
 		else if (fileType == ".json")
 			mime = "application/json";
+		else if (fileType == ".js")
+			mime = "application/javascript";
 		else if (fileType == ".pdf")
 			mime = "application/pdf";
 		else if (fileType == ".ico")
@@ -186,22 +188,14 @@ bool    responseHttp::_addHtml(void)
 void	responseHttp::_makeResponseList(void)
 {
 	size_t	bufferSize = 65536;
-
-	if (this->_response.size() < bufferSize)
-		this->_responseList.push_back(this->_response);
-	else
+	
+	while (_response.size() > bufferSize)
 	{
-		for (size_t index = 0; _response.size() > index * bufferSize; index++)
-		{
-			// if ((index + 1) * bufferSize < _response.size())
-			this->_responseList.push_back(_response.substr(index * bufferSize, (index + 1) * bufferSize));
-			// else
-			// {
-			// 	std::cout << "coucou" << std::endl;
-			// 	this->_responseList.push_back(_response.substr(index * bufferSize));
-			// }
-		}
+		_responseList.push_back(_response.substr(0, bufferSize));
+		_response = _response.substr(bufferSize);
 	}
+	_responseList.push_back(_response);
+	_response = "";
 }
 
 /////////////////////////////////////////////////////////////////
@@ -219,7 +213,7 @@ std::vector<std::string>    responseHttp::createResponse(void)
     this->_getServerIndex();
     this->_getLocationIndex();
 	if (this->_findFileName() && this->_addHtml() && this->_createHeader())
-		;
+		std::cout << "coucou" << std::endl; // trouver quoi faire !
 	this->_makeResponseList();
 	return (this->_responseList);
 }

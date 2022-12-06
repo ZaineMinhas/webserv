@@ -82,21 +82,18 @@ void	server::handle_client(config &srv)
  
 		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 		{
-			std::cout << "maybe write client : " << it->_cli << std::endl;
 			if (FD_ISSET(it->_cli, &this->_write_set))
 			{
-				std::cout << "write client : " << it->_cli << std::endl; 
-				std::cout << "Line : " << it->_response[0].c_str() << " END" << std::endl;
-				it->_ret = send(it->_cli, it->_response[0].c_str(), it->_response[0].size(), 0);
-				std::cout << "COUCOU" << std::endl;
-				it->_response.erase(it->_response.begin());
+				std::string	ret = it->_response[0];
+				int len = ret.size();
+				it->_ret = send(it->_cli, it->_response[0].c_str(), len, 0);
 				if (it->_ret < 0)
 				{
-					std::cout << "ICI : " << strerror(errno) << std::endl;
 					it->close_client(&this->_tmp_set);
 					this->_clients.erase(it);
 					break ;
 				}
+				it->_response.erase(it->_response.begin());
 				if (it->_response.empty())
 				{
 					it->close_client(&this->_tmp_set);
@@ -109,10 +106,8 @@ void	server::handle_client(config &srv)
 
 		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 		{
-			std::cout << "maybe read client : " << it->_cli << std::endl; 
 			if (FD_ISSET(it->_cli, &this->_read_set))
 			{
-				std::cout << "read client : " << it->_cli << std::endl; 
 				char	buffer[200];
 				
 				ssize_t	ret = recv(it->_cli, buffer, 199, 0);
@@ -133,8 +128,6 @@ void	server::handle_client(config &srv)
 						std::vector<std::string>	request = split(buff);
 						responseHttp	response(request, srv.getServers());
 						it->_response = response.createResponse();
-						// for (std::vector<std::string>::iterator iter = it->_response.begin(); iter != it->_response.end(); iter++)
-						// 	std::cout << "LINE : " << iter->c_str() << " END" << std::endl;
 					}
 					buff.clear();
 				}
@@ -149,7 +142,6 @@ void	server::handle_client(config &srv)
 			if (FD_ISSET(it->_socket, &this->_read_set))
 			{
 				client	cli(it->_socket, &this->_tmp_set);
-				std::cout << "connexion de : " << cli._cli << std::endl; 
 				this->_clients.push_back(cli);
 				if (select_socket < cli._cli)
 					select_socket = cli._cli;
