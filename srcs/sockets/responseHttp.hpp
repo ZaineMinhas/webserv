@@ -23,19 +23,19 @@ private:
     std::vector<directory>          _directories;
     std::vector<std::string>        _request;
     std::string						_response;
-	std::pair<std::string, size_t>	_host;
-	std::string						_fileName;
+	  std::pair<std::string, size_t>	_host;
+	  std::string						_fileName;
     std::string                     _htmlTxt;
-	size_t							_i_s;
-	size_t							_i_d;
+	  size_t							_i_s;
+  	size_t							_i_d;
 
     void    _getServerIndex();
     void    _getLocationIndex();
 
-	void	_createAutoIndex(void);
+  	void	_createAutoIndex(void);
     
-	bool    _findFileName();
-    bool    _createHeader();
+    bool    _findFileName();
+    bool    _createHeader(std::string msg);
     bool    _errorPage(std::string code);
     bool    _addHtml();
 
