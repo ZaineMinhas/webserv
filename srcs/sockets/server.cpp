@@ -86,7 +86,9 @@ void	server::handle_client(config &srv)
 			{
 				std::string	ret = it->_response[0];
 				int len = ret.size();
+				std::cout << it->_response[0] << std::endl;
 				it->_ret = send(it->_cli, it->_response[0].c_str(), len, 0);
+				std::cout << it->_ret << std::endl;
 				if (it->_ret < 0)
 				{
 					it->close_client(&this->_tmp_set);

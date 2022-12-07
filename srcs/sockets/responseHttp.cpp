@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/06 18:13:44 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/07 13:14:25 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,9 +101,9 @@ bool	responseHttp::_findFileName(void)
 	return (true);
 }
 
-bool    responseHttp::_createHeader(void)
+bool    responseHttp::_createHeader(std::string msg)
 {
-	this->_response += this->_request[2] + " 200 OK";
+	this->_response += this->_request[2] + " " + msg;
 
 	std::string	mime = "";
 	size_t		pos = _fileName.find_last_of(".");
@@ -163,9 +163,8 @@ bool	responseHttp::_errorPage(std::string code)
 		this->_fileName += "./error_pages";
 
 	this->_fileName += "/" + code + ".html";
-	this->_response += this->_request[2] + " " + code + ""/*size_t to string*/ + "\r\n\r\n";
 	this->_addHtml();
-
+	this->_createHeader(code);
 	return (false);
 }
 
@@ -174,6 +173,7 @@ bool    responseHttp::_addHtml(void)
     std::string		htmlTxt;
 	std::ifstream	ftxt(this->_fileName.c_str());
 
+
 	if (ftxt) {
 		std::stringstream	ss;
 		ss << ftxt.rdbuf();
@@ -181,6 +181,7 @@ bool    responseHttp::_addHtml(void)
 	}
 	else
 		return (this->_errorPage("404")); // No page to return --> ERROR
+	std::cout << htmlTxt << std::endl;
 	_htmlTxt = htmlTxt;
 	return (true);
 }
@@ -212,7 +213,7 @@ std::vector<std::string>    responseHttp::createResponse(void)
 {
     this->_getServerIndex();
     this->_getLocationIndex();
-	if (this->_findFileName() && this->_addHtml() && this->_createHeader())
+	if (this->_findFileName() && this->_addHtml() && this->_createHeader("200 Ok"))
 		std::cout << "coucou" << std::endl; // trouver quoi faire !
 	this->_makeResponseList();
 	return (this->_responseList);
