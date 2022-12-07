@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/01 16:25:48 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/07 14:05:31 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,14 @@ private:
     void    _getServerIndex();
     void    _getLocationIndex();
 
-    bool    _findFileName();
+	void	_createAutoIndex(void);
+    
+	bool    _findFileName();
     bool    _createHeader();
     bool    _errorPage(std::string code);
     bool    _addHtml();
 
-    void     _makeResponseList();
+    void	_makeResponseList();
 
 public:
     responseHttp(std::vector<std::string> request, std::vector<serverBlock> servers);

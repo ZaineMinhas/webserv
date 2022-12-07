@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/01 16:27:35 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/07 14:19:22 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,11 @@ void    responseHttp::_getLocationIndex(void)
 	id == -1 ? this->_directories.size() : this->_i_d = id;
 }
 
+void	responseHttp::_createAutoIndex(void)
+{
+	// _htmlTxt = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset="utf-8"/>\n<title>Index</title>\n</head>\n<body>\n<h1>Index :</h1>\n<ul>\n";
+	std::cout << "File name : " << _fileName << std::endl;
+}
 
 bool	responseHttp::_findFileName(void)
 {
@@ -64,9 +69,9 @@ bool	responseHttp::_findFileName(void)
 				if (!this->_directories[this->_i_d].getIndex().empty())
 					this->_fileName += "/" + this->_directories[this->_i_d].getIndex();
 				else if (this->_directories[this->_i_d].getAutoindex())
-					; // create autoindex
+					_createAutoIndex();
 				else if (this->_servers[this->_i_s].getAutoindex())
-					; // create autoindex
+					_createAutoIndex();
 				else
 					return (this->_errorPage("500"));
 			}
