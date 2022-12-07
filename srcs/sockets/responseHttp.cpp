@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "responseHttp.hpp"
+#include <dirent.h>
+#include <iostream>
 
 void    responseHttp::_getServerIndex(void)
 {
@@ -47,6 +49,25 @@ void    responseHttp::_getLocationIndex(void)
 		}
 	}
 	id == -1 ? this->_directories.size() : this->_i_d = id;
+}
+
+bool	responseHttp::_createAutoIndex(void)
+{
+	struct dirent	*d;
+	DIR				*dr;
+	dr = opendir(_fileName.c_str());
+	_htmlTxt = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='utf-8'/>\n<title>Index</title>\n</head>\n<body>\n<h1>Index :</h1>\n<ul>\n";
+	if (dr)
+	{
+		for (d = readdir(dr); d; d = readdir(dr))
+			_htmlTxt += "<li><a href='" + std::string(d->d_name) + "'>" + std::string(d->d_name) + "</a></li>\n";
+		_htmlTxt += "</ul>\n</body>\n</html>";
+		closedir(dr);
+	}
+	else
+		std::cout << "Error" << std::endl;
+	_createHeader("200");
+	return (false);
 }
 
 std::string	responseHttp::_getMsgCode(std::string code)
@@ -115,9 +136,9 @@ bool	responseHttp::_findFileName(void)
 				if (!this->_directories[this->_i_d].getIndex().empty())
 					this->_fileName += "/" + this->_directories[this->_i_d].getIndex();
 				else if (this->_directories[this->_i_d].getAutoindex())
-					; // create autoindex
+					return (_createAutoIndex());
 				else if (this->_servers[this->_i_s].getAutoindex())
-					; // create autoindex
+					return (_createAutoIndex());
 				else
 					return (this->_errorPage("500"));
 			}
@@ -134,9 +155,9 @@ bool	responseHttp::_findFileName(void)
 				if (!this->_directories[this->_i_d].getIndex().empty())
 					this->_fileName += "/" + this->_directories[this->_i_d].getIndex();
 				else if (this->_directories[this->_i_d].getAutoindex())
-					; // create autoindex
+					return (_createAutoIndex());
 				else if (this->_servers[this->_i_s].getAutoindex())
-					; // create autoindex
+					return (_createAutoIndex());
 				else
 					return (this->_errorPage("500"));
 			}
@@ -191,9 +212,8 @@ bool    responseHttp::_createHeader(std::string code)
 	length << _htmlTxt.size();
 	_response += "\nContent-Length: " + length.str();
 	if (!mime.empty())
-		_response += "\nContent-Type: " + mime + "\r\n\r\n" + _htmlTxt;
-	// for (size_t index = 0; _response.size() > index * 65536; index++)
-	// 	std::cout << _response.substr(index * 65536, (index + 1) * 65536).c_str() << std::endl;
+		_response += "\nContent-Type: " + mime;
+	_response += "\r\n\r\n" + _htmlTxt;
 	return (true);
 }
 
@@ -233,7 +253,6 @@ bool    responseHttp::_addHtml(void)
 	}
 	else
 		return (this->_errorPage("404")); // No page to return --> ERROR
-	std::cout << htmlTxt << std::endl;
 	_htmlTxt = htmlTxt;
 	return (true);
 }

@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/07 14:50:35 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/07 15:21:04 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define RESPONSEHTTP_HPP
 
 #include "server.hpp"
+#include <dirent.h>
 
 class responseHttp
 {
@@ -33,12 +34,11 @@ private:
     void        _getLocationIndex();
     std::string _getMsgCode(std::string code);
 
-  	void	    _createAutoIndex(void);
-    
-    bool        _findFileName();
-    bool        _createHeader(std::string msg);
-    bool        _errorPage(std::string code);
-    bool        _addHtml();
+  	bool	_createAutoIndex(void);
+    bool    _findFileName();
+    bool    _createHeader(std::string msg);
+    bool    _errorPage(std::string code);
+    bool    _addHtml();
 
     void	    _makeResponseList();
 
