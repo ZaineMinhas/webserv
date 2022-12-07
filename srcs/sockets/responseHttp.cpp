@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/07 15:28:25 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/07 15:28:29 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,60 @@ bool	responseHttp::_createAutoIndex(void)
 	}
 	else
 		std::cout << "Error" << std::endl;
-	_createHeader("200 Ok");
+	_createHeader("200");
 	return (false);
+}
+
+std::string	responseHttp::_getMsgCode(std::string code)
+{
+	if (code == "200")
+		return ("Ok.");
+	else if (code == "400")
+		return ("Bad request.");
+	else if (code == "401")
+		return ("Unauthorized authentication request.");
+	else if (code == "402")
+		return ("Payment Required.");
+	else if (code == "403")
+		return ("You don't have permission to access this resource.");
+	else if (code == "404")
+		return ("Page not found.");
+	else if (code == "405")
+		return ("Method Not Allowed error.");
+	else if (code == "406")
+		return ("Not Acceptable.");
+	else if (code == "407")
+		return ("Proxy Authentication Required.");
+	else if (code == "408")
+		return ("Request Timeout.");
+	else if (code == "409")
+		return ("Conflict.");
+	else if (code == "410")
+		return ("Asset no longer exists.");
+	else if (code == "411")
+		return ("Length Required.");
+	else if (code == "412")
+		return ("Access to this resource has been denied.");
+	else if (code == "413")
+		return ("Request is too big.");
+	else if (code == "414")
+		return ("Request URL too large.");
+	else if (code == "415")
+		return ("Unsupported Media Type.");
+	else if (code == "500")
+		return ("Internal Server Error.");
+	else if (code == "501")
+		return ("Server do not support this request type.");
+	else if (code == "502")
+		return ("Bad Gateway server.");
+	else if (code == "503")
+		return ("Service Unavailable server.");
+	else if (code == "504")
+		return ("Gateway Timeout server.");
+	else if (code == "505")
+		return ("HTTP Version Not Supported.");
+	else
+		return ("");
 }
 
 bool	responseHttp::_findFileName(void)
@@ -121,9 +173,9 @@ bool	responseHttp::_findFileName(void)
 	return (true);
 }
 
-bool    responseHttp::_createHeader(std::string msg)
+bool    responseHttp::_createHeader(std::string code)
 {
-	this->_response += this->_request[2] + " " + msg;
+	this->_response += this->_request[2] + " " + code + " " + this->_getMsgCode(code);
 
 	std::string	mime = "";
 	size_t		pos = _fileName.find_last_of(".");
@@ -181,7 +233,9 @@ bool	responseHttp::_errorPage(std::string code)
 	if (this->_fileName.empty())
 		this->_fileName += "./error_pages";
 
-	this->_fileName += "/" + code + ".html";
+	
+
+	this->_fileName += "/" + code;
 	this->_addHtml();
 	this->_createHeader(code);
 	return (false);
@@ -191,7 +245,6 @@ bool    responseHttp::_addHtml(void)
 {
     std::string		htmlTxt;
 	std::ifstream	ftxt(this->_fileName.c_str());
-
 
 	if (ftxt) {
 		std::stringstream	ss;
