@@ -3,16 +3,11 @@ body
     font-size: 22px;
     text-decoration: unset;
     color: white;
-    background-image: url("../images/Aliens\ arrivent\ sur\ terre\ avec\ toute\ sa\ clique\ de\ bras\ cassé.jpg");
+    background-image: url("https://lejournal.cnrs.fr/sites/default/files/styles/asset_image_full/public/assets/images/main_image_galaxies_stephans_quintet_sq_nircam_miri_final-5mb_72dpi.jpg?itok=UhYIvuGD");
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}
-
-body img:hover
-{
-    animation: 2s totation infinite linear;
 }
 
 h1
@@ -59,8 +54,13 @@ div {
 
 .nyancat {
 	position:absolute;
-	animation: upDown 1.5s alternate infinite ease-in-out;
+	animation: 1.5s upDown alternate infinite ease-in-out;
 	width:100%;
+}
+
+.nyancat:hover {
+    animation: 2s totation infinite linear, 1.5s tota alternate infinite ease-in-out;
+
 }
 
 
@@ -70,6 +70,15 @@ div {
     }
     100% {
         transform: rotate(359deg);
+    }
+}
+
+@keyframes tota {
+    0% {
+        transform: translateY(0vh);
+    }
+    100% {
+        transform: translateY(9vh);
     }
 }
 

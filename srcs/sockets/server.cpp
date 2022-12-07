@@ -126,6 +126,8 @@ void	server::handle_client(config &srv)
 					if (it->_response.empty())
 					{
 						std::vector<std::string>	request = split(buff);
+						if (request[1].at(request[1].size() - 1) == '/' && request[1].size() > 1)
+							request[1] = request[1].substr(0, request[1].size() - 1);
 						responseHttp	response(request, srv.getServers());
 						it->_response = response.createResponse();
 					}

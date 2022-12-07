@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/07 15:28:29 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/07 17:14:30 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,9 @@ void    responseHttp::_getLocationIndex(void)
 	int	id = -1;
 
 	for (std::vector<directory>::iterator it = this->_directories.begin(); it != this->_directories.end(); it++, this->_i_d++)
-	{	
-		std::string	toCompare = this->_request[1].substr(0, it->getName().size());
-		if (it->getName() == toCompare)
+	{
+		// std::string	toCompare = this->_request[1].substr(0, it->getName().size());
+		if (it->getName() == this->_request[1])
 		{
 			if (id == -1)
 				id = this->_i_d;
@@ -124,8 +124,15 @@ std::string	responseHttp::_getMsgCode(std::string code)
 
 bool	responseHttp::_findFileName(void)
 {
+	std::cout << "FILE NAME : " << _i_d << std::endl;
 	if (this->_i_d == this->_directories.size()) // if no location
+	{
 		this->_fileName = this->_servers[this->_i_s].getRoot() + this->_request[1];
+		DIR				*dr;
+		dr = opendir(_fileName.c_str());
+		if (dr)
+			return (this->_createAutoIndex());
+	}
 	else // if location
 	{
 		if (!this->_directories[this->_i_d].getRoot().empty()) // if root
@@ -143,8 +150,7 @@ bool	responseHttp::_findFileName(void)
 					return (this->_errorPage("500"));
 			}
 			else
-				this->_fileName += this->_request[1].substr(this->_directories[this->_i_d].getName().size(), this->_request[1].size() - this->_directories[this->_i_d].getName().size());			
-		}
+				this->_fileName += this->_request[1].substr(this->_directories[this->_i_d].getName().size(), this->_request[1].size() - this->_directories[this->_i_d].getName().size());					}
 		else // if no root
 		{
 			size_t	untilSlash = this->_servers[this->_i_s].getRoot().find("/");
@@ -233,9 +239,21 @@ bool	responseHttp::_errorPage(std::string code)
 	if (this->_fileName.empty())
 		this->_fileName += "./error_pages";
 
-	
+	struct dirent	*d;
+	DIR				*dr;
+	dr = opendir(_fileName.c_str());
 
-	this->_fileName += "/" + code;
+	if (dr)
+	{
+		for (d = readdir(dr); d; d = readdir(dr))
+			if (std::string(d->d_name).find(code) != std::string::npos)
+			{
+				this->_fileName += "/";
+				this->_fileName += d->d_name;
+				break ;
+			}
+	}
+	
 	this->_addHtml();
 	this->_createHeader(code);
 	return (false);
@@ -284,7 +302,7 @@ std::vector<std::string>    responseHttp::createResponse(void)
 {
     this->_getServerIndex();
     this->_getLocationIndex();
-	if (this->_findFileName() && this->_addHtml() && this->_createHeader("200 Ok"))
+	if (this->_findFileName() && this->_addHtml() && this->_createHeader("200"))
 		std::cout << "coucou" << std::endl; // trouver quoi faire !
 	this->_makeResponseList();
 	return (this->_responseList);
