@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:23:06 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/29 17:47:52 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/05 13:45:31 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,9 @@
 struct server {
 	std::vector<srvSocket>		_servers;
 	std::vector<client>			_clients;
-	fd_set						_cli_set;
-	fd_set						_srv_set;
+	fd_set						_read_set;
+	fd_set						_write_set;
+	fd_set						_tmp_set;
 	timeval						_timeout;
 
 	server(std::vector<size_t> ports);

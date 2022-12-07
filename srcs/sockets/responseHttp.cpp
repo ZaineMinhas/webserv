@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/01 18:27:48 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/07 13:14:25 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,9 +101,9 @@ bool	responseHttp::_findFileName(void)
 	return (true);
 }
 
-bool    responseHttp::_createHeader(void)
+bool    responseHttp::_createHeader(std::string msg)
 {
-	this->_response += this->_request[2] + " 200 OK";
+	this->_response += this->_request[2] + " " + msg;
 
 	std::string	mime = "";
 	size_t		pos = _fileName.find_last_of(".");
@@ -123,12 +123,16 @@ bool    responseHttp::_createHeader(void)
 			mime = "image/jpeg";
 		else if (fileType == ".json")
 			mime = "application/json";
+		else if (fileType == ".js")
+			mime = "application/javascript";
 		else if (fileType == ".pdf")
 			mime = "application/pdf";
 		else if (fileType == ".ico")
 			mime = "image/vnd.microsoft.icon";
+		else if (fileType == ".woff")
+			mime = "font/woff";
 		else if (fileType == ".woff2")
-			mime = "application/xhtml+xml";
+			mime = "font/woff2";
 	}
 
 	std::stringstream	length;
@@ -159,9 +163,8 @@ bool	responseHttp::_errorPage(std::string code)
 		this->_fileName += "./error_pages";
 
 	this->_fileName += "/" + code + ".html";
-	this->_response += this->_request[2] + " " + code + ""/*size_t to string*/ + "\r\n\r\n";
 	this->_addHtml();
-
+	this->_createHeader(code);
 	return (false);
 }
 
@@ -170,6 +173,7 @@ bool    responseHttp::_addHtml(void)
     std::string		htmlTxt;
 	std::ifstream	ftxt(this->_fileName.c_str());
 
+
 	if (ftxt) {
 		std::stringstream	ss;
 		ss << ftxt.rdbuf();
@@ -177,6 +181,7 @@ bool    responseHttp::_addHtml(void)
 	}
 	else
 		return (this->_errorPage("404")); // No page to return --> ERROR
+	std::cout << htmlTxt << std::endl;
 	_htmlTxt = htmlTxt;
 	return (true);
 }
@@ -184,12 +189,14 @@ bool    responseHttp::_addHtml(void)
 void	responseHttp::_makeResponseList(void)
 {
 	size_t	bufferSize = 65536;
-
-	if (this->_response.size() < bufferSize)
-		this->_responseList.push_back(this->_response);
-	else
-		for (size_t index = 0; _response.size() > index * bufferSize; index++)
-			this->_responseList.push_back(_response.substr(index * bufferSize, (index + 1) * bufferSize).c_str());
+	
+	while (_response.size() > bufferSize)
+	{
+		_responseList.push_back(_response.substr(0, bufferSize));
+		_response = _response.substr(bufferSize);
+	}
+	_responseList.push_back(_response);
+	_response = "";
 }
 
 /////////////////////////////////////////////////////////////////
@@ -206,8 +213,8 @@ std::vector<std::string>    responseHttp::createResponse(void)
 {
     this->_getServerIndex();
     this->_getLocationIndex();
-	if (this->_findFileName() && this->_addHtml() && this->_createHeader())
-		;
+	if (this->_findFileName() && this->_addHtml() && this->_createHeader("200 Ok"))
+		std::cout << "coucou" << std::endl; // trouver quoi faire !
 	this->_makeResponseList();
 	return (this->_responseList);
 }
