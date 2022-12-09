@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/07 17:14:30 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/09 15:03:58 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,6 +176,7 @@ bool	responseHttp::_findFileName(void)
 			}
 		}
 	}
+	std::cout << this->_fileName << std::endl;
 	return (true);
 }
 

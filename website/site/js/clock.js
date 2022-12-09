@@ -40,7 +40,7 @@ const hourHand = document.querySelector('.hourHand');
 	window.addEventListener("mousemove", () => {
 		if (Math.floor(Math.random() * 1000) == 17) {
 			is_open = true;
-			alert("coucou")
+			alert("tu veux baiser des meres chaudes dans ta region ?")
 		}
 		
 	})

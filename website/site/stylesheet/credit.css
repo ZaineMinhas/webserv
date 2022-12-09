@@ -8,7 +8,7 @@
 }
 
 body {
-	font-family: 'Press Start 2P', cursive;;
+	font-family: ostrich_sansbold;
 	border: 0;
 	padding: 0;
 	box-sizing: border-box;
@@ -31,6 +31,7 @@ body img {
 }
 
 h1 {
+	margin-bottom: 0em;
 	font-weight: normal;
 	font-size: 5em;
 	color: white;
@@ -39,7 +40,7 @@ h1 {
 					6px 6px yellow,
 					8px 8px green,
 					10px 10px cyan;
-	animation: 4s up_down infinite;
+	animation: 3s up_down infinite linear;
 }
 
 p {
@@ -49,6 +50,7 @@ p {
 
 p:hover {
 	scale: 1.6;
+	animation: 4s totation infinite linear;
 }
 
 a {
@@ -63,8 +65,9 @@ a {
 	text-decoration: none;
 	text-shadow: 2px 2px 5px cyan;
 	position: absolute;
-	bottom: 0.5vh;
-	left: 0.5vw;
+	bottom: 10px;
+	left: 10px;
+	padding: 5px;
 	border-radius: 10px / 10px;
 	box-shadow: 0px 0px 5px 2px purple, -0px -0px 5px 2px purple;
 }
@@ -95,4 +98,9 @@ a {
 	80% { text-shadow: 2px 2px 5px red; }
 	95% { text-shadow: 2px 2px 5px cyan; }
 	100% { text-shadow: 2px 2px 5px red; }
+}
+
+@keyframes totation {
+    0% { transform: rotate(0); }
+    100% { transform: rotate(359deg); }
 }
