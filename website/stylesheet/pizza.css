@@ -1,23 +1,24 @@
 body
 {
-	text-shadow: 1px 1px 1px black;
 	background-image: url("../images/pizza-back2.jpg");
+	font-family: Comic Sans MS, fantasy;
+	text-shadow: 1px 1px 1px black;
 	background-position: right;
 	background-color: #f6a06b;
-	align-items: center;
-	font-family: Comic Sans MS, fantasy;
+	display: flex;
+	flex-direction: column;
 }
 
 h1
 {
 	color: rgb(230, 119, 1);
-	text-align: center;
 	font-family: cursive; /* police d'ecriture */
 	font-size: 5em; /* taille de la police */
 	border: 5px rgb(255, 157, 9) solid; /* pour faire un encadrer */
 	border-radius: 20px / 10px; /* faire que les cote soit arrondis */
 	box-shadow: 6px 6px 10px black; /* faire de l'ombre sur la boite */
 	text-shadow: 1px 1px 1px black; /* faire de l'ombre sur le texte de la boite */
+	text-align: center;
 }
 
 h2
@@ -26,21 +27,19 @@ h2
 	text-decoration: underline;
 }
 
-p
-{
-	color: #c11a1e;
-}
+p { color: #c11a1e; }
 
-li
-{
-	color: darkgoldenrod;
-}
+li { color: darkgoldenrod; }
 
 mark { background-color: tomato; }
 
 em { color: rgb(133, 84, 10); }
 
+a { text-decoration: none; }
+
 .autre { text-decoration: line-through; }
+
+.prix { margin-top: -28vh; }
 
 .test
 {
@@ -48,12 +47,13 @@ em { color: rgb(133, 84, 10); }
 	font-weight: bold; /* pour mettre en gras */
 }
 
-.legende
-{
+.legende {
 	text-align: right;
+	margin-right: 10em;
 }
 
-.float
+.pizza
 {
 	float: right;
+	display: block;
 }

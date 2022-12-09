@@ -57,26 +57,42 @@ a {
 					6px 6px blue;
 }
 
+.webserv {
+	font-size: 2.5em;
+	background-image: url("../images/star1.gif");
+	text-decoration: none;
+	text-shadow: 2px 2px 5px cyan;
+	position: absolute;
+	bottom: 0.5vh;
+	left: 0.5vw;
+	border-radius: 10px / 10px;
+	box-shadow: 0px 0px 5px 2px purple, -0px -0px 5px 2px purple;
+}
+
+.webserv:hover {
+	animation: 2s neon 3;
+}
+
 @keyframes rot {
-	0% {
-		transform: rotate(0);
-	}
-	50% {
-		transform: rotate(180deg);
-	}
-	100% {
-		transform: rotate(360deg);
-	}
+	0% { transform: rotate(0); }
+	50% { transform: rotate(180deg); }
+	100% { transform: rotate(360deg); }
 }
 
 @keyframes up_down {
-	0% {
-		transform: translateY(0);
-	}
-	50% {
-		transform: translateY(calc(100vh - 180px));
-	}
-	100% {
-		transform: translateY(0);
-	}
+	0% { transform: translateY(0); }
+	50% { transform: translateY(calc(100vh - 180px)); }
+	100% { transform: translateY(0); }
+}
+
+@keyframes neon
+{
+	0% { text-shadow: 2px 2px 5px red; }
+	69% { text-shadow: 2px 2px 5px red; }
+	70% { text-shadow: 2px 2px 5px cyan; }
+	75% { text-shadow: 2px 2px 5px red; }
+	76% { text-shadow: 2px 2px 5px cyan; }
+	80% { text-shadow: 2px 2px 5px red; }
+	95% { text-shadow: 2px 2px 5px cyan; }
+	100% { text-shadow: 2px 2px 5px red; }
 }
