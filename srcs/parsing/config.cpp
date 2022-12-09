@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:09 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/21 14:12:52 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/11/22 18:02:02 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ config	&config::operator=(const config &src) {
 
 /*___ getters ___*/
 
-std::vector<serverBlock>	config::getServers(void) const { return (_servers); }
-std::vector<size_t>			config::getPorts(void) const { return (_ports); }
+std::vector<serverBlock>	config::getServers(void) { return (_servers); }
+std::vector<size_t>			config::getPorts(void) { return (_ports); }
 
 
 /*___ utils ___*/

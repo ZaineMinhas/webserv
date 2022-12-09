@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:28 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/16 17:22:04 by aliens           ###   ########.fr       */
+/*   Updated: 2022/11/22 16:23:32 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
 
 class config {
 private:
-	std::vector<serverBlock>	_servers;
 	std::vector<size_t>			_ports;
+	std::vector<serverBlock>	_servers;
 
 public:
 
@@ -36,8 +36,8 @@ public:
 
 	/*___ getters ___*/
 
-	std::vector<serverBlock>	getServers(void) const;
-	std::vector<size_t>			getPorts(void) const;
+	std::vector<serverBlock>	getServers(void);
+	std::vector<size_t>			getPorts(void);
 
 	/*___ utils ___*/
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   serverBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 14:04:18 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/21 14:14:09 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/07 16:57:57 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,14 +101,14 @@ void	serverBlock::setErrorPages(std::string &error_pages)
 
 /*___ getters ___*/
 
-std::string						serverBlock::getName(void) const { return (_name); }
-std::string						serverBlock::getRoot(void) const { return (_root); }
-std::pair<std::string, size_t>	serverBlock::getListen(void) const {return (_listen); }
-bool							serverBlock::getAutoindex(void) const { return (_autoindex); }
-size_t							serverBlock::getBodySize(void) const { return (_body_size); }
-std::vector<directory>			serverBlock::getDirectories(void) const { return (_directories); }
-std::vector<std::string>		serverBlock::getMethods(void) const { return (_methods); }
-std::map<size_t, std::string>	serverBlock::getErrorPages(void) const { return (_error_pages); }
+std::string						serverBlock::getName(void) { return (_name); }
+std::string						serverBlock::getRoot(void) { return (_root); }
+std::pair<std::string, size_t>	serverBlock::getListen(void) {return (_listen); }
+bool							serverBlock::getAutoindex(void) { return (_autoindex); }
+size_t							serverBlock::getBodySize(void) { return (_body_size); }
+std::vector<directory>			&serverBlock::getDirectories(void) { return (_directories); }
+std::vector<std::string>		serverBlock::getMethods(void) { return (_methods); }
+std::map<size_t, std::string>	serverBlock::getErrorPages(void) { return (_error_pages); }
 
 /*___ utils ___*/
 
@@ -132,7 +132,7 @@ void	serverBlock::set(std::string &key, std::string &value)
 		throw (config::badConfFile(std::string("bad key: ") + key));
 }
 
-void	serverBlock::add_directory(directory to_add, std::string &name) {
+void	serverBlock::add_directory(const directory &to_add, std::string &name) {
 	_directories.push_back(to_add);
 	_directories.back().setName(name);
 }
@@ -171,7 +171,7 @@ directory	&directory::operator=(const directory &src) {
 /*___ setters ___*/
 
 void	directory::setName(std::string &name) { _name = name; }
-void	directory::setRoot(std::string &root) { _root = root; }
+void	directory::setRoot(const std::string &root) { _root = root; }
 void	directory::setIndex(std::string &index) { _index = index; }
 
 void	directory::setMethods(std::string &methods)
@@ -210,12 +210,12 @@ void	directory::setAutoindex(std::string &autoindex)
 
 /*___ getters ___*/
 
-std::string						directory::getName(void) const { return (_name); }
-std::string						directory::getRoot(void) const { return (_root); }
-std::string						directory::getIndex(void) const { return (_index); }
-std::vector<std::string>		directory::getMethods(void) const { return (_methods); }
-std::pair<size_t, std::string>	directory::getHttpRedirect(void) const { return (_http_redirect); }
-bool							directory::getAutoindex(void) const { return (_autoindex); }
+std::string						directory::getName(void) { return (_name); }
+std::string						directory::getRoot(void) { return (_root); }
+std::string						directory::getIndex(void) { return (_index); }
+std::vector<std::string>		directory::getMethods(void) { return (_methods); }
+std::pair<size_t, std::string>	directory::getHttpRedirect(void) { return (_http_redirect); }
+bool							directory::getAutoindex(void) { return (_autoindex); }
 
 /*___ utils ___*/
 
