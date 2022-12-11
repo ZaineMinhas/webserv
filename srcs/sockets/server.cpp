@@ -80,12 +80,25 @@ void	server::handle_client(config &srv)
 		if (select(select_socket + 1, &this->_read_set, &this->_write_set, NULL, NULL) <= 0)
 			throw (server::selectError());
  
+		for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+		{
+			if (FD_ISSET(it->_socket, &this->_read_set))
+			{
+				client	cli(it->_socket, &this->_tmp_set);
+				this->_clients.push_back(cli);
+				if (select_socket < cli._cli)
+					select_socket = cli._cli;
+				break;
+			}
+		}
+		
 		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 		{
 			if (FD_ISSET(it->_cli, &this->_write_set))
 			{
 				std::string	ret = it->_response[0];
 				int len = ret.size();
+				std::cout << ret.c_str() << std::endl;
 				it->_ret = send(it->_cli, it->_response[0].c_str(), len, 0);
 				if (it->_ret < 0)
 				{
@@ -137,19 +150,7 @@ void	server::handle_client(config &srv)
 					send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
 				break;
 			}
-		}
-	
-		for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
-		{
-			if (FD_ISSET(it->_socket, &this->_read_set))
-			{
-				client	cli(it->_socket, &this->_tmp_set);
-				this->_clients.push_back(cli);
-				if (select_socket < cli._cli)
-					select_socket = cli._cli;
-				break;
-			}
-		}
+		}	
 	}
 }
 
