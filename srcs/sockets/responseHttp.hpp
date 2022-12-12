@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/07 15:21:04 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/12 14:23:36 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define RESPONSEHTTP_HPP
 
 #include "server.hpp"
+#include "utils.hpp"
 #include <dirent.h>
 
 class responseHttp
