@@ -61,8 +61,6 @@ server	&server::operator=(const server &srv)
 	return (*this);
 }
 
-#include <cerrno>
-
 void	server::handle_client(config &srv)
 {
 	std::string	buff;
@@ -80,15 +78,26 @@ void	server::handle_client(config &srv)
 		if (select(select_socket + 1, &this->_read_set, &this->_write_set, NULL, NULL) <= 0)
 			throw (server::selectError());
  
+		for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+		{
+			if (FD_ISSET(it->_socket, &this->_read_set))
+			{
+				client	cli(it->_socket, &this->_tmp_set);
+				this->_clients.push_back(cli);
+				if (select_socket < cli._cli)
+					select_socket = cli._cli;
+				break;
+			}
+		}
+		
 		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 		{
 			if (FD_ISSET(it->_cli, &this->_write_set))
 			{
 				std::string	ret = it->_response[0];
 				int len = ret.size();
-				std::cout << it->_response[0] << std::endl;
+				std::cout << ret.c_str() << std::endl;
 				it->_ret = send(it->_cli, it->_response[0].c_str(), len, 0);
-				std::cout << it->_ret << std::endl;
 				if (it->_ret < 0)
 				{
 					it->close_client(&this->_tmp_set);
@@ -128,6 +137,8 @@ void	server::handle_client(config &srv)
 					if (it->_response.empty())
 					{
 						std::vector<std::string>	request = split(buff);
+						if (request[1].at(request[1].size() - 1) == '/' && request[1].size() > 1)
+							request[1] = request[1].substr(0, request[1].size() - 1);
 						responseHttp	response(request, srv.getServers());
 						it->_response = response.createResponse();
 					}
@@ -137,19 +148,7 @@ void	server::handle_client(config &srv)
 					send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
 				break;
 			}
-		}
-	
-		for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
-		{
-			if (FD_ISSET(it->_socket, &this->_read_set))
-			{
-				client	cli(it->_socket, &this->_tmp_set);
-				this->_clients.push_back(cli);
-				if (select_socket < cli._cli)
-					select_socket = cli._cli;
-				break;
-			}
-		}
+		}	
 	}
 }
 
