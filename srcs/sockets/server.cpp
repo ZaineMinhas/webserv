@@ -123,7 +123,7 @@ void	server::handle_client(config &srv)
 				if (buff.find("\r\n\r\n") != std::string::npos)
 				{
 					std::cout << buff << std::endl;
-					if (it->_response.empty())
+					if (it->_response.empty()) // maybe to delete
 					{
 						std::vector<std::string>	request = split(buff);
 						responseHttp	response(request, srv.getServers());
