@@ -212,9 +212,21 @@ bool	responseHttp::_errorPage(std::string code)
 	if (this->_fileName.empty())
 		this->_fileName += "./error_pages";
 
-	
+	struct dirent	*d;
+	DIR				*dr;
+	dr = opendir(_fileName.c_str());
 
-	this->_fileName += "/" + code;
+	if (dr)
+	{
+		for (d = readdir(dr); d; d = readdir(dr))
+			if (std::string(d->d_name).find(code) != std::string::npos)
+			{
+				this->_fileName += "/";
+				this->_fileName += d->d_name;
+				break ;
+			}
+	}
+	
 	this->_addHtml();
 	this->_createHeader(code);
 	return (false);
