@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/07 15:21:04 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/12 17:36:29 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,11 @@ private:
   	bool	_createAutoIndex(void);
     bool    _findFileName();
     bool    _createHeader(std::string msg);
-    bool    _errorPage(std::string code);
     bool    _addHtml();
 
-    void	    _makeResponseList();
+    void    _makeResponseList();
+
+    char    **_createEnv();
 
 public:
     responseHttp(std::vector<std::string> request, std::vector<serverBlock> servers);
@@ -50,8 +51,12 @@ public:
 
     const char  *toSend() const;
     int           size() const;
+    
     std::string getResponse() const;
     
+    bool    errorPage(std::string code);
+    
+    void    make_cgi();
 };
 
 #endif
