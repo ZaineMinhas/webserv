@@ -61,8 +61,6 @@ server	&server::operator=(const server &srv)
 	return (*this);
 }
 
-#include <cerrno>
-
 void	server::handle_client(config &srv)
 {
 	std::string	buff;
