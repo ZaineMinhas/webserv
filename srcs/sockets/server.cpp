@@ -133,14 +133,11 @@ void	server::handle_client(config &srv)
 				if (buff.find("\r\n\r\n") != std::string::npos)
 				{
 					std::cout << buff << std::endl;
-					if (it->_response.empty()) // maybe to delete
-					{
-						std::vector<std::string>	request = split(buff);
-						if (request[1].at(request[1].size() - 1) == '/' && request[1].size() > 1)
-							request[1] = request[1].substr(0, request[1].size() - 1);
-						responseHttp	response(request, srv.getServers());
-						it->_response = response.createResponse();
-					}
+					std::vector<std::string>	request = split(buff);
+					if (request[1].at(request[1].size() - 1) == '/' && request[1].size() > 1)
+						request[1] = request[1].substr(0, request[1].size() - 1);
+					responseHttp	response(request, srv.getServers());
+					it->_response = response.createResponse();
 					buff.clear();
 				}
 				else

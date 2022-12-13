@@ -41,10 +41,11 @@ private:
     bool    _findFileName();
 	bool	_getMime(void);
     bool    _createHeader(std::string msg);
-    bool    _errorPage(std::string code);
     bool    _addHtml();
 
-    void	    _makeResponseList();
+    void    _makeResponseList();
+
+    char    **_createEnv();
 
 public:
     responseHttp(std::vector<std::string> request, std::vector<serverBlock> servers);
@@ -54,8 +55,12 @@ public:
 
     const char  *toSend() const;
     int           size() const;
+    
     std::string getResponse() const;
     
+    bool    errorPage(std::string code);
+    
+    void    make_cgi();
 };
 
 #endif

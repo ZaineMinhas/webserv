@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:06:34 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/06 16:31:36 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/12 15:11:05 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,8 @@ client	&client::operator=(const client &cli)
 void	client::close_client(fd_set *set)
 {
 	close(this->_cli);
-	FD_CLR(this->_cli, set);
+	if (set)
+		FD_CLR(this->_cli, set);
 }
 
 const char	*client::initError::what() const throw() { return ("client socket: error: init"); }

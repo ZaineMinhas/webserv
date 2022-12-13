@@ -208,7 +208,72 @@ bool    responseHttp::_createHeader(std::string code)
 	return (true);
 }
 
-bool	responseHttp::_errorPage(std::string code)
+bool    responseHttp::_addHtml(void)
+{
+    std::string		htmlTxt;
+	std::ifstream	ftxt(this->_fileName.c_str());
+
+	if (ftxt) {
+		std::stringstream	ss;
+		ss << ftxt.rdbuf();
+		htmlTxt = ss.str();
+	}
+	else
+		return (this->errorPage("404")); // No page to return --> ERROR
+	_htmlTxt = htmlTxt;
+	return (true);
+}
+
+void	responseHttp::_makeResponseList(void)
+{
+	size_t	bufferSize = 65536;
+	
+	while (_response.size() > bufferSize)
+	{
+		_responseList.push_back(_response.substr(0, bufferSize));
+		_response = _response.substr(bufferSize);
+	}
+	_responseList.push_back(_response);
+	_response = "";
+}
+
+char	**responseHttp::_createEnv()
+{
+	std::vector<std::string>	env;
+
+	env.push_back("AUTH_TYPE=");
+	env.push_back("CONTENT_LENGTH="); // a chopper qq part
+	env.push_back("CONTENT_TYPE="); // a chopper qq part
+	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
+	env.push_back("PATH_INFO="); // a chopper qq part
+	env.push_back("PATH_TRANSLATED="); // a chopper qq part
+	env.push_back("QUERY_STRING="); // a chopper qq part
+
+	
+}
+
+/////////////////////////////////////////////////////////////////
+
+responseHttp::responseHttp(std::vector<std::string> request, std::vector<serverBlock> servers) : _servers(servers), _request(request), _i_s(0), _i_d(0) {}
+
+responseHttp::~responseHttp(void) {}
+
+const char  *responseHttp::toSend(void) const { return(this->_response.c_str()); }
+std::string	responseHttp::getResponse(void) const { return (this->_response); }
+int      	responseHttp::size(void) const { return(this->_response.size()); }
+
+std::vector<std::string>    responseHttp::createResponse(void)
+{
+	this->_getServerIndex();
+	this->_getLocationIndex();
+	if (this->_findFileName())
+		if (this->_addHtml())
+			this->_createHeader("200 Ok");
+	this->_makeResponseList();
+	return (this->_responseList);
+}
+
+bool	responseHttp::errorPage(std::string code)
 {
 	this->_fileName.clear();
 	this->_response.clear();
@@ -244,52 +309,10 @@ bool	responseHttp::_errorPage(std::string code)
 	return (false);
 }
 
-bool    responseHttp::_addHtml(void)
+void	responseHttp::make_cgi()
 {
-    std::string		htmlTxt;
-	std::ifstream	ftxt(this->_fileName.c_str());
+	char	**env;
 
-	if (ftxt) {
-		std::stringstream	ss;
-		ss << ftxt.rdbuf();
-		htmlTxt = ss.str();
-	}
-	else
-		return (this->_errorPage("404")); // No page to return --> ERROR
-	_htmlTxt = htmlTxt;
-	return (true);
-}
-
-void	responseHttp::_makeResponseList(void)
-{
-	size_t	bufferSize = 65536;
+	env = this->_createEnv(); //chopper l'env
 	
-	while (_response.size() > bufferSize)
-	{
-		_responseList.push_back(_response.substr(0, bufferSize));
-		_response = _response.substr(bufferSize);
-	}
-	_responseList.push_back(_response);
-	_response = "";
-}
-
-/////////////////////////////////////////////////////////////////
-
-responseHttp::responseHttp(std::vector<std::string> request, std::vector<serverBlock> servers) : _servers(servers), _request(request), _i_s(0), _i_d(0) {}
-
-responseHttp::~responseHttp(void) {}
-
-const char  *responseHttp::toSend(void) const { return(this->_response.c_str()); }
-std::string	responseHttp::getResponse(void) const { return (this->_response); }
-int      	responseHttp::size(void) const { return(this->_response.size()); }
-
-std::vector<std::string>    responseHttp::createResponse(void)
-{
-	this->_getServerIndex();
-	this->_getLocationIndex();
-	if (this->_findFileName())
-		if (this->_addHtml())
-			this->_createHeader("200 Ok");
-	this->_makeResponseList();
-	return (this->_responseList);
 }
