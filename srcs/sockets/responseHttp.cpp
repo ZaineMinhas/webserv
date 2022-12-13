@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/12 18:25:56 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/13 16:26:57 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,13 +34,15 @@ void    responseHttp::_getServerIndex(void)
 
 void    responseHttp::_getLocationIndex(void)
 {
+	std::string	url = this->_request[1] + "/";
+	if (_i_s == _servers.size())
+		return ; // create an error of bad resquest
     this->_directories = this->_servers[this->_i_s].getDirectories();
 	int	id = -1;
 
 	for (std::vector<directory>::iterator it = this->_directories.begin(); it != this->_directories.end(); it++, this->_i_d++)
-	{
-		// std::string	toCompare = this->_request[1].substr(0, it->getName().size());
-		if (it->getName() == this->_request[1])
+	{	
+		if (url.find(it->getName() + "/") != std::string::npos)
 		{
 			if (id == -1)
 				id = this->_i_d;
@@ -48,7 +50,7 @@ void    responseHttp::_getLocationIndex(void)
 				id = this->_i_d;
 		}
 	}
-	id == -1 ? this->_directories.size() : this->_i_d = id;
+	id == -1 ? this->_i_d = this->_directories.size() : this->_i_d = id;
 }
 
 bool	responseHttp::_createAutoIndex(void)
@@ -56,7 +58,8 @@ bool	responseHttp::_createAutoIndex(void)
 	struct dirent	*d;
 	DIR				*dr;
 	dr = opendir(_fileName.c_str());
-	_htmlTxt = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='utf-8'/>\n<title>Index</title>\n</head>\n<body>\n<h1>Index :</h1>\n<ul>\n";
+	std::string	tmp = _fileName.substr(0, _fileName.rfind("/"));
+	_htmlTxt = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='utf-8'/>\n<title>Index</title>\n</head>\n<body>\n<h1>Index of " + tmp.substr(tmp.rfind("/")) + " :</h1>\n<hr/><ul>\n";
 	if (dr)
 	{
 		for (d = readdir(dr); d; d = readdir(dr))
@@ -65,7 +68,7 @@ bool	responseHttp::_createAutoIndex(void)
 		closedir(dr);
 	}
 	else
-		std::cout << "Error" << std::endl;
+		return (_errorPage("404"));
 	_createHeader("200");
 	return (false);
 }
@@ -124,56 +127,69 @@ std::string	responseHttp::_getMsgCode(std::string code)
 
 bool	responseHttp::_findFileName(void)
 {
-	if (this->_i_d == this->_directories.size()) // if no location
+	std::string	path = _request[1];
+	respConf	conf;
+	conf.setServ(_servers[_i_s]);
+	if (_i_d != _servers[_i_s].getDirectories().size()) // if location
 	{
-		this->_fileName = this->_servers[this->_i_s].getRoot() + this->_request[1];
-		DIR				*dr;
-		dr = opendir(_fileName.c_str());
-		if (dr)
-			return (this->_createAutoIndex());
+		directory	loc = _servers[_i_s].getDirectories()[_i_d];
+		conf.setLoc(loc);
+		if (!loc.getRoot().empty()) // if root in location
+			conf.path = urlJoin(conf.path, path.substr(loc.getName().size()));
+		else
+			conf.path = urlJoin(conf.path, path);
+		// set errors pages
 	}
-	else // if location
+	else
 	{
-		if (!this->_directories[this->_i_d].getRoot().empty()) // if root
-		{
-			this->_fileName += this->_directories[this->_i_d].getRoot();
-			if (this->_request[1] == this->_directories[this->_i_d].getName())
-			{
-				if (!this->_directories[this->_i_d].getIndex().empty())
-					this->_fileName += "/" + this->_directories[this->_i_d].getIndex();
-				else if (this->_directories[this->_i_d].getAutoindex())
-					return (_createAutoIndex());
-				else if (this->_servers[this->_i_s].getAutoindex())
-					return (_createAutoIndex());
-				else
-					return (this->errorPage("500"));
-			}
-			else
-				this->_fileName += this->_request[1].substr(this->_directories[this->_i_d].getName().size(), this->_request[1].size() - this->_directories[this->_i_d].getName().size());					}
-		else // if no root
-		{
-			size_t	untilSlash = this->_servers[this->_i_s].getRoot().find("/");
-			this->_fileName += this->_servers[this->_i_s].getRoot();
-			if (this->_servers[this->_i_s].getRoot().substr(untilSlash, this->_servers[this->_i_s].getRoot().size() - untilSlash) == this->_request[1] || \
-				this->_directories[this->_i_d].getName() == this->_request[1])
-			{
-				if (!this->_directories[this->_i_d].getIndex().empty())
-					this->_fileName += "/" + this->_directories[this->_i_d].getIndex();
-				else if (this->_directories[this->_i_d].getAutoindex())
-					return (_createAutoIndex());
-				else if (this->_servers[this->_i_s].getAutoindex())
-					return (_createAutoIndex());
-				else
-					return (this->errorPage("500"));
-			}
-			else
-			{
-				if (this->_servers[this->_i_s].getRoot().substr(untilSlash, this->_servers[this->_i_s].getRoot().size() - untilSlash) == this->_request[1].substr(0, this->_servers[this->_i_s].getRoot().size() - untilSlash))
-					this->_fileName += "/" + this->_request[1].substr(this->_servers[this->_i_s].getRoot().size(), this->_request[1].size() - this->_servers[this->_i_s].getRoot().size());
-				else
-					this->_fileName += this->_request[1];
-			}
-		}
+		conf.path += rtrim(path, "/");
+		// set errors pages	
+	}
+	if (urlCompare(conf.path, conf.root) && !conf.index.empty()) // add index if exist
+		conf.path = urlJoin(conf.path, conf.index);
+
+	_fileName = conf.path;
+	_autoindex = conf.autoindex;
+	return (_getMime());
+}
+
+bool	responseHttp::_getMime(void)
+{
+	size_t		pos = _fileName.find_last_of(".");
+	
+	if (pos != std::string::npos) // get Content-type
+	{
+		std::string	fileType = _fileName.substr(pos, _fileName.size() - pos);
+		if (fileType == ".css")
+			_mime = "text/css";
+		else if (fileType == ".html")
+			_mime = "text/html";
+		else if (fileType == ".gif")
+			_mime = "image/gif";
+		else if (fileType == ".png")
+			_mime = "image/png";
+		else if (fileType == ".jpeg" || fileType == ".jpg")
+			_mime = "image/jpeg";
+		else if (fileType == ".json")
+			_mime = "application/json";
+		else if (fileType == ".js")
+			_mime = "application/javascript";
+		else if (fileType == ".pdf")
+			_mime = "application/pdf";
+		else if (fileType == ".ico")
+			_mime = "image/vnd.microsoft.icon";
+		else if (fileType == ".woff")
+			_mime = "font/woff";
+		else if (fileType == ".woff2")
+			_mime = "font/woff2";
+	}
+	if (_mime.empty())
+	{
+		if (!_autoindex)
+			; // create an error 404
+		else
+			_createAutoIndex();
+		return (false);	
 	}
 	return (true);
 }
@@ -182,42 +198,12 @@ bool    responseHttp::_createHeader(std::string code)
 {
 	this->_response += this->_request[2] + " " + code + " " + this->_getMsgCode(code);
 
-	std::string	mime = "";
-	size_t		pos = _fileName.find_last_of(".");
-	
-	if (pos != std::string::npos) // get Content-type
-	{
-		std::string	fileType = _fileName.substr(pos, _fileName.size() - pos);
-		if (fileType == ".css")
-			mime = "text/css";
-		else if (fileType == ".html")
-			mime = "text/html";
-		else if (fileType == ".gif")
-			mime = "image/gif";
-		else if (fileType == ".png")
-			mime = "image/png";
-		else if (fileType == ".jpeg" || fileType == ".jpg")
-			mime = "image/jpeg";
-		else if (fileType == ".json")
-			mime = "application/json";
-		else if (fileType == ".js")
-			mime = "application/javascript";
-		else if (fileType == ".pdf")
-			mime = "application/pdf";
-		else if (fileType == ".ico")
-			mime = "image/vnd.microsoft.icon";
-		else if (fileType == ".woff")
-			mime = "font/woff";
-		else if (fileType == ".woff2")
-			mime = "font/woff2";
-	}
-
 	std::stringstream	length;
 
 	length << _htmlTxt.size();
 	_response += "\nContent-Length: " + length.str();
-	if (!mime.empty())
-		_response += "\nContent-Type: " + mime;
+	if (!_mime.empty())
+		_response += "\nContent-Type: " + _mime;
 	_response += "\r\n\r\n" + _htmlTxt;
 	return (true);
 }
@@ -278,10 +264,11 @@ int      	responseHttp::size(void) const { return(this->_response.size()); }
 
 std::vector<std::string>    responseHttp::createResponse(void)
 {
-    this->_getServerIndex();
-    this->_getLocationIndex();
-	if (this->_findFileName() && this->_addHtml() && this->_createHeader("200"))
-		std::cout << "coucou" << std::endl; // trouver quoi faire !
+	this->_getServerIndex();
+	this->_getLocationIndex();
+	if (this->_findFileName())
+		if (this->_addHtml())
+			this->_createHeader("200 Ok");
 	this->_makeResponseList();
 	return (this->_responseList);
 }

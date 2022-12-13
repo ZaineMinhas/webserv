@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   serverBlock.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 16:00:26 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/23 01:03:44 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/12 15:21:14 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ private:
 	std::vector<std::string>				_methods;
 	std::pair<size_t, std::string>			_http_redirect;
 	bool									_autoindex;
+	bool									_autoindexIsSet;
 
 public:
 
@@ -121,6 +122,7 @@ public:
 	std::vector<std::string>				getMethods(void);
 	std::pair<size_t, std::string>			getHttpRedirect(void);
 	bool									getAutoindex(void);
+	bool									getAutoindexIsSet(void);
 
 	/*___ utils ___*/
 

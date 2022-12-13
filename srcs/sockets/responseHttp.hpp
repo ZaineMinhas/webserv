@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/12 17:36:29 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/13 15:53:42 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define RESPONSEHTTP_HPP
 
 #include "server.hpp"
+#include "utils.hpp"
 #include <dirent.h>
 
 class responseHttp
@@ -24,11 +25,13 @@ private:
     std::vector<directory>          _directories;
     std::vector<std::string>        _request;
     std::string						_response;
+	std::string						_mime;
 	std::pair<std::string, size_t>	_host;
 	std::string						_fileName;
     std::string                     _htmlTxt;
 	size_t							_i_s;
   	size_t							_i_d;
+	bool							_autoindex;
 
     void        _getServerIndex();
     void        _getLocationIndex();
@@ -36,6 +39,7 @@ private:
 
   	bool	_createAutoIndex(void);
     bool    _findFileName();
+	bool	_getMime(void);
     bool    _createHeader(std::string msg);
     bool    _addHtml();
 
