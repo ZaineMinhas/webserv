@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/11 15:24:41 by ctirions          #+#    #+#             */
-/*   Updated: 2022/12/12 16:58:45 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/12 18:12:53 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,10 @@ void	respConf::setLoc(directory loc)
 	if (loc.getAutoindexIsSet())
 		autoindex = loc.getAutoindex();
 	if (!loc.getRoot().empty())
+	{
+		path = loc.getRoot();
 		root = loc.getRoot();
+	}
 	if (!loc.getIndex().empty())
 		index = loc.getIndex();
 	if (!loc.getMethods().empty())

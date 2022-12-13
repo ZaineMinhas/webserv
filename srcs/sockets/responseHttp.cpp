@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/12 17:46:56 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/13 16:26:57 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,8 @@ bool	responseHttp::_createAutoIndex(void)
 	struct dirent	*d;
 	DIR				*dr;
 	dr = opendir(_fileName.c_str());
-	_htmlTxt = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='utf-8'/>\n<title>Index</title>\n</head>\n<body>\n<h1>Index :</h1>\n<ul>\n";
+	std::string	tmp = _fileName.substr(0, _fileName.rfind("/"));
+	_htmlTxt = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='utf-8'/>\n<title>Index</title>\n</head>\n<body>\n<h1>Index of " + tmp.substr(tmp.rfind("/")) + " :</h1>\n<hr/><ul>\n";
 	if (dr)
 	{
 		for (d = readdir(dr); d; d = readdir(dr))
@@ -67,7 +68,7 @@ bool	responseHttp::_createAutoIndex(void)
 		closedir(dr);
 	}
 	else
-		std::cout << "Error" << std::endl;
+		return (_errorPage("404"));
 	_createHeader("200");
 	return (false);
 }
@@ -148,7 +149,48 @@ bool	responseHttp::_findFileName(void)
 		conf.path = urlJoin(conf.path, conf.index);
 
 	_fileName = conf.path;
-	std::cout << std::endl << "File name : " << _fileName << std::endl;
+	_autoindex = conf.autoindex;
+	return (_getMime());
+}
+
+bool	responseHttp::_getMime(void)
+{
+	size_t		pos = _fileName.find_last_of(".");
+	
+	if (pos != std::string::npos) // get Content-type
+	{
+		std::string	fileType = _fileName.substr(pos, _fileName.size() - pos);
+		if (fileType == ".css")
+			_mime = "text/css";
+		else if (fileType == ".html")
+			_mime = "text/html";
+		else if (fileType == ".gif")
+			_mime = "image/gif";
+		else if (fileType == ".png")
+			_mime = "image/png";
+		else if (fileType == ".jpeg" || fileType == ".jpg")
+			_mime = "image/jpeg";
+		else if (fileType == ".json")
+			_mime = "application/json";
+		else if (fileType == ".js")
+			_mime = "application/javascript";
+		else if (fileType == ".pdf")
+			_mime = "application/pdf";
+		else if (fileType == ".ico")
+			_mime = "image/vnd.microsoft.icon";
+		else if (fileType == ".woff")
+			_mime = "font/woff";
+		else if (fileType == ".woff2")
+			_mime = "font/woff2";
+	}
+	if (_mime.empty())
+	{
+		if (!_autoindex)
+			; // create an error 404
+		else
+			_createAutoIndex();
+		return (false);	
+	}
 	return (true);
 }
 
@@ -156,42 +198,12 @@ bool    responseHttp::_createHeader(std::string code)
 {
 	this->_response += this->_request[2] + " " + code + " " + this->_getMsgCode(code);
 
-	std::string	mime = "";
-	size_t		pos = _fileName.find_last_of(".");
-	
-	if (pos != std::string::npos) // get Content-type
-	{
-		std::string	fileType = _fileName.substr(pos, _fileName.size() - pos);
-		if (fileType == ".css")
-			mime = "text/css";
-		else if (fileType == ".html")
-			mime = "text/html";
-		else if (fileType == ".gif")
-			mime = "image/gif";
-		else if (fileType == ".png")
-			mime = "image/png";
-		else if (fileType == ".jpeg" || fileType == ".jpg")
-			mime = "image/jpeg";
-		else if (fileType == ".json")
-			mime = "application/json";
-		else if (fileType == ".js")
-			mime = "application/javascript";
-		else if (fileType == ".pdf")
-			mime = "application/pdf";
-		else if (fileType == ".ico")
-			mime = "image/vnd.microsoft.icon";
-		else if (fileType == ".woff")
-			mime = "font/woff";
-		else if (fileType == ".woff2")
-			mime = "font/woff2";
-	}
-
 	std::stringstream	length;
 
 	length << _htmlTxt.size();
 	_response += "\nContent-Length: " + length.str();
-	if (!mime.empty())
-		_response += "\nContent-Type: " + mime;
+	if (!_mime.empty())
+		_response += "\nContent-Type: " + _mime;
 	_response += "\r\n\r\n" + _htmlTxt;
 	return (true);
 }
@@ -275,8 +287,9 @@ std::vector<std::string>    responseHttp::createResponse(void)
 {
 	this->_getServerIndex();
 	this->_getLocationIndex();
-	if (this->_findFileName() && this->_addHtml() && this->_createHeader("200 Ok"))
-		std::cout << "coucou" << std::endl; // trouver quoi faire !
+	if (this->_findFileName())
+		if (this->_addHtml())
+			this->_createHeader("200 Ok");
 	this->_makeResponseList();
 	return (this->_responseList);
 }

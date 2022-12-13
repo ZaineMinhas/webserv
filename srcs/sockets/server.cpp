@@ -96,7 +96,6 @@ void	server::handle_client(config &srv)
 			{
 				std::string	ret = it->_response[0];
 				int len = ret.size();
-				std::cout << ret.c_str() << std::endl;
 				it->_ret = send(it->_cli, it->_response[0].c_str(), len, 0);
 				if (it->_ret < 0)
 				{
