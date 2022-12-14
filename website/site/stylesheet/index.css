@@ -8,11 +8,12 @@
 }
 
 body {
-	background-image: url(../images/star1.gif);
+	background-image: url("../images/star1.gif");
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	font-family: ostrich_sansbold;
+	overflow: hidden;
 }
 
 h1 {

@@ -96,6 +96,7 @@ void	server::handle_client(config &srv)
 			{
 				std::string	ret = it->_response[0];
 				int len = ret.size();
+				// std::cout << ret.c_str() << std::endl;
 				it->_ret = send(it->_cli, it->_response[0].c_str(), len, 0);
 				if (it->_ret < 0)
 				{
@@ -132,12 +133,15 @@ void	server::handle_client(config &srv)
 
 				if (buff.find("\r\n\r\n") != std::string::npos)
 				{
-					std::cout << buff << std::endl;
-					std::vector<std::string>	request = split(buff);
-					if (request[1].at(request[1].size() - 1) == '/' && request[1].size() > 1)
-						request[1] = request[1].substr(0, request[1].size() - 1);
-					responseHttp	response(request, srv.getServers());
-					it->_response = response.createResponse();
+					// std::cout << buff << std::endl;
+					if (it->_response.empty())
+					{
+						std::vector<std::string>	request = split(buff);
+						if (request[1].at(request[1].size() - 1) == '/' && request[1].size() > 1)
+							request[1] = request[1].substr(0, request[1].size() - 1);
+						responseHttp	response(request, srv.getServers());
+						it->_response = response.createResponse();
+					}
 					buff.clear();
 				}
 				else

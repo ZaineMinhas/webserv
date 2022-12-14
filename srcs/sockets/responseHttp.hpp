@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/13 15:53:42 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/14 16:21:10 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include "server.hpp"
 #include "utils.hpp"
 #include <dirent.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 class responseHttp
 {
@@ -54,13 +56,13 @@ public:
     std::vector<std::string>    createResponse();
 
     const char  *toSend() const;
-    int           size() const;
+    int         size() const;
     
     std::string getResponse() const;
     
     bool    errorPage(std::string code);
     
-    void    make_cgi();
+    bool    make_cgi();
 };
 
 #endif

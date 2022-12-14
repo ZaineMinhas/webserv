@@ -2,9 +2,9 @@
 
 import cgi
 
-form = cgi.FieldStorage()
-nom_du_pote		= form.getvalue('nom_du_pote')
-forme_de_maison	= form.getvalue('forme_de_maison')
+# form = cgi.FieldStorage()
+nom_du_pote		= "salut"
+forme_de_maison	= "salut"
 
 print ("<html>")
 print ("<head>")

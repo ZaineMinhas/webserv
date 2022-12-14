@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/13 16:26:57 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/14 17:01:20 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "responseHttp.hpp"
 #include <dirent.h>
 #include <iostream>
+#include <unistd.h>
 
 void    responseHttp::_getServerIndex(void)
 {
@@ -68,7 +69,7 @@ bool	responseHttp::_createAutoIndex(void)
 		closedir(dr);
 	}
 	else
-		return (_errorPage("404"));
+		return (errorPage("404"));
 	_createHeader("200");
 	return (false);
 }
@@ -150,6 +151,8 @@ bool	responseHttp::_findFileName(void)
 
 	_fileName = conf.path;
 	_autoindex = conf.autoindex;
+	if (_fileName.find(".py") != std::string::npos)
+		make_cgi();
 	return (_getMime());
 }
 
@@ -240,16 +243,43 @@ void	responseHttp::_makeResponseList(void)
 char	**responseHttp::_createEnv()
 {
 	std::vector<std::string>	env;
+	char						buffer[PATH_MAX];
+	char						**ret;
 
 	env.push_back("AUTH_TYPE=");
-	env.push_back("CONTENT_LENGTH="); // a chopper qq part
-	env.push_back("CONTENT_TYPE="); // a chopper qq part
 	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
-	env.push_back("PATH_INFO="); // a chopper qq part
-	env.push_back("PATH_TRANSLATED="); // a chopper qq part
-	env.push_back("QUERY_STRING="); // a chopper qq part
+	env.push_back("PATH_INFO=" + _fileName.substr(_fileName.find("?") + 1));
+	getcwd(buffer, PATH_MAX);
+	env.push_back("PATH_TRANSLATED=" + std::string(buffer) + _request[1]);
+	env.push_back("QUERY_STRING=" + _fileName.substr(_fileName.find("?") + 1));
+	env.push_back("REMOTE_ADDR=");
+	env.push_back("REMOTE_HOST=");
+	env.push_back("REMOTE_IDENT=");
+	env.push_back("REMOTE_USER=");
+	env.push_back("REQUEST_METHOD=" + _request[0]);
+	env.push_back("SCRIPT_NAME=" + _fileName.substr(0, _fileName.find("?")));
+	if (!_servers[_i_s].getName().empty())
+		env.push_back("SERVER_NAME=" + _servers[_i_s].getName());
+	else
+		env.push_back("SERVER_NAME=" + _servers[_i_s].getListen().first);
+	env.push_back("SERVER_PORTS=" + _servers[_i_s].getListen().second);
+	env.push_back("SERVER_PROTOCOL=HTTP/1.1");
+	env.push_back("SERVER_SOFTWARE=JoJo_SERVER/0.1");
+	env.push_back("HTPP_ACCEPT=" + _request[12]); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
+	env.push_back("HTPP_ACCEPT_LANGUAGE=" + _request[16]); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
+	env.push_back("HTTP_USER_AGENT=" + _request[11]);
+	env.push_back("HTTP_REFERER=" + _request[27]);
 
-	
+	ret = new char *[env.size() + 1];
+	int i = 0;
+	for (std::vector<std::string>::iterator it = env.begin(); it != env.end(); it++)
+	{
+		// std::cout << *it << std::endl;
+		ret[i] = new char[it->size() + 1];
+		strcpy(ret[i], it->c_str());
+		i++;
+	}
+	return (ret);
 }
 
 /////////////////////////////////////////////////////////////////
@@ -268,7 +298,7 @@ std::vector<std::string>    responseHttp::createResponse(void)
 	this->_getLocationIndex();
 	if (this->_findFileName())
 		if (this->_addHtml())
-			this->_createHeader("200 Ok");
+			this->_createHeader("200");
 	this->_makeResponseList();
 	return (this->_responseList);
 }
@@ -309,10 +339,61 @@ bool	responseHttp::errorPage(std::string code)
 	return (false);
 }
 
-void	responseHttp::make_cgi()
+bool	responseHttp::make_cgi()
 {
 	char	**env;
+	int		fd_in[2];
+	int		fd_out[2];
+	int 	status = 0;
+	pid_t	pid;
+	char	tmp[65537] = {0};
 
-	env = this->_createEnv(); //chopper l'env
+	env = this->_createEnv();
+	if (pipe(fd_in) == -1 || pipe(fd_out) == -1)
+		return (true);
+	if ((pid = fork()) == -1)
+		return (true);
+	else if (pid == 0)
+	{
+		if (dup2(fd_in[0], STDIN_FILENO) == -1)
+			exit(1);
+		if (dup2(fd_out[1], STDOUT_FILENO) == -1)
+			exit(1);
+		close(fd_in[0]);
+		close(fd_in[1]);
+		close(fd_out[0]);
+		close(fd_out[1]);
+
+		char *av[3];
+		std::string tmp = "cgi-bin" + _request[1].substr(0, _request[1].find("?"));
+		std::string exec_path = "/usr/bin/python3"; // pour les scripts en python, il faudra d'autres chemin pour d'autres scripts
+
+		av[0] = (char *)exec_path.c_str();
+		av[1] = (char *)tmp.c_str();
+		av[2] = NULL;
+
+		execve(av[0], av, env);
+		exit(1);
+	}
+
+	if (dup2(fd_in[0], 0) == -1)
+		return (true);
+	close(fd_in[0]);
+	close(fd_in[1]);
+	close(fd_out[1]);
 	
+	for (int i = 0; env[i]; i++)
+		delete env[i];
+	delete env;
+	
+	int ret = waitpid(pid, &status, 0);
+	while (ret > 0)
+	{
+		ret = read(fd_out[0], tmp, 65536);
+		tmp[ret] = '\0';
+		_htmlTxt = tmp;
+	}
+	close(fd_out[0]);
+	_createHeader("401");
+	return (false);
 }

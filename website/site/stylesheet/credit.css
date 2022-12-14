@@ -17,6 +17,7 @@ body {
 	object-fit: cover;
 	flex-direction: column;
 	align-items: center;
+	overflow: hidden;
 }
 
 body img {
