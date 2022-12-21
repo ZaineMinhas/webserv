@@ -6,7 +6,7 @@
 /*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/14 17:01:20 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/21 18:05:08 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,7 @@ bool	responseHttp::_findFileName(void)
 	_fileName = conf.path;
 	_autoindex = conf.autoindex;
 	if (_fileName.find(".py") != std::string::npos)
-		make_cgi();
+		return (make_cgi());
 	return (_getMime());
 }
 
@@ -274,11 +274,11 @@ char	**responseHttp::_createEnv()
 	int i = 0;
 	for (std::vector<std::string>::iterator it = env.begin(); it != env.end(); it++)
 	{
-		// std::cout << *it << std::endl;
 		ret[i] = new char[it->size() + 1];
 		strcpy(ret[i], it->c_str());
 		i++;
 	}
+	ret[env.size()] = NULL;
 	return (ret);
 }
 
@@ -342,27 +342,22 @@ bool	responseHttp::errorPage(std::string code)
 bool	responseHttp::make_cgi()
 {
 	char	**env;
-	int		fd_in[2];
-	int		fd_out[2];
+	int		fd[2];
 	int 	status = 0;
 	pid_t	pid;
-	char	tmp[65537] = {0};
 
 	env = this->_createEnv();
-	if (pipe(fd_in) == -1 || pipe(fd_out) == -1)
+	if (pipe(fd) == -1)
 		return (true);
+	
 	if ((pid = fork()) == -1)
 		return (true);
 	else if (pid == 0)
 	{
-		if (dup2(fd_in[0], STDIN_FILENO) == -1)
+		if (dup2(fd[1], STDOUT_FILENO) == -1)
 			exit(1);
-		if (dup2(fd_out[1], STDOUT_FILENO) == -1)
-			exit(1);
-		close(fd_in[0]);
-		close(fd_in[1]);
-		close(fd_out[0]);
-		close(fd_out[1]);
+
+		close(fd[0]);
 
 		char *av[3];
 		std::string tmp = "cgi-bin" + _request[1].substr(0, _request[1].find("?"));
@@ -372,28 +367,31 @@ bool	responseHttp::make_cgi()
 		av[1] = (char *)tmp.c_str();
 		av[2] = NULL;
 
+		std::cerr << "args : " << av[0] << " | " << av[1] << std::endl;
+
 		execve(av[0], av, env);
 		exit(1);
 	}
-
-	if (dup2(fd_in[0], 0) == -1)
-		return (true);
-	close(fd_in[0]);
-	close(fd_in[1]);
-	close(fd_out[1]);
+	else
+	{
+		char buffer[1024] = {0};
+		close(fd[1]);
+		for (int ret = 1; ret > 0; ret = read(fd[0], buffer, 1024))
+		{
+			buffer[ret] = '\0';
+			_htmlTxt += buffer;
+		}
+	}
+	close(fd[1]);
+	close(fd[0]);
+	waitpid(pid, &status, 0);
+	
+	std::cout << _htmlTxt << std::endl;
 	
 	for (int i = 0; env[i]; i++)
 		delete env[i];
 	delete env;
 	
-	int ret = waitpid(pid, &status, 0);
-	while (ret > 0)
-	{
-		ret = read(fd_out[0], tmp, 65536);
-		tmp[ret] = '\0';
-		_htmlTxt = tmp;
-	}
-	close(fd_out[0]);
 	_createHeader("401");
 	return (false);
 }

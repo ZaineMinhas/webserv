@@ -1,9 +1,5 @@
-import cgi
-
-form = cgi.FieldStorage()
-
-nom_du_pote		= form["nom_du_pote"].value
-forme_de_maison	= form["forme_de_la_maison"].value
+nom_du_pote		= "salut"
+forme_de_maison	= "salut"
 
 print("<html>")
 print("<head>")
