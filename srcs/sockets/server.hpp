@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/02 13:23:06 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/05 13:45:31 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/22 16:52:24 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 struct server {
 	std::vector<srvSocket>		_servers;
 	std::vector<client>			_clients;
+	size_t						_bodyLength;
 	fd_set						_read_set;
 	fd_set						_write_set;
 	fd_set						_tmp_set;

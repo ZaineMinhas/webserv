@@ -13,16 +13,35 @@
 #include "server.hpp"
 #include "responseHttp.hpp"
 
-static std::vector<std::string>	split(std::string buff)
+static std::map<std::string, std::string>	split(std::string buff)
 {
-	std::stringstream ss(buff);
-	std::istream_iterator<std::string>	begin(ss);
-	std::istream_iterator<std::string>	end;
-	return (std::vector<std::string>(begin, end));
+	std::string line;
+	std::map<std::string, std::string>	ret;
+
+	ret.insert(std::make_pair("method:", buff.substr(0, buff.find(" "))));
+	buff.erase(0, buff.find(" ") + 1);
+	ret.insert(std::make_pair("file:", buff.substr(0, buff.find(" "))));
+	buff.erase(0, buff.find(" ") + 1);
+	ret.insert(std::make_pair("version:", buff.substr(0, buff.find("\n"))));
+	buff.erase(0, buff.find("\n") + 1);
+
+
+	std::stringstream	ss(buff);
+
+	while (getline(ss, line))
+	{
+		size_t	pos = line.find(":");
+		if (pos == std::string::npos)
+			break ;
+		ret.insert(std::make_pair(line.substr(0, pos + 1), line.substr(pos + 2)));
+	}
+
+	return (ret);
 }
 
 server::server(std::vector<size_t> ports)
 {
+	_bodyLength = 0;
 	FD_ZERO(&this->_tmp_set);
 	for (std::vector<size_t>::iterator it = ports.begin(); it != ports.end(); it++)
 	{
@@ -119,6 +138,7 @@ void	server::handle_client(config &srv)
 		{
 			if (FD_ISSET(it->_cli, &this->_read_set))
 			{
+				std::map<std::string, std::string>	header;
 				char	buffer[200];
 				
 				ssize_t	ret = recv(it->_cli, buffer, 199, 0);
@@ -131,21 +151,34 @@ void	server::handle_client(config &srv)
 
 				buff += std::string(buffer, ret);
 
-				if (buff.find("\r\n\r\n") != std::string::npos)
+				if (buff.find("\r\n\r\n") != std::string::npos && header.empty())
 				{
-					// std::cout << buff << std::endl;
-					if (it->_response.empty())
+					header = split(buff);
+					// for (std::map<std::string, std::string>::iterator it = header.begin(); it != header.end(); it++)
+					// 	std::cout << it->first << " | " << it->second << std::endl;
+					if (header.at("file:").at(header.at("file:").size() - 1) == '/' && header.at("file:").size() > 1)
+						header.at("file:").erase(header.at("file:").size() - 1);
+					if (header.at("method:") == "POST")
 					{
-						std::vector<std::string>	request = split(buff);
-						if (request[1].at(request[1].size() - 1) == '/' && request[1].size() > 1)
-							request[1] = request[1].substr(0, request[1].size() - 1);
-						responseHttp	response(request, srv.getServers());
-						it->_response = response.createResponse();
+						std::stringstream ss(header.at("Content-Length:"));
+						ss >> _bodyLength;
 					}
-					buff.clear();
 				}
 				else
 					send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
+				if (!header.empty())
+				{
+					std::cout << buff << std::endl;
+
+					if (header.at("method:") == "POST")
+						_bodyLength -= ret;
+					if (!_bodyLength)
+					{
+						responseHttp	response(header, srv.getServers());
+						it->_response = response.createResponse();
+						buff.clear();
+					}
+				}
 				break;
 			}
 		}	

@@ -1,4 +1,6 @@
-nom_du_pote		= "salut"
+import os
+
+nom_du_pote		= os.environ['USER']
 forme_de_maison	= "salut"
 
 print("<html>")

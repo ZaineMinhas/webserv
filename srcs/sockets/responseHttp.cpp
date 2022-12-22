@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/21 18:05:08 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/22 15:37:08 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,12 @@
 
 void    responseHttp::_getServerIndex(void)
 {
-	for (std::vector<std::string>::iterator it = this->_request.begin(); it != this->_request.end(); it++)
-	{
-		if (*it == "Host:")
-		{
-			it++;
-			this->_host.first = it->substr(0, it->find(":"));
-			std::stringstream	ss(it->substr(it->find(":") + 1, it->size() - it->find(":") + 1));
-			ss >> this->_host.second;
-			break ;
-		}
-	}
+	std::string	host = _request.at("Host:");
+
+	this->_host.first = host.substr(0, host.find(":"));
+	std::stringstream	ss(host.substr(host.find(":") + 1, host.size() - host.find(":") + 1));
+	ss >> this->_host.second;
+	
 	for (std::vector<serverBlock>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++, this->_i_s++)
 		if (this->_host == it->getListen())
 			break ;
@@ -35,7 +30,7 @@ void    responseHttp::_getServerIndex(void)
 
 void    responseHttp::_getLocationIndex(void)
 {
-	std::string	url = this->_request[1] + "/";
+	std::string	url = this->_request.at("file:") + "/";
 	if (_i_s == _servers.size())
 		return ; // create an error of bad resquest
     this->_directories = this->_servers[this->_i_s].getDirectories();
@@ -128,7 +123,7 @@ std::string	responseHttp::_getMsgCode(std::string code)
 
 bool	responseHttp::_findFileName(void)
 {
-	std::string	path = _request[1];
+	std::string	path = _request.at("file:");
 	respConf	conf;
 	conf.setServ(_servers[_i_s]);
 	if (_i_d != _servers[_i_s].getDirectories().size()) // if location
@@ -199,7 +194,7 @@ bool	responseHttp::_getMime(void)
 
 bool    responseHttp::_createHeader(std::string code)
 {
-	this->_response += this->_request[2] + " " + code + " " + this->_getMsgCode(code);
+	this->_response += this->_request.at("version:") + " " + code + " " + this->_getMsgCode(code);
 
 	std::stringstream	length;
 
@@ -250,13 +245,13 @@ char	**responseHttp::_createEnv()
 	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	env.push_back("PATH_INFO=" + _fileName.substr(_fileName.find("?") + 1));
 	getcwd(buffer, PATH_MAX);
-	env.push_back("PATH_TRANSLATED=" + std::string(buffer) + _request[1]);
+	env.push_back("PATH_TRANSLATED=" + std::string(buffer) + _request.at("file:"));
 	env.push_back("QUERY_STRING=" + _fileName.substr(_fileName.find("?") + 1));
 	env.push_back("REMOTE_ADDR=");
 	env.push_back("REMOTE_HOST=");
 	env.push_back("REMOTE_IDENT=");
 	env.push_back("REMOTE_USER=");
-	env.push_back("REQUEST_METHOD=" + _request[0]);
+	env.push_back("REQUEST_METHOD=" + _request.at("method:"));
 	env.push_back("SCRIPT_NAME=" + _fileName.substr(0, _fileName.find("?")));
 	if (!_servers[_i_s].getName().empty())
 		env.push_back("SERVER_NAME=" + _servers[_i_s].getName());
@@ -265,10 +260,10 @@ char	**responseHttp::_createEnv()
 	env.push_back("SERVER_PORTS=" + _servers[_i_s].getListen().second);
 	env.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	env.push_back("SERVER_SOFTWARE=JoJo_SERVER/0.1");
-	env.push_back("HTPP_ACCEPT=" + _request[12]); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
-	env.push_back("HTPP_ACCEPT_LANGUAGE=" + _request[16]); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
-	env.push_back("HTTP_USER_AGENT=" + _request[11]);
-	env.push_back("HTTP_REFERER=" + _request[27]);
+	env.push_back("HTPP_ACCEPT=" + _request.at("Accept:")); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
+	env.push_back("HTPP_ACCEPT_LANGUAGE=" + _request.at("Accept-Language:")); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
+	env.push_back("HTTP_USER_AGENT=" + _request.at("User-Agent:"));
+	env.push_back("HTTP_REFERER=" + _request.at("Referer:"));
 
 	ret = new char *[env.size() + 1];
 	int i = 0;
@@ -284,7 +279,7 @@ char	**responseHttp::_createEnv()
 
 /////////////////////////////////////////////////////////////////
 
-responseHttp::responseHttp(std::vector<std::string> request, std::vector<serverBlock> servers) : _servers(servers), _request(request), _i_s(0), _i_d(0) {}
+responseHttp::responseHttp(std::map<std::string, std::string> request, std::vector<serverBlock> servers) : _servers(servers), _request(request), _i_s(0), _i_d(0) {}
 
 responseHttp::~responseHttp(void) {}
 
@@ -360,14 +355,12 @@ bool	responseHttp::make_cgi()
 		close(fd[0]);
 
 		char *av[3];
-		std::string tmp = "cgi-bin" + _request[1].substr(0, _request[1].find("?"));
+		std::string tmp = "cgi-bin" + _request.at("file:").substr(0, _request.at("file:").find("?"));
 		std::string exec_path = "/usr/bin/python3"; // pour les scripts en python, il faudra d'autres chemin pour d'autres scripts
 
 		av[0] = (char *)exec_path.c_str();
 		av[1] = (char *)tmp.c_str();
 		av[2] = NULL;
-
-		std::cerr << "args : " << av[0] << " | " << av[1] << std::endl;
 
 		execve(av[0], av, env);
 		exit(1);
@@ -385,9 +378,7 @@ bool	responseHttp::make_cgi()
 	close(fd[1]);
 	close(fd[0]);
 	waitpid(pid, &status, 0);
-	
-	std::cout << _htmlTxt << std::endl;
-	
+		
 	for (int i = 0; env[i]; i++)
 		delete env[i];
 	delete env;

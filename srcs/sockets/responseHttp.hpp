@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/14 16:21:10 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/22 14:46:24 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ private:
     std::vector<std::string>        _responseList;
     std::vector<serverBlock>        _servers;
     std::vector<directory>          _directories;
-    std::vector<std::string>        _request;
+    std::map<std::string, std::string>        _request;
     std::string						_response;
 	std::string						_mime;
 	std::pair<std::string, size_t>	_host;
@@ -50,7 +50,7 @@ private:
     char    **_createEnv();
 
 public:
-    responseHttp(std::vector<std::string> request, std::vector<serverBlock> servers);
+    responseHttp(std::map<std::string, std::string> request, std::vector<serverBlock> servers);
     ~responseHttp();
 
     std::vector<std::string>    createResponse();
