@@ -138,43 +138,45 @@ void	server::handle_client(config &srv)
 		{
 			if (FD_ISSET(it->_cli, &this->_read_set))
 			{
+				bool	headerEnd = false;
 				std::map<std::string, std::string>	header;
 				char	buffer[200];
 				
-				ssize_t	ret = recv(it->_cli, buffer, 199, 0);
-				if (ret < 0)
+				it->_ret = recv(it->_cli, buffer, 199, 0);
+				if (it->_ret < 0)
 				{
 					it->close_client(&this->_tmp_set);
 					this->_clients.erase(it);
 					break ;
 				}
-
-				buff += std::string(buffer, ret);
-
+				buff += std::string(buffer, it->_ret);
 				if (buff.find("\r\n\r\n") != std::string::npos && header.empty())
 				{
+					// std::cout << buff << std::endl;
 					header = split(buff);
 					// for (std::map<std::string, std::string>::iterator it = header.begin(); it != header.end(); it++)
 					// 	std::cout << it->first << " | " << it->second << std::endl;
 					if (header.at("file:").at(header.at("file:").size() - 1) == '/' && header.at("file:").size() > 1)
 						header.at("file:").erase(header.at("file:").size() - 1);
 					if (header.at("method:") == "POST")
-					{
-						std::stringstream ss(header.at("Content-Length:"));
-						ss >> _bodyLength;
-					}
+						_bodyLength = stringToSize(header.at("Content-Length:"));
+					buff.erase(0, buff.find("\r\n\r\n") + 4);
+					std::cout << buff << std::endl;
 				}
 				else
 					send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
 				if (!header.empty())
 				{
-					std::cout << buff << std::endl;
+					if (header.at("method:") == "POST" && !headerEnd) {
 
-					if (header.at("method:") == "POST")
-						_bodyLength -= ret;
+						_bodyLength -= buff.size();
+						headerEnd = true;
+					}
+					else if (header.at("method:") == "POST")
+						_bodyLength -= it->_ret;
 					if (!_bodyLength)
 					{
-						responseHttp	response(header, srv.getServers());
+						responseHttp	response(buff, header, srv.getServers());
 						it->_response = response.createResponse();
 						buff.clear();
 					}

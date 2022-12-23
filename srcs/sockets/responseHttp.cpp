@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/22 15:37:08 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/23 16:49:20 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,13 @@ bool	responseHttp::_createAutoIndex(void)
 	dr = opendir(_fileName.c_str());
 	std::string	tmp = _fileName.substr(0, _fileName.rfind("/"));
 	_htmlTxt = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='utf-8'/>\n<title>Index</title>\n</head>\n<body>\n<h1>Index of " + tmp.substr(tmp.rfind("/")) + " :</h1>\n<hr/><ul>\n";
+	std::string	dir = _servers[_i_s].getDirectories()[_i_d].getName() + "/";
+	if (dir.empty())
+		dir = _fileName;
 	if (dr)
 	{
 		for (d = readdir(dr); d; d = readdir(dr))
-			_htmlTxt += "<li><a href='" + std::string(d->d_name) + "'>" + std::string(d->d_name) + "</a></li>\n";
+			_htmlTxt += "<li><a href='" + dir + std::string(d->d_name) + "'>" + std::string(d->d_name) + "</a></li>\n";
 		_htmlTxt += "</ul>\n</body>\n</html>";
 		closedir(dr);
 	}
@@ -184,7 +187,7 @@ bool	responseHttp::_getMime(void)
 	if (_mime.empty())
 	{
 		if (!_autoindex)
-			; // create an error 404
+			return (errorPage("404"));
 		else
 			_createAutoIndex();
 		return (false);	
@@ -243,10 +246,16 @@ char	**responseHttp::_createEnv()
 
 	env.push_back("AUTH_TYPE=");
 	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
-	env.push_back("PATH_INFO=" + _fileName.substr(_fileName.find("?") + 1));
+	if (_request.at("method:") == "POST")
+		env.push_back("PATH_INFO=" + _body);
+	else
+		env.push_back("PATH_INFO=" + _fileName.substr(_fileName.find("?") + 1));
 	getcwd(buffer, PATH_MAX);
 	env.push_back("PATH_TRANSLATED=" + std::string(buffer) + _request.at("file:"));
-	env.push_back("QUERY_STRING=" + _fileName.substr(_fileName.find("?") + 1));
+	if (_request.at("method:") == "POST")
+		env.push_back("QUERY_STRING=" + _body);
+	else
+		env.push_back("QUERY_STRING=" + _fileName.substr(_fileName.find("?") + 1));
 	env.push_back("REMOTE_ADDR=");
 	env.push_back("REMOTE_HOST=");
 	env.push_back("REMOTE_IDENT=");
@@ -279,7 +288,7 @@ char	**responseHttp::_createEnv()
 
 /////////////////////////////////////////////////////////////////
 
-responseHttp::responseHttp(std::map<std::string, std::string> request, std::vector<serverBlock> servers) : _servers(servers), _request(request), _i_s(0), _i_d(0) {}
+responseHttp::responseHttp(std::string body, std::map<std::string, std::string> request, std::vector<serverBlock> servers) : _servers(servers), _request(request), _body(body), _i_s(0), _i_d(0) {}
 
 responseHttp::~responseHttp(void) {}
 

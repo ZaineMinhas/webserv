@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/11 15:24:57 by ctirions          #+#    #+#             */
-/*   Updated: 2022/12/12 16:58:37 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/23 14:40:41 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,5 +33,7 @@ typedef struct responseConfig
 bool		urlCompare(std::string url1, std::string url2);
 std::string	urlJoin(std::string urlBase, std::string toAdd);
 std::string	rtrim(std::string str, std::string toDel);
+size_t		stringToSize(std::string str);
+std::string	sizeToString(size_t nb);
 
 #endif
