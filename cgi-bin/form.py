@@ -2,13 +2,15 @@ import cgi
 
 form = cgi.FieldStorage()
 
-nom = form['nom_du_pote'].value
-forme = form['forme_de_maison'].value
+if "nom_du_pote" not in form:
+	nom = "rien du tout"
+else:
+	nom = form['nom_du_pote'].value
 
-if nom == "": #ca marche pas
-    nom = "rien du tout"
-if forme == "": #ca marche pas
-    forme = "rien du tout"
+if "forme_de_maison" not in form:
+	forme = "rien du tout"
+else:
+	forme = form['forme_de_maison'].value
 
 print("<!DOCTYPE html>")
 print("<html>")
@@ -17,7 +19,7 @@ print("<meta charset='utf-8'/>")
 print("<title>Les infos !</title>")
 print("<style>")
 print("body {")
-print("background-color: rgba(246, 246, 246);")
+print("background-color: rgb(246, 246, 246);")
 print("display: flex;")
 print("flex-direction: column;")
 print("align-items: center;")
