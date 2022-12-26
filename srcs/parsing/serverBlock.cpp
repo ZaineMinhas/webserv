@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   serverBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 14:04:18 by ctirions          #+#    #+#             */
-/*   Updated: 2022/12/07 16:57:57 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/12 17:12:01 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 
 /*___ canonical form ___*/
 
-serverBlock::serverBlock(void) : _autoindex(false), _body_size(0) {}
+serverBlock::serverBlock(void) {}
 
 serverBlock::serverBlock(const serverBlock &src) { *this = src; }
 
@@ -152,7 +152,11 @@ void	serverBlock::checkValues(void) {
 
 /*___ canonical form ___*/
 
-directory::directory(void) {}
+directory::directory(void)
+{
+	_autoindex = false;
+	_autoindexIsSet = false;
+}
 
 directory::directory(const directory &src) { *this = src; }
 
@@ -165,6 +169,7 @@ directory	&directory::operator=(const directory &src) {
 	_methods = src._methods;
 	_http_redirect = src._http_redirect;
 	_autoindex = src._autoindex;
+	_autoindexIsSet = src._autoindexIsSet;
 	return (*this);
 }
 
@@ -200,6 +205,7 @@ void	directory::setHttpRedirect(std::string &redirects)
 }
 void	directory::setAutoindex(std::string &autoindex)
 {
+	_autoindexIsSet = true;
 	if (autoindex == "on")
 		_autoindex = true;
 	else if (autoindex == "off")
@@ -216,6 +222,7 @@ std::string						directory::getIndex(void) { return (_index); }
 std::vector<std::string>		directory::getMethods(void) { return (_methods); }
 std::pair<size_t, std::string>	directory::getHttpRedirect(void) { return (_http_redirect); }
 bool							directory::getAutoindex(void) { return (_autoindex); }
+bool							directory::getAutoindexIsSet(void) { return (_autoindexIsSet); }
 
 /*___ utils ___*/
 

@@ -3,30 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/07 17:14:30 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/26 15:47:57 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "responseHttp.hpp"
 #include <dirent.h>
 #include <iostream>
+#include <unistd.h>
 
 void    responseHttp::_getServerIndex(void)
 {
-	for (std::vector<std::string>::iterator it = this->_request.begin(); it != this->_request.end(); it++)
-	{
-		if (*it == "Host:")
-		{
-			it++;
-			this->_host.first = it->substr(0, it->find(":"));
-			std::stringstream	ss(it->substr(it->find(":") + 1, it->size() - it->find(":") + 1));
-			ss >> this->_host.second;
-			break ;
-		}
-	}
+	std::string	host = _request.at("Host:");
+
+	this->_host.first = host.substr(0, host.find(":"));
+	std::stringstream	ss(host.substr(host.find(":") + 1, host.size() - host.find(":") + 1));
+	ss >> this->_host.second;
+	
 	for (std::vector<serverBlock>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++, this->_i_s++)
 		if (this->_host == it->getListen())
 			break ;
@@ -34,21 +30,25 @@ void    responseHttp::_getServerIndex(void)
 
 void    responseHttp::_getLocationIndex(void)
 {
+	std::string	url = this->_request.at("file:") + "/";
+	if (_i_s == _servers.size())
+		return ; // create an error of bad resquest
     this->_directories = this->_servers[this->_i_s].getDirectories();
 	int	id = -1;
 
 	for (std::vector<directory>::iterator it = this->_directories.begin(); it != this->_directories.end(); it++, this->_i_d++)
-	{
-		// std::string	toCompare = this->_request[1].substr(0, it->getName().size());
-		if (it->getName() == this->_request[1])
+	{	
+		if (url.find(it->getName() + "/") != std::string::npos)
 		{
 			if (id == -1)
 				id = this->_i_d;
 			else if (it->getName().size() > this->_directories[id].getName().size())
 				id = this->_i_d;
 		}
+		else if (it->getName() == "/")
+			id = this->_i_d;
 	}
-	id == -1 ? this->_directories.size() : this->_i_d = id;
+	id == -1 ? this->_i_d = this->_directories.size() : this->_i_d = id;
 }
 
 bool	responseHttp::_createAutoIndex(void)
@@ -56,16 +56,25 @@ bool	responseHttp::_createAutoIndex(void)
 	struct dirent	*d;
 	DIR				*dr;
 	dr = opendir(_fileName.c_str());
-	_htmlTxt = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='utf-8'/>\n<title>Index</title>\n</head>\n<body>\n<h1>Index :</h1>\n<ul>\n";
+	std::string	tmp = _fileName.substr(0, _fileName.rfind("/"));
+	_htmlTxt = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='utf-8'/>\n<title>Index</title>\n</head>\n<body>\n<h1>Index of " + tmp.substr(tmp.rfind("/")) + " :</h1>\n<hr/><ul>\n";
+	std::cout << "Size : " << _servers[_i_s].getDirectories().size() << std::endl;
+	std::cout << "_i_d : " << _i_d << std::endl;
+	std::string	dir = _servers[_i_s].getDirectories()[_i_d].getName() + "/";
+	if (dir.empty())
+		dir = _fileName;
 	if (dr)
 	{
 		for (d = readdir(dr); d; d = readdir(dr))
-			_htmlTxt += "<li><a href='" + std::string(d->d_name) + "'>" + std::string(d->d_name) + "</a></li>\n";
+			_htmlTxt += "<li><a href='" + dir + std::string(d->d_name) + "'>" + std::string(d->d_name) + "</a></li>\n";
 		_htmlTxt += "</ul>\n</body>\n</html>";
 		closedir(dr);
 	}
 	else
-		std::cout << "Error" << std::endl;
+	{
+		std::cout << "SALUT" << std::endl;
+		return (errorPage("404"));
+	}
 	_createHeader("200");
 	return (false);
 }
@@ -124,106 +133,190 @@ std::string	responseHttp::_getMsgCode(std::string code)
 
 bool	responseHttp::_findFileName(void)
 {
-	std::cout << "FILE NAME : " << _i_d << std::endl;
-	if (this->_i_d == this->_directories.size()) // if no location
+	std::string	path = _request.at("file:");
+	respConf	conf;
+	conf.setServ(_servers[_i_s]);
+	if (_i_d != _servers[_i_s].getDirectories().size()) // if location
 	{
-		this->_fileName = this->_servers[this->_i_s].getRoot() + this->_request[1];
-		DIR				*dr;
-		dr = opendir(_fileName.c_str());
-		if (dr)
-			return (this->_createAutoIndex());
+		directory	loc = _servers[_i_s].getDirectories()[_i_d];
+		conf.setLoc(loc);
+		if (!loc.getRoot().empty()) // if root in location
+			conf.path = urlJoin(conf.path, path.substr(loc.getName().size()));
+		else
+			conf.path = urlJoin(conf.path, path);
+		// set errors pages
 	}
-	else // if location
+	else
 	{
-		if (!this->_directories[this->_i_d].getRoot().empty()) // if root
-		{
-			this->_fileName += this->_directories[this->_i_d].getRoot();
-			if (this->_request[1] == this->_directories[this->_i_d].getName())
-			{
-				if (!this->_directories[this->_i_d].getIndex().empty())
-					this->_fileName += "/" + this->_directories[this->_i_d].getIndex();
-				else if (this->_directories[this->_i_d].getAutoindex())
-					return (_createAutoIndex());
-				else if (this->_servers[this->_i_s].getAutoindex())
-					return (_createAutoIndex());
-				else
-					return (this->_errorPage("500"));
-			}
-			else
-				this->_fileName += this->_request[1].substr(this->_directories[this->_i_d].getName().size(), this->_request[1].size() - this->_directories[this->_i_d].getName().size());					}
-		else // if no root
-		{
-			size_t	untilSlash = this->_servers[this->_i_s].getRoot().find("/");
-			this->_fileName += this->_servers[this->_i_s].getRoot();
-			if (this->_servers[this->_i_s].getRoot().substr(untilSlash, this->_servers[this->_i_s].getRoot().size() - untilSlash) == this->_request[1] || \
-				this->_directories[this->_i_d].getName() == this->_request[1])
-			{
-				if (!this->_directories[this->_i_d].getIndex().empty())
-					this->_fileName += "/" + this->_directories[this->_i_d].getIndex();
-				else if (this->_directories[this->_i_d].getAutoindex())
-					return (_createAutoIndex());
-				else if (this->_servers[this->_i_s].getAutoindex())
-					return (_createAutoIndex());
-				else
-					return (this->_errorPage("500"));
-			}
-			else
-			{
-				if (this->_servers[this->_i_s].getRoot().substr(untilSlash, this->_servers[this->_i_s].getRoot().size() - untilSlash) == this->_request[1].substr(0, this->_servers[this->_i_s].getRoot().size() - untilSlash))
-					this->_fileName += "/" + this->_request[1].substr(this->_servers[this->_i_s].getRoot().size(), this->_request[1].size() - this->_servers[this->_i_s].getRoot().size());
-				else
-					this->_fileName += this->_request[1];
-			}
-		}
+		conf.path += rtrim(path, "/");
+		// set errors pages	
 	}
-	return (true);
+	if (urlCompare(conf.path, conf.root) && !conf.index.empty()) // add index if exist
+		conf.path = urlJoin(conf.path, conf.index);
+
+	_fileName = conf.path;
+	_autoindex = conf.autoindex;
+	if (_fileName.find(".py") != std::string::npos)
+		return (make_cgi());
+	return (_getMime());
 }
 
-bool    responseHttp::_createHeader(std::string code)
+bool	responseHttp::_getMime(void)
 {
-	this->_response += this->_request[2] + " " + code + " " + this->_getMsgCode(code);
-
-	std::string	mime = "";
 	size_t		pos = _fileName.find_last_of(".");
 	
 	if (pos != std::string::npos) // get Content-type
 	{
 		std::string	fileType = _fileName.substr(pos, _fileName.size() - pos);
 		if (fileType == ".css")
-			mime = "text/css";
+			_mime = "text/css";
 		else if (fileType == ".html")
-			mime = "text/html";
+			_mime = "text/html";
 		else if (fileType == ".gif")
-			mime = "image/gif";
+			_mime = "image/gif";
 		else if (fileType == ".png")
-			mime = "image/png";
+			_mime = "image/png";
 		else if (fileType == ".jpeg" || fileType == ".jpg")
-			mime = "image/jpeg";
+			_mime = "image/jpeg";
 		else if (fileType == ".json")
-			mime = "application/json";
+			_mime = "application/json";
 		else if (fileType == ".js")
-			mime = "application/javascript";
+			_mime = "application/javascript";
 		else if (fileType == ".pdf")
-			mime = "application/pdf";
+			_mime = "application/pdf";
 		else if (fileType == ".ico")
-			mime = "image/vnd.microsoft.icon";
+			_mime = "image/vnd.microsoft.icon";
 		else if (fileType == ".woff")
-			mime = "font/woff";
+			_mime = "font/woff";
 		else if (fileType == ".woff2")
-			mime = "font/woff2";
+			_mime = "font/woff2";
 	}
+	if (_mime.empty())
+	{
+
+		if (!_autoindex)
+			return (errorPage("404"));
+		else
+			_createAutoIndex();
+		return (false);	
+	}
+	return (true);
+}
+
+bool    responseHttp::_createHeader(std::string code)
+{
+	this->_response += this->_request.at("version:") + " " + code + " " + this->_getMsgCode(code);
 
 	std::stringstream	length;
 
 	length << _htmlTxt.size();
 	_response += "\nContent-Length: " + length.str();
-	if (!mime.empty())
-		_response += "\nContent-Type: " + mime;
+	if (!_mime.empty())
+		_response += "\nContent-Type: " + _mime;
 	_response += "\r\n\r\n" + _htmlTxt;
 	return (true);
 }
 
-bool	responseHttp::_errorPage(std::string code)
+bool    responseHttp::_addHtml(void)
+{
+    std::string		htmlTxt;
+	std::ifstream	ftxt(this->_fileName.c_str());
+
+	if (ftxt) {
+		std::stringstream	ss;
+		ss << ftxt.rdbuf();
+		htmlTxt = ss.str();
+	}
+	else
+		return (this->errorPage("404")); // No page to return --> ERROR
+	_htmlTxt = htmlTxt;
+	return (true);
+}
+
+void	responseHttp::_makeResponseList(void)
+{
+	size_t	bufferSize = 65536;
+	
+	while (_response.size() > bufferSize)
+	{
+		_responseList.push_back(_response.substr(0, bufferSize));
+		_response = _response.substr(bufferSize);
+	}
+	_responseList.push_back(_response);
+	_response = "";
+}
+
+char	**responseHttp::_createEnv()
+{
+	std::vector<std::string>	env;
+	char						buffer[PATH_MAX];
+	char						**ret;
+
+	env.push_back("AUTH_TYPE=");
+	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
+	if (_request.at("method:") == "POST")
+		env.push_back("PATH_INFO=" + _body);
+	else
+		env.push_back("PATH_INFO=" + _fileName.substr(_fileName.find("?") + 1));
+	getcwd(buffer, PATH_MAX);
+	env.push_back("PATH_TRANSLATED=" + std::string(buffer) + _request.at("file:"));
+	if (_request.at("method:") == "POST")
+		env.push_back("QUERY_STRING=" + _body);
+	else
+		env.push_back("QUERY_STRING=" + _fileName.substr(_fileName.find("?") + 1));
+	env.push_back("REMOTE_ADDR=");
+	env.push_back("REMOTE_HOST=");
+	env.push_back("REMOTE_IDENT=");
+	env.push_back("REMOTE_USER=");
+	env.push_back("REQUEST_METHOD=" + _request.at("method:"));
+	env.push_back("SCRIPT_NAME=" + _fileName.substr(0, _fileName.find("?")));
+	if (!_servers[_i_s].getName().empty())
+		env.push_back("SERVER_NAME=" + _servers[_i_s].getName());
+	else
+		env.push_back("SERVER_NAME=" + _servers[_i_s].getListen().first);
+	std::string	str = sizeToString(_servers[_i_s].getListen().second);
+	env.push_back("SERVER_PORTS=" + str);
+	env.push_back("SERVER_PROTOCOL=HTTP/1.1");
+	env.push_back("SERVER_SOFTWARE=JoJo_SERVER/0.1");
+	env.push_back("HTPP_ACCEPT=" + _request.at("Accept:")); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
+	env.push_back("HTPP_ACCEPT_LANGUAGE=" + _request.at("Accept-Language:")); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
+	env.push_back("HTTP_USER_AGENT=" + _request.at("User-Agent:"));
+	env.push_back("HTTP_REFERER=" + _request.at("Referer:"));
+
+	ret = new char *[env.size() + 1];
+	int i = 0;
+	for (std::vector<std::string>::iterator it = env.begin(); it != env.end(); it++)
+	{
+		ret[i] = new char[it->size() + 1];
+		strcpy(ret[i], it->c_str());
+		i++;
+	}
+	ret[env.size()] = NULL;
+	return (ret);
+}
+
+/////////////////////////////////////////////////////////////////
+
+responseHttp::responseHttp(std::string body, std::map<std::string, std::string> request, std::vector<serverBlock> servers) : _servers(servers), _request(request), _body(body), _i_s(0), _i_d(0) {}
+
+responseHttp::~responseHttp(void) {}
+
+const char  *responseHttp::toSend(void) const { return(this->_response.c_str()); }
+std::string	responseHttp::getResponse(void) const { return (this->_response); }
+int      	responseHttp::size(void) const { return(this->_response.size()); }
+
+std::vector<std::string>    responseHttp::createResponse(void)
+{
+	this->_getServerIndex();
+	this->_getLocationIndex();
+	if (this->_findFileName())
+		if (this->_addHtml())
+			this->_createHeader("200");
+	this->_makeResponseList();
+	return (this->_responseList);
+}
+
+bool	responseHttp::errorPage(std::string code)
 {
 	this->_fileName.clear();
 	this->_response.clear();
@@ -259,51 +352,55 @@ bool	responseHttp::_errorPage(std::string code)
 	return (false);
 }
 
-bool    responseHttp::_addHtml(void)
+bool	responseHttp::make_cgi()
 {
-    std::string		htmlTxt;
-	std::ifstream	ftxt(this->_fileName.c_str());
+	char	**env;
+	int		fd[2];
+	int 	status = 0;
+	pid_t	pid;
 
-	if (ftxt) {
-		std::stringstream	ss;
-		ss << ftxt.rdbuf();
-		htmlTxt = ss.str();
+	env = this->_createEnv();
+	if (pipe(fd) == -1)
+		return (true);
+	
+	if ((pid = fork()) == -1)
+		return (true);
+	else if (pid == 0)
+	{
+		if (dup2(fd[1], STDOUT_FILENO) == -1)
+			exit(1);
+
+		close(fd[0]);
+
+		char *av[3];
+		std::string tmp = "cgi-bin" + _request.at("file:").substr(0, _request.at("file:").find("?"));
+		std::string exec_path = "/usr/bin/python3"; // pour les scripts en python, il faudra d'autres chemin pour d'autres scripts
+
+		av[0] = (char *)exec_path.c_str();
+		av[1] = (char *)tmp.c_str();
+		av[2] = NULL;
+
+		execve(av[0], av, env);
+		exit(1);
 	}
 	else
-		return (this->_errorPage("404")); // No page to return --> ERROR
-	_htmlTxt = htmlTxt;
-	return (true);
-}
-
-void	responseHttp::_makeResponseList(void)
-{
-	size_t	bufferSize = 65536;
-	
-	while (_response.size() > bufferSize)
 	{
-		_responseList.push_back(_response.substr(0, bufferSize));
-		_response = _response.substr(bufferSize);
+		char buffer[1024] = {0};
+		close(fd[1]);
+		for (int ret = 1; ret > 0; ret = read(fd[0], buffer, 1024))
+		{
+			buffer[ret] = '\0';
+			_htmlTxt += buffer;
+		}
 	}
-	_responseList.push_back(_response);
-	_response = "";
-}
-
-/////////////////////////////////////////////////////////////////
-
-responseHttp::responseHttp(std::vector<std::string> request, std::vector<serverBlock> servers) : _servers(servers), _request(request), _i_s(0), _i_d(0) {}
-
-responseHttp::~responseHttp(void) {}
-
-const char  *responseHttp::toSend(void) const { return(this->_response.c_str()); }
-std::string	responseHttp::getResponse(void) const { return (this->_response); }
-int      	responseHttp::size(void) const { return(this->_response.size()); }
-
-std::vector<std::string>    responseHttp::createResponse(void)
-{
-    this->_getServerIndex();
-    this->_getLocationIndex();
-	if (this->_findFileName() && this->_addHtml() && this->_createHeader("200"))
-		std::cout << "coucou" << std::endl; // trouver quoi faire !
-	this->_makeResponseList();
-	return (this->_responseList);
+	close(fd[1]);
+	close(fd[0]);
+	waitpid(pid, &status, 0);
+		
+	for (int i = 0; env[i]; i++)
+		delete env[i];
+	delete env;
+	
+	_createHeader("401");
+	return (false);
 }

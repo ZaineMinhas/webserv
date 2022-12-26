@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   webserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/16 16:53:28 by aliens            #+#    #+#             */
-/*   Updated: 2022/11/29 15:54:11 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/12 17:05:20 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int	main(int argc, char **argv) {
 			srv.check_conf_file(argv[1], srv);
 		else
 			srv.check_conf_file("./conf_files/file1.conf", srv);
-		
+
 		server webserv(srv.getPorts());
 		webserv.handle_client(srv);
 	}

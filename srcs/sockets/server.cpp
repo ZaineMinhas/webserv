@@ -13,16 +13,35 @@
 #include "server.hpp"
 #include "responseHttp.hpp"
 
-static std::vector<std::string>	split(std::string buff)
+static std::map<std::string, std::string>	split(std::string buff)
 {
-	std::stringstream ss(buff);
-	std::istream_iterator<std::string>	begin(ss);
-	std::istream_iterator<std::string>	end;
-	return (std::vector<std::string>(begin, end));
+	std::string line;
+	std::map<std::string, std::string>	ret;
+
+	ret.insert(std::make_pair("method:", buff.substr(0, buff.find(" "))));
+	buff.erase(0, buff.find(" ") + 1);
+	ret.insert(std::make_pair("file:", buff.substr(0, buff.find(" "))));
+	buff.erase(0, buff.find(" ") + 1);
+	ret.insert(std::make_pair("version:", buff.substr(0, buff.find("\n"))));
+	buff.erase(0, buff.find("\n") + 1);
+
+
+	std::stringstream	ss(buff);
+
+	while (getline(ss, line))
+	{
+		size_t	pos = line.find(":");
+		if (pos == std::string::npos)
+			break ;
+		ret.insert(std::make_pair(line.substr(0, pos + 1), line.substr(pos + 2)));
+	}
+
+	return (ret);
 }
 
 server::server(std::vector<size_t> ports)
 {
+	_bodyLength = 0;
 	FD_ZERO(&this->_tmp_set);
 	for (std::vector<size_t>::iterator it = ports.begin(); it != ports.end(); it++)
 	{
@@ -61,8 +80,6 @@ server	&server::operator=(const server &srv)
 	return (*this);
 }
 
-#include <cerrno>
-
 void	server::handle_client(config &srv)
 {
 	std::string	buff;
@@ -80,12 +97,25 @@ void	server::handle_client(config &srv)
 		if (select(select_socket + 1, &this->_read_set, &this->_write_set, NULL, NULL) <= 0)
 			throw (server::selectError());
  
+		for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+		{
+			if (FD_ISSET(it->_socket, &this->_read_set))
+			{
+				client	cli(it->_socket, &this->_tmp_set);
+				this->_clients.push_back(cli);
+				if (select_socket < cli._cli)
+					select_socket = cli._cli;
+				break;
+			}
+		}
+		
 		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 		{
 			if (FD_ISSET(it->_cli, &this->_write_set))
 			{
 				std::string	ret = it->_response[0];
 				int len = ret.size();
+				// std::cout << ret.c_str() << std::endl;
 				it->_ret = send(it->_cli, it->_response[0].c_str(), len, 0);
 				if (it->_ret < 0)
 				{
@@ -108,48 +138,52 @@ void	server::handle_client(config &srv)
 		{
 			if (FD_ISSET(it->_cli, &this->_read_set))
 			{
+				bool	headerEnd = false;
+				std::map<std::string, std::string>	header;
 				char	buffer[200];
 				
-				ssize_t	ret = recv(it->_cli, buffer, 199, 0);
-				if (ret < 0)
+				it->_ret = recv(it->_cli, buffer, 199, 0);
+				if (it->_ret < 0)
 				{
 					it->close_client(&this->_tmp_set);
 					this->_clients.erase(it);
 					break ;
 				}
-
-				buff += std::string(buffer, ret);
-
-				if (buff.find("\r\n\r\n") != std::string::npos)
+				buff += std::string(buffer, it->_ret);
+				if (buff.find("\r\n\r\n") != std::string::npos && header.empty())
 				{
+					// std::cout << buff << std::endl;
+					header = split(buff);
+					// for (std::map<std::string, std::string>::iterator it = header.begin(); it != header.end(); it++)
+					// 	std::cout << it->first << " | " << it->second << std::endl;
+					if (header.at("file:").at(header.at("file:").size() - 1) == '/' && header.at("file:").size() > 1)
+						header.at("file:").erase(header.at("file:").size() - 1);
+					if (header.at("method:") == "POST")
+						_bodyLength = stringToSize(header.at("Content-Length:"));
+					buff.erase(0, buff.find("\r\n\r\n") + 4);
 					std::cout << buff << std::endl;
-					if (it->_response.empty())
-					{
-						std::vector<std::string>	request = split(buff);
-						if (request[1].at(request[1].size() - 1) == '/' && request[1].size() > 1)
-							request[1] = request[1].substr(0, request[1].size() - 1);
-						responseHttp	response(request, srv.getServers());
-						it->_response = response.createResponse();
-					}
-					buff.clear();
 				}
 				else
 					send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
+				if (!header.empty())
+				{
+					if (header.at("method:") == "POST" && !headerEnd) {
+
+						_bodyLength -= buff.size();
+						headerEnd = true;
+					}
+					else if (header.at("method:") == "POST")
+						_bodyLength -= it->_ret;
+					if (!_bodyLength)
+					{
+						responseHttp	response(buff, header, srv.getServers());
+						it->_response = response.createResponse();
+						buff.clear();
+					}
+				}
 				break;
 			}
-		}
-	
-		for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
-		{
-			if (FD_ISSET(it->_socket, &this->_read_set))
-			{
-				client	cli(it->_socket, &this->_tmp_set);
-				this->_clients.push_back(cli);
-				if (select_socket < cli._cli)
-					select_socket = cli._cli;
-				break;
-			}
-		}
+		}	
 	}
 }
 
