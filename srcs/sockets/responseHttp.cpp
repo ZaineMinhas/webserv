@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/23 16:49:20 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/26 15:18:56 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -266,7 +266,8 @@ char	**responseHttp::_createEnv()
 		env.push_back("SERVER_NAME=" + _servers[_i_s].getName());
 	else
 		env.push_back("SERVER_NAME=" + _servers[_i_s].getListen().first);
-	env.push_back("SERVER_PORTS=" + _servers[_i_s].getListen().second);
+	std::string	str = sizeToString(_servers[_i_s].getListen().second);
+	env.push_back("SERVER_PORTS=" + str);
 	env.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	env.push_back("SERVER_SOFTWARE=JoJo_SERVER/0.1");
 	env.push_back("HTPP_ACCEPT=" + _request.at("Accept:")); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
