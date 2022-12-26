@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/11 15:24:41 by ctirions          #+#    #+#             */
-/*   Updated: 2022/12/23 14:43:19 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/26 18:00:20 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ void	respConf::setLoc(directory loc)
 		index = loc.getIndex();
 	if (!loc.getMethods().empty())
 		methods = loc.getMethods();
+	if (!loc.getHttpRedirect().second.empty())
+		redirect = loc.getHttpRedirect();
 }
 
 bool	urlCompare(std::string url1, std::string url2)

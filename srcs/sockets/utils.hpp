@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/11 15:24:57 by ctirions          #+#    #+#             */
-/*   Updated: 2022/12/23 14:40:41 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/26 17:59:07 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,13 @@
 
 typedef struct responseConfig
 {
-	std::string					path;
-	bool						autoindex;
-	size_t						bodySize;
-	std::string					root;
-	std::string					index;
-	std::vector<std::string>	methods;
+	bool							autoindex;
+	size_t							bodySize;
+	std::string						path;
+	std::string						root;
+	std::string						index;
+	std::vector<std::string>		methods;
+	std::pair<size_t, std::string>	redirect;
 
 	void	setServ(serverBlock serv);
 	void	setLoc(directory loc);
