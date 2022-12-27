@@ -161,7 +161,6 @@ void	server::handle_client(config &srv)
 					if (header.at("method:") == "POST")
 						_bodyLength = stringToSize(header.at("Content-Length:"));
 					buff.erase(0, buff.find("\r\n\r\n") + 4);
-					std::cout << buff << std::endl;
 				}
 				else
 					send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);

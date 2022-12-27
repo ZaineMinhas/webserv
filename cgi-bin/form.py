@@ -12,29 +12,31 @@ if "forme_de_maison" not in form:
 else:
 	forme = form['forme_de_maison'].value
 
-print("<!DOCTYPE html>")
-print("<html>")
-print("<head>")
-print("<meta charset='utf-8'/>")
-print("<title>Les infos !</title>")
-print("<style>")
-print("body {")
-print("background-color: rgb(246, 246, 246);")
-print("display: flex;")
-print("flex-direction: column;")
-print("align-items: center;")
-print("justify-content: center;")
-print("min-height: 100vh;")
-print("}")
-print("img {")
-print("justify-content: right;")
-print("min-width: 50vw;")
-print("}")
-print("</style>")
-print("</head>")
-print("<body>")
-print("<p>Ta maison s'apelle %s</p>" % (nom))
-print("<p>Et ton pote est de forme %s</p>" % (forme))
-print("<img src='https://s.clipartkey.com/mpngs/s/222-2222639_ironicmeme-ironic-png-sunglasses-emoji-smileyface-cool-glasses.png'>")
-print("</body>")
-print("</html>")
+print("""\
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'/>
+<title>Les infos !</title>
+<style>
+body {
+background-color: rgb(246, 246, 246);
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+min-height: 100vh;
+}
+img {
+justify-content: right;
+min-width: 50vw;
+}
+</style>
+</head>
+<body>
+<p>Ta maison s'apelle %s</p>
+<p>Et ton pote est de forme %s</p>
+<img src='https://s.clipartkey.com/mpngs/s/222-2222639_ironicmeme-ironic-png-sunglasses-emoji-smileyface-cool-glasses.png'>
+</body>
+</html>
+""" % (nom, forme))

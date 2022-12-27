@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/26 15:47:57 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/27 15:35:09 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,6 @@ bool	responseHttp::_createAutoIndex(void)
 	dr = opendir(_fileName.c_str());
 	std::string	tmp = _fileName.substr(0, _fileName.rfind("/"));
 	_htmlTxt = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='utf-8'/>\n<title>Index</title>\n</head>\n<body>\n<h1>Index of " + tmp.substr(tmp.rfind("/")) + " :</h1>\n<hr/><ul>\n";
-	std::cout << "Size : " << _servers[_i_s].getDirectories().size() << std::endl;
-	std::cout << "_i_d : " << _i_d << std::endl;
 	std::string	dir = _servers[_i_s].getDirectories()[_i_d].getName() + "/";
 	if (dir.empty())
 		dir = _fileName;
@@ -71,10 +69,7 @@ bool	responseHttp::_createAutoIndex(void)
 		closedir(dr);
 	}
 	else
-	{
-		std::cout << "SALUT" << std::endl;
 		return (errorPage("404"));
-	}
 	_createHeader("200");
 	return (false);
 }
