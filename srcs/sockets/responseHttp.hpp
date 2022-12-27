@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/23 16:10:11 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/26 18:14:04 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ private:
 	std::string						    _mime;
     std::string                         _body;
 	std::pair<std::string, size_t>	    _host;
+	std::pair<size_t, std::string>	    _redirect;
 	std::string						    _fileName;
     std::string                         _htmlTxt;
 	size_t							    _i_s;
@@ -40,30 +41,31 @@ private:
     void        _getLocationIndex();
     std::string _getMsgCode(std::string code);
 
-  	bool	_createAutoIndex(void);
-    bool    _findFileName();
-	bool	_getMime(void);
-    bool    _createHeader(std::string msg);
-    bool    _addHtml();
+	std::vector<std::string>	_generateRedirect(void);
+  	bool						_createAutoIndex(void);
+    bool    					_findFileName(void);
+	bool						_getMime(void);
+    bool    					_createHeader(std::string msg);
+    bool    					_addHtml(void);
 
-    void    _makeResponseList();
+    void    _makeResponseList(void);
 
-    char    **_createEnv();
+    char    **_createEnv(void);
 
 public:
     responseHttp(std::string body, std::map<std::string, std::string> request, std::vector<serverBlock> servers);
-    ~responseHttp();
+    ~responseHttp(void);
 
-    std::vector<std::string>    createResponse();
+    std::vector<std::string>    createResponse(void);
 
-    const char  *toSend() const;
-    int         size() const;
+    const char  *toSend(void) const;
+    int         size(void) const;
     
-    std::string getResponse() const;
+    std::string getResponse(void) const;
     
     bool    errorPage(std::string code);
     
-    bool    make_cgi();
+    bool    make_cgi(void);
 };
 
 #endif

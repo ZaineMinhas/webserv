@@ -22,7 +22,7 @@ static std::map<std::string, std::string>	split(std::string buff)
 	buff.erase(0, buff.find(" ") + 1);
 	ret.insert(std::make_pair("file:", buff.substr(0, buff.find(" "))));
 	buff.erase(0, buff.find(" ") + 1);
-	ret.insert(std::make_pair("version:", buff.substr(0, buff.find("\n"))));
+	ret.insert(std::make_pair("version:", buff.substr(0, buff.find("\n") - 1)));
 	buff.erase(0, buff.find("\n") + 1);
 
 
@@ -128,7 +128,7 @@ void	server::handle_client(config &srv)
 				{
 					it->close_client(&this->_tmp_set);
 					this->_clients.erase(it);
-					std::cout << std::endl << "######################" << std::endl;
+					std::cout << std::endl << "######################" << std::endl << std::endl;
 				}
 				break ;
 			}
@@ -152,7 +152,7 @@ void	server::handle_client(config &srv)
 				buff += std::string(buffer, it->_ret);
 				if (buff.find("\r\n\r\n") != std::string::npos && header.empty())
 				{
-					// std::cout << buff << std::endl;
+					std::cout << buff << std::endl;
 					header = split(buff);
 					// for (std::map<std::string, std::string>::iterator it = header.begin(); it != header.end(); it++)
 					// 	std::cout << it->first << " | " << it->second << std::endl;
