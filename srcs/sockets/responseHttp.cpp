@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/27 15:35:09 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/29 18:04:04 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 void    responseHttp::_getServerIndex(void)
 {
-	std::string	host = _request.at("Host:");
+	std::string	host = _header.at("Host:");
 
 	this->_host.first = host.substr(0, host.find(":"));
 	std::stringstream	ss(host.substr(host.find(":") + 1, host.size() - host.find(":") + 1));
@@ -30,7 +30,7 @@ void    responseHttp::_getServerIndex(void)
 
 void    responseHttp::_getLocationIndex(void)
 {
-	std::string	url = this->_request.at("file:") + "/";
+	std::string	url = this->_header.at("file:") + "/";
 	if (_i_s == _servers.size())
 		return ; // create an error of bad resquest
     this->_directories = this->_servers[this->_i_s].getDirectories();
@@ -57,6 +57,7 @@ std::vector<std::string>	responseHttp::_generateRedirect(void)
 		_htmlTxt = "HTTP/1.1 308 Permanent Redirect\nLocation: " + _redirect.second + "\r\n\r\n";
 	else
 		 _htmlTxt = "HTTP/1.1 " + sizeToString(_redirect.first) + "Moved Permanently\nLocation: " + _redirect.second + "\r\n\r\n";
+	// std::cout << "redirect : " << _htmlTxt << std::endl;
 	_makeResponseList();
 	return (_responseList);
 }
@@ -88,6 +89,8 @@ std::string	responseHttp::_getMsgCode(std::string code)
 {
 	if (code == "200")
 		return ("Ok.");
+	else if (code == "201")
+		return ("Created.");
 	else if (code == "400")
 		return ("Bad request.");
 	else if (code == "401")
@@ -138,7 +141,7 @@ std::string	responseHttp::_getMsgCode(std::string code)
 
 bool	responseHttp::_findFileName(void)
 {
-	std::string	path = _request.at("file:");
+	std::string	path = _header.at("file:");
 	respConf	conf;
 	conf.setServ(_servers[_i_s]);
 	if (_i_d != _servers[_i_s].getDirectories().size()) // if location
@@ -162,8 +165,16 @@ bool	responseHttp::_findFileName(void)
 	_fileName = conf.path;
 	_autoindex = conf.autoindex;
 	_redirect = conf.redirect;
-	if (_fileName.find(".py") != std::string::npos)
-		return (make_cgi());
+	if (_header.at("method:") == "POST") {
+		_htmlTxt = make_cgi();
+		_createHeader("201");
+		return (false);
+	}
+	else if (_fileName.find(".py") != std::string::npos) {
+		_htmlTxt = make_cgi();
+		_createHeader("200");
+		return (false);
+	}
 	return (_getMime());
 }
 
@@ -199,7 +210,6 @@ bool	responseHttp::_getMime(void)
 	}
 	if (_mime.empty())
 	{
-
 		if (!_autoindex)
 			return (errorPage("404"));
 		else
@@ -211,7 +221,7 @@ bool	responseHttp::_getMime(void)
 
 bool    responseHttp::_createHeader(std::string code)
 {
-	this->_response = this->_request.at("version:") + " " + code + " " + this->_getMsgCode(code);
+	this->_response = this->_header.at("version:") + " " + code + " " + this->_getMsgCode(code);
 
 	std::stringstream	length;
 
@@ -250,7 +260,9 @@ void	responseHttp::_makeResponseList(void)
 		_response = _response.substr(bufferSize);
 	}
 	_responseList.push_back(_response);
-	_response = "";
+	_response.clear();
+	// for (std::vector<std::string>::iterator it = _responseList.begin(); it != _responseList.end(); it++)
+	// 	std::cout << "LINE : " << it->c_str() << " END" << std::endl;
 }
 
 char	**responseHttp::_createEnv()
@@ -260,35 +272,46 @@ char	**responseHttp::_createEnv()
 	char						**ret;
 
 	env.push_back("AUTH_TYPE=");
+
 	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
-	if (_request.at("method:") == "POST")
+
+	if (_header.at("method:") == "POST") {
 		env.push_back("PATH_INFO=" + _body);
-	else
-		env.push_back("PATH_INFO=" + _fileName.substr(_fileName.find("?") + 1));
-	getcwd(buffer, PATH_MAX);
-	env.push_back("PATH_TRANSLATED=" + std::string(buffer) + _request.at("file:"));
-	if (_request.at("method:") == "POST")
 		env.push_back("QUERY_STRING=" + _body);
-	else
+		env.push_back("CONTENT_LENGTH=" + _header.at("Content-Length:"));
+		env.push_back("CONTENT_TYPE=" + _header.at("Content-Type:"));
+	}
+	else {
+		env.push_back("PATH_INFO=" + _fileName.substr(_fileName.find("?") + 1));
 		env.push_back("QUERY_STRING=" + _fileName.substr(_fileName.find("?") + 1));
+		env.push_back("CONTENT_LENGTH=");
+	}
+	
+
+	getcwd(buffer, PATH_MAX);
+	env.push_back("PATH_TRANSLATED=" + std::string(buffer) + _header.at("file:"));
+
 	env.push_back("REMOTE_ADDR=");
 	env.push_back("REMOTE_HOST=");
 	env.push_back("REMOTE_IDENT=");
 	env.push_back("REMOTE_USER=");
-	env.push_back("REQUEST_METHOD=" + _request.at("method:"));
+	env.push_back("REQUEST_METHOD=" + _header.at("method:"));
 	env.push_back("SCRIPT_NAME=" + _fileName.substr(0, _fileName.find("?")));
+
 	if (!_servers[_i_s].getName().empty())
 		env.push_back("SERVER_NAME=" + _servers[_i_s].getName());
 	else
 		env.push_back("SERVER_NAME=" + _servers[_i_s].getListen().first);
+
 	std::string	str = sizeToString(_servers[_i_s].getListen().second);
 	env.push_back("SERVER_PORTS=" + str);
+
 	env.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	env.push_back("SERVER_SOFTWARE=JoJo_SERVER/0.1");
-	env.push_back("HTPP_ACCEPT=" + _request.at("Accept:")); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
-	env.push_back("HTPP_ACCEPT_LANGUAGE=" + _request.at("Accept-Language:")); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
-	env.push_back("HTTP_USER_AGENT=" + _request.at("User-Agent:"));
-	env.push_back("HTTP_REFERER=" + _request.at("Referer:"));
+	env.push_back("HTPP_ACCEPT=" + _header.at("Accept:")); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
+	env.push_back("HTPP_ACCEPT_LANGUAGE=" + _header.at("Accept-Language:")); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
+	env.push_back("HTTP_USER_AGENT=" + _header.at("User-Agent:"));
+	env.push_back("HTTP_REFERER=" + _header.at("Referer:"));
 
 	ret = new char *[env.size() + 1];
 	int i = 0;
@@ -304,7 +327,7 @@ char	**responseHttp::_createEnv()
 
 /////////////////////////////////////////////////////////////////
 
-responseHttp::responseHttp(std::string body, std::map<std::string, std::string> request, std::vector<serverBlock> servers) : _servers(servers), _request(request), _body(body), _i_s(0), _i_d(0) {}
+responseHttp::responseHttp(std::string body, std::map<std::string, std::string> header, std::vector<serverBlock> servers) : _servers(servers), _header(header), _body(body), _i_s(0), _i_d(0) {}
 
 responseHttp::~responseHttp(void) {}
 
@@ -354,29 +377,40 @@ bool	responseHttp::errorPage(std::string code)
 	return (false);
 }
 
-bool	responseHttp::make_cgi()
+std::string	responseHttp::make_cgi()
 {
-	char	**env;
-	int		fd[2];
-	int 	status = 0;
-	pid_t	pid;
+	char		**env;
+	char		buffer[1024] = {0};
+	int			fd_in[2];
+	int			fd_out[2];
+	int 		status = 0;
+	int			ret = 1;
+	std::string	str;
+	pid_t		pid;
 
 	env = this->_createEnv();
-	if (pipe(fd) == -1)
-		return (true);
+	if (pipe(fd_in) == -1 || pipe(fd_out) == -1)
+		return ("");
 	
 	if ((pid = fork()) == -1)
-		return (true);
+		return ("");
 	else if (pid == 0)
 	{
-		if (dup2(fd[1], STDOUT_FILENO) == -1)
+		if (dup2(fd_in[0], STDIN_FILENO) == -1)
+			exit(1);
+		if (dup2(fd_out[1], STDOUT_FILENO) == -1)
 			exit(1);
 
-		close(fd[0]);
+		close(fd_in[0]);
+		close(fd_in[1]);
+		close(fd_out[0]);
+		close(fd_out[1]);
 
 		char *av[3];
-		std::string tmp = "cgi-bin" + _request.at("file:").substr(0, _request.at("file:").find("?"));
+		std::string tmp = "cgi-bin" + _header.at("file:").substr(_header.at("file:").rfind("/"));
 		std::string exec_path = "/usr/bin/python3"; // pour les scripts en python, il faudra d'autres chemin pour d'autres scripts
+		if (tmp.find("?") != std::string::npos)
+			tmp.erase(tmp.find("?"));
 
 		av[0] = (char *)exec_path.c_str();
 		av[1] = (char *)tmp.c_str();
@@ -385,24 +419,25 @@ bool	responseHttp::make_cgi()
 		execve(av[0], av, env);
 		exit(1);
 	}
-	else
-	{
-		char buffer[1024] = {0};
-		close(fd[1]);
-		for (int ret = 1; ret > 0; ret = read(fd[0], buffer, 1024))
-		{
-			buffer[ret] = '\0';
-			_htmlTxt += buffer;
-		}
-	}
-	close(fd[1]);
-	close(fd[0]);
-	waitpid(pid, &status, 0);
-		
+	if (dup2(fd_in[0], STDIN_FILENO) == -1)
+		return ("");
+	if (_header.at("method:") == "POST")
+		write(fd_in[1], _body.c_str(), _body.size());
+
+	close(fd_out[1]);
+	close(fd_in[0]);
+	close(fd_in[1]);
 	for (int i = 0; env[i]; i++)
 		delete env[i];
 	delete env;
 	
-	_createHeader("401");
-	return (false);
+	waitpid(pid, &status, 0);
+	while (ret > 0)
+	{
+		ret = read(fd_out[0], buffer, 1024);
+		buffer[ret] = '\0';
+		str += std::string(buffer);
+	}
+	close(fd_out[0]);
+	return (str);
 }

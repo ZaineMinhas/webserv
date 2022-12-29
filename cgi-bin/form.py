@@ -27,14 +27,17 @@ align-items: center;
 justify-content: center;
 min-height: 100vh;
 }
+p { font-size: 2em; }
 img {
-justify-content: right;
+z-index: -1;
+rotate: 26deg;
 min-width: 50vw;
 }
+.premier { margin-bottom: -25px; }
 </style>
 </head>
 <body>
-<p>Ta maison s'apelle %s</p>
+<p class="premier">Ta maison s'apelle %s</p>
 <p>Et ton pote est de forme %s</p>
 <img src='https://s.clipartkey.com/mpngs/s/222-2222639_ironicmeme-ironic-png-sunglasses-emoji-smileyface-cool-glasses.png'>
 </body>

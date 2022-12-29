@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/26 18:14:04 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/29 17:04:44 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ private:
     std::vector<std::string>            _responseList;
     std::vector<serverBlock>            _servers;
     std::vector<directory>              _directories;
-    std::map<std::string, std::string>  _request;
+    std::map<std::string, std::string>  _header;
     std::string						    _response;
 	std::string						    _mime;
     std::string                         _body;
@@ -65,7 +65,7 @@ public:
     
     bool    errorPage(std::string code);
     
-    bool    make_cgi(void);
+    std::string    make_cgi(void);
 };
 
 #endif
