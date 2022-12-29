@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:06:34 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/12 15:11:05 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/29 16:02:14 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,10 @@ const char	*srvSocket::listenError::what() const throw() { return ("server socke
 client::client(int srv, fd_set *set)
 {
 	this->_ret = 0;
+	this->_bodyLength = 0;
+	this->_ready = false;
+	this->_headerEnd = false;
+	this->_respIsCreate = false;
 	
 	this->_fromlen = sizeof(this->_from);
 	if ((this->_cli = accept(srv, (sockaddr *)&this->_from, &this->_fromlen)) == -1)
@@ -87,6 +91,15 @@ client::client(const client &cli)
 	this->_from.sin_addr.s_addr = cli._from.sin_addr.s_addr;
 	this->_from.sin_port = cli._from.sin_port;
 	this->_fromlen = cli._fromlen;
+	this->_response = cli._response;
+	this->_header = cli._header;
+	this->_head = cli._head;
+	this->_body = cli._body;
+	this->_bodyLength = cli._bodyLength;
+	this->_ret = cli._ret;
+	this->_ready = cli._ready;
+	this->_headerEnd = cli._headerEnd;
+	this->_respIsCreate = cli._respIsCreate;
 }
 
 client	&client::operator=(const client &cli)
@@ -96,6 +109,15 @@ client	&client::operator=(const client &cli)
 	this->_from.sin_addr.s_addr = cli._from.sin_addr.s_addr;
 	this->_from.sin_port = cli._from.sin_port;
 	this->_fromlen = cli._fromlen;
+	this->_response = cli._response;
+	this->_header = cli._header;
+	this->_head = cli._head;
+	this->_body = cli._body;
+	this->_bodyLength = cli._bodyLength;
+	this->_ret = cli._ret;
+	this->_ready = cli._ready;
+	this->_headerEnd = cli._headerEnd;
+	this->_respIsCreate = cli._respIsCreate;
 	return (*this);
 }
 

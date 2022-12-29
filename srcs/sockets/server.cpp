@@ -41,7 +41,6 @@ static std::map<std::string, std::string>	split(std::string buff)
 
 server::server(std::vector<size_t> ports)
 {
-	_bodyLength = 0;
 	FD_ZERO(&this->_tmp_set);
 	for (std::vector<size_t>::iterator it = ports.begin(); it != ports.end(); it++)
 	{
@@ -82,8 +81,10 @@ server	&server::operator=(const server &srv)
 
 void	server::handle_client(config &srv)
 {
-	std::string	buff;
 	int select_socket = this->_servers.back()._socket;
+
+	_timeout.tv_sec = 60 * 5;
+	_timeout.tv_usec = 0;
 
 	while (1)
 	{
@@ -91,10 +92,10 @@ void	server::handle_client(config &srv)
 
 		FD_ZERO(&this->_write_set);
 		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
-			if (!it->_response.empty())
+			if (it->_ready)
 				FD_SET(it->_cli, &this->_write_set);
-
-		if (select(select_socket + 1, &this->_read_set, &this->_write_set, NULL, NULL) <= 0)
+	
+		if (select(select_socket + 1, &this->_read_set, &this->_write_set, NULL, &_timeout) <= 0)
 			throw (server::selectError());
  
 		for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
@@ -113,22 +114,30 @@ void	server::handle_client(config &srv)
 		{
 			if (FD_ISSET(it->_cli, &this->_write_set))
 			{
-				std::string	ret = it->_response[0];
+				if (!it->_respIsCreate)
+				{
+					it->_response = responseHttp(it->_body, it->_header, srv.getServers()).createResponse();
+					it->_respIsCreate = true;
+				}
+
+				std::string	ret = *it->_response.begin();
 				int len = ret.size();
-				// std::cout << ret.c_str() << std::endl;
-				it->_ret = send(it->_cli, it->_response[0].c_str(), len, 0);
+				// std::cout << "BEGIN : " << ret << " END" << std::endl;
+				it->_ret = send(it->_cli, ret.c_str(), len, 0);
 				if (it->_ret < 0)
 				{
 					it->close_client(&this->_tmp_set);
 					this->_clients.erase(it);
 					break ;
 				}
+				
 				it->_response.erase(it->_response.begin());
 				if (it->_response.empty())
 				{
 					it->close_client(&this->_tmp_set);
 					this->_clients.erase(it);
-					std::cout << std::endl << "######################" << std::endl << std::endl;
+					std::cout << std::endl << "Is empty" << std::endl << "######################" << std::endl << std::endl;
+					break ;
 				}
 				break ;
 			}
@@ -138,48 +147,39 @@ void	server::handle_client(config &srv)
 		{
 			if (FD_ISSET(it->_cli, &this->_read_set))
 			{
-				bool	headerEnd = false;
-				std::map<std::string, std::string>	header;
-				char	buffer[200];
+				char	buffer[200] = {0};
 				
 				it->_ret = recv(it->_cli, buffer, 199, 0);
-				if (it->_ret < 0)
+				if (it->_ret <= 0)
 				{
 					it->close_client(&this->_tmp_set);
 					this->_clients.erase(it);
+					std::cout << std::endl << "######################" << std::endl << std::endl;
 					break ;
 				}
-				buff += std::string(buffer, it->_ret);
-				if (buff.find("\r\n\r\n") != std::string::npos && header.empty())
+				if (!it->_headerEnd)
 				{
-					std::cout << buff << std::endl;
-					header = split(buff);
-					// for (std::map<std::string, std::string>::iterator it = header.begin(); it != header.end(); it++)
-					// 	std::cout << it->first << " | " << it->second << std::endl;
-					if (header.at("file:").at(header.at("file:").size() - 1) == '/' && header.at("file:").size() > 1)
-						header.at("file:").erase(header.at("file:").size() - 1);
-					if (header.at("method:") == "POST")
-						_bodyLength = stringToSize(header.at("Content-Length:"));
-					buff.erase(0, buff.find("\r\n\r\n") + 4);
+					it->_head += std::string(buffer, it->_ret);
+					if (it->_head.find("\r\n\r\n") != std::string::npos)
+					{
+						it->_headerEnd = true;
+						it->_body = it->_head.substr(it->_head.find("\r\n\r\n") + 4);
+						it->_head = it->_head.substr(0, it->_head.find("\r\n\r\n"));
+						it->_header = split(it->_head);
+						if (it->_header.at("method:") == "POST")
+							it->_bodyLength = stringToSize(it->_header.at("Content-Length:"));
+						else
+							it->_bodyLength = 0;
+					}
+					else
+					 	send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
 				}
 				else
+					it->_body += std::string(buffer, it->_ret);
+				if (it->_body.size() >= it->_bodyLength && it->_headerEnd)
+					it->_ready = true;
+				else
 					send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
-				if (!header.empty())
-				{
-					if (header.at("method:") == "POST" && !headerEnd) {
-
-						_bodyLength -= buff.size();
-						headerEnd = true;
-					}
-					else if (header.at("method:") == "POST")
-						_bodyLength -= it->_ret;
-					if (!_bodyLength)
-					{
-						responseHttp	response(buff, header, srv.getServers());
-						it->_response = response.createResponse();
-						buff.clear();
-					}
-				}
 				break;
 			}
 		}	
