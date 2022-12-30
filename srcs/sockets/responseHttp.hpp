@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/30 15:42:58 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/30 19:34:20 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ public:
     
     bool    errorPage(std::string code);
     
-    std::string    make_cgi(void);
+    std::string    make_cgi(std::string ext);
     
     static std::string getMsgCode(std::string code);
 };

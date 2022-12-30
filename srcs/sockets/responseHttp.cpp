@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/30 15:43:27 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/30 20:06:40 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,12 +111,12 @@ bool	responseHttp::_findFileName(void)
 	_autoindex = conf.autoindex;
 	_redirect = conf.redirect;
 	if (_header.at("method:") == "POST") {
-		_htmlTxt = make_cgi();
+		_htmlTxt = make_cgi(".py");
 		_createHeader("201");
 		return (false);
 	}
-	else if (_fileName.find(".py") != std::string::npos) {
-		_htmlTxt = make_cgi();
+	else if (_fileName.find(".py") != std::string::npos || _fileName.find(".php") != std::string::npos) {
+		_htmlTxt = make_cgi(_fileName.find(".py") != std::string::npos ? ".py" : ".php");
 		_createHeader("200");
 		return (false);
 	}
@@ -230,7 +230,6 @@ char	**responseHttp::_createEnv()
 		env.push_back("CONTENT_LENGTH=");
 	}
 	
-
 	getcwd(buffer, PATH_MAX);
 	env.push_back("PATH_TRANSLATED=" + std::string(buffer) + _header.at("file:"));
 
@@ -254,7 +253,8 @@ char	**responseHttp::_createEnv()
 	env.push_back("HTPP_ACCEPT=" + _header.at("Accept:")); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
 	env.push_back("HTPP_ACCEPT_LANGUAGE=" + _header.at("Accept-Language:")); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
 	env.push_back("HTTP_USER_AGENT=" + _header.at("User-Agent:"));
-	env.push_back("HTTP_REFERER=" + _header.at("Referer:"));
+	if (_header.find("Referer:") != _header.end())
+		env.push_back("HTTP_REFERER=" + _header.at("Referer:"));
 
 	ret = new char *[env.size() + 1];
 	int i = 0;
@@ -320,7 +320,7 @@ bool	responseHttp::errorPage(std::string code)
 	return (false);
 }
 
-std::string	responseHttp::make_cgi()
+std::string	responseHttp::make_cgi(std::string ext)
 {
 	char		**env;
 	char		buffer[1024] = {0};
@@ -350,8 +350,18 @@ std::string	responseHttp::make_cgi()
 		close(fd_out[1]);
 
 		char *av[3];
-		std::string tmp = "cgi-bin" + _header.at("file:").substr(_header.at("file:").rfind("/"));
-		std::string exec_path = "/usr/bin/python3"; // pour les scripts en python, il faudra d'autres chemin pour d'autres scripts
+		std::string	tmp, exec_path;
+		if (ext == ".php")
+		{
+			tmp = _fileName;
+			exec_path = "/usr/bin/php";
+		}
+		else
+		{
+			tmp = "cgi-bin" + _header.at("file:").substr(_header.at("file:").rfind("/"));
+			exec_path = "/usr/bin/python3";
+		}
+		
 		if (tmp.find("?") != std::string::npos)
 			tmp.erase(tmp.find("?"));
 
