@@ -83,21 +83,40 @@ void	server::handle_client(config &srv)
 {
 	int select_socket = this->_servers.back()._socket;
 
-	_timeout.tv_sec = 60 * 5;
-	_timeout.tv_usec = 0;
 
 	while (1)
 	{
+		_timeout.tv_sec = 1;
+		_timeout.tv_usec = 0;
 		this->_read_set = this->_tmp_set;
 
 		FD_ZERO(&this->_write_set);
 		for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 			if (it->_ready)
 				FD_SET(it->_cli, &this->_write_set);
-	
-		if (select(select_socket + 1, &this->_read_set, &this->_write_set, NULL, &_timeout) <= 0)
-			throw (server::selectError());
- 
+
+		int ret;
+		if ((ret = select(select_socket + 1, &this->_read_set, &this->_write_set, NULL, &_timeout)) <= 0)
+		{
+			std::string code = !ret ? "408" : "500";
+			std::string	htmlTxt;
+			std::string	response;
+			for (std::vector<client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+			{
+				std::ifstream		ftxt(std::string("./error_pages/" + code + ".html").c_str());
+				std::stringstream	ss;
+				ss << ftxt.rdbuf();
+				htmlTxt = ss.str();
+				ftxt.close();
+
+				response = "HTTP/1.1 " + code + " " + responseHttp::getMsgCode(code) + "\nContent-Length: " + sizeToString(htmlTxt.size()) + "\nContent-Type: text/html" +  "\r\n\r\n" + htmlTxt +"\r\n";
+				int len = response.size();
+				it->_ret = send(it->_cli, response.c_str(), len, 0);
+				it->close_client(&this->_tmp_set);
+			}
+			_clients.erase(_clients.begin(), _clients.end());
+		}
+
 		for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
 		{
 			if (FD_ISSET(it->_socket, &this->_read_set))
@@ -122,7 +141,6 @@ void	server::handle_client(config &srv)
 
 				std::string	ret = *it->_response.begin();
 				int len = ret.size();
-				// std::cout << "BEGIN : " << ret << " END" << std::endl;
 				it->_ret = send(it->_cli, ret.c_str(), len, 0);
 				if (it->_ret < 0)
 				{
@@ -133,12 +151,7 @@ void	server::handle_client(config &srv)
 				
 				it->_response.erase(it->_response.begin());
 				if (it->_response.empty())
-				{
-					it->close_client(&this->_tmp_set);
-					this->_clients.erase(it);
-					std::cout << std::endl << "Is empty" << std::endl << "######################" << std::endl << std::endl;
-					break ;
-				}
+					it->reset_client();
 				break ;
 			}
 		}
@@ -154,9 +167,9 @@ void	server::handle_client(config &srv)
 				{
 					it->close_client(&this->_tmp_set);
 					this->_clients.erase(it);
-					std::cout << std::endl << "######################" << std::endl << std::endl;
 					break ;
 				}
+
 				if (!it->_headerEnd)
 				{
 					it->_head += std::string(buffer, it->_ret);
