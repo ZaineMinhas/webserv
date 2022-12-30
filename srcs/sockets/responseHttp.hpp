@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/30 19:34:20 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/30 21:08:23 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ private:
 	bool							    _autoindex;
 
     void        _getServerIndex();
-    void        _getLocationIndex();
+    bool        _getLocationIndex();
 
 	std::vector<std::string>	_generateRedirect(void);
   	bool						_createAutoIndex(void);

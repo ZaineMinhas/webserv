@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/30 20:06:40 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/30 21:09:19 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,20 +19,20 @@ void    responseHttp::_getServerIndex(void)
 {
 	std::string	host = _header.at("Host:");
 
-	this->_host.first = host.substr(0, host.find(":"));
+	_host.first = host.substr(0, host.find(":"));
 	std::stringstream	ss(host.substr(host.find(":") + 1, host.size() - host.find(":") + 1));
-	ss >> this->_host.second;
+	ss >> _host.second;
 	
-	for (std::vector<serverBlock>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++, this->_i_s++)
-		if (this->_host == it->getListen())
+	for (std::vector<serverBlock>::iterator it = _servers.begin(); it != _servers.end(); it++, _i_s++)
+		if (_host == it->getListen() || (_host.first == it->getName() && _host.second == it->getListen().second))
 			break ;
 }
 
-void    responseHttp::_getLocationIndex(void)
+bool    responseHttp::_getLocationIndex(void)
 {
 	std::string	url = this->_header.at("file:") + "/";
-	if (_i_s == _servers.size())
-		return ; // create an error of bad resquest
+	if (_i_s == _servers.size())	
+		return (false); // create an error of bad resquest
     this->_directories = this->_servers[this->_i_s].getDirectories();
 	int	id = -1;
 
@@ -49,6 +49,7 @@ void    responseHttp::_getLocationIndex(void)
 			id = this->_i_d;
 	}
 	id == -1 ? this->_i_d = this->_directories.size() : this->_i_d = id;
+	return (true);
 }
 
 std::vector<std::string>	responseHttp::_generateRedirect(void)
@@ -281,7 +282,8 @@ int      	responseHttp::size(void) const { return(this->_response.size()); }
 std::vector<std::string>    responseHttp::createResponse(void)
 {
 	this->_getServerIndex();
-	this->_getLocationIndex();
+	if (!this->_getLocationIndex())
+		return (this->_responseList);
 	if (this->_findFileName())
 		if (this->_addHtml())
 			this->_createHeader("200");
