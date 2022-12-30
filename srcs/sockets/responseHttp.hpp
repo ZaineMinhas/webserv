@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/29 17:04:44 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/30 15:42:58 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ private:
 
     void        _getServerIndex();
     void        _getLocationIndex();
-    std::string _getMsgCode(std::string code);
 
 	std::vector<std::string>	_generateRedirect(void);
   	bool						_createAutoIndex(void);
@@ -66,6 +65,8 @@ public:
     bool    errorPage(std::string code);
     
     std::string    make_cgi(void);
+    
+    static std::string getMsgCode(std::string code);
 };
 
 #endif

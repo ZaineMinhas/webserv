@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/29 18:04:04 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/30 15:43:27 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,10 +54,9 @@ void    responseHttp::_getLocationIndex(void)
 std::vector<std::string>	responseHttp::_generateRedirect(void)
 {
 	if (_redirect.first == 308)
-		_htmlTxt = "HTTP/1.1 308 Permanent Redirect\nLocation: " + _redirect.second + "\r\n\r\n";
+		_response = "HTTP/1.1 308 Permanent Redirect\nLocation: " + _redirect.second + "\r\n\r\n";
 	else
-		 _htmlTxt = "HTTP/1.1 " + sizeToString(_redirect.first) + "Moved Permanently\nLocation: " + _redirect.second + "\r\n\r\n";
-	// std::cout << "redirect : " << _htmlTxt << std::endl;
+		_response = "HTTP/1.1 " + sizeToString(_redirect.first) + " Moved Permanently\nLocation: " + _redirect.second + "\r\n\r\n";
 	_makeResponseList();
 	return (_responseList);
 }
@@ -83,60 +82,6 @@ bool	responseHttp::_createAutoIndex(void)
 		return (errorPage("404"));
 	_createHeader("200");
 	return (false);
-}
-
-std::string	responseHttp::_getMsgCode(std::string code)
-{
-	if (code == "200")
-		return ("Ok.");
-	else if (code == "201")
-		return ("Created.");
-	else if (code == "400")
-		return ("Bad request.");
-	else if (code == "401")
-		return ("Unauthorized authentication request.");
-	else if (code == "402")
-		return ("Payment Required.");
-	else if (code == "403")
-		return ("You don't have permission to access this resource.");
-	else if (code == "404")
-		return ("Page not found.");
-	else if (code == "405")
-		return ("Method Not Allowed error.");
-	else if (code == "406")
-		return ("Not Acceptable.");
-	else if (code == "407")
-		return ("Proxy Authentication Required.");
-	else if (code == "408")
-		return ("Request Timeout.");
-	else if (code == "409")
-		return ("Conflict.");
-	else if (code == "410")
-		return ("Asset no longer exists.");
-	else if (code == "411")
-		return ("Length Required.");
-	else if (code == "412")
-		return ("Access to this resource has been denied.");
-	else if (code == "413")
-		return ("Request is too big.");
-	else if (code == "414")
-		return ("Request URL too large.");
-	else if (code == "415")
-		return ("Unsupported Media Type.");
-	else if (code == "500")
-		return ("Internal Server Error.");
-	else if (code == "501")
-		return ("Server do not support this request type.");
-	else if (code == "502")
-		return ("Bad Gateway server.");
-	else if (code == "503")
-		return ("Service Unavailable server.");
-	else if (code == "504")
-		return ("Gateway Timeout server.");
-	else if (code == "505")
-		return ("HTTP Version Not Supported.");
-	else
-		return ("");
 }
 
 bool	responseHttp::_findFileName(void)
@@ -221,7 +166,7 @@ bool	responseHttp::_getMime(void)
 
 bool    responseHttp::_createHeader(std::string code)
 {
-	this->_response = this->_header.at("version:") + " " + code + " " + this->_getMsgCode(code);
+	this->_response = this->_header.at("version:") + " " + code + " " + this->getMsgCode(code);
 
 	std::stringstream	length;
 
@@ -235,18 +180,16 @@ bool    responseHttp::_createHeader(std::string code)
 
 bool    responseHttp::_addHtml(void)
 {
-    std::string		htmlTxt;
 	std::ifstream	ftxt(this->_fileName.c_str());
 
 	if (ftxt) {
 		std::stringstream	ss;
 		ss << ftxt.rdbuf();
-		htmlTxt = ss.str();
+		_htmlTxt = ss.str();
 		ftxt.close();
 	}
 	else
 		return (this->errorPage("404")); // No page to return --> ERROR
-	_htmlTxt = htmlTxt;
 	return (true);
 }
 
@@ -337,13 +280,13 @@ int      	responseHttp::size(void) const { return(this->_response.size()); }
 
 std::vector<std::string>    responseHttp::createResponse(void)
 {
-	if (!_redirect.second.empty())
-		return (_generateRedirect());
 	this->_getServerIndex();
 	this->_getLocationIndex();
 	if (this->_findFileName())
 		if (this->_addHtml())
 			this->_createHeader("200");
+	if (!_redirect.second.empty())
+		return (_generateRedirect());
 	this->_makeResponseList();
 	return (this->_responseList);
 }
@@ -440,4 +383,58 @@ std::string	responseHttp::make_cgi()
 	}
 	close(fd_out[0]);
 	return (str);
+}
+
+std::string responseHttp::getMsgCode(std::string code)
+{
+	if (code == "200")
+		return ("Ok.");
+	else if (code == "201")
+		return ("Created.");
+	else if (code == "400")
+		return ("Bad request.");
+	else if (code == "401")
+		return ("Unauthorized authentication request.");
+	else if (code == "402")
+		return ("Payment Required.");
+	else if (code == "403")
+		return ("You don't have permission to access this resource.");
+	else if (code == "404")
+		return ("Page not found.");
+	else if (code == "405")
+		return ("Method Not Allowed error.");
+	else if (code == "406")
+		return ("Not Acceptable.");
+	else if (code == "407")
+		return ("Proxy Authentication Required.");
+	else if (code == "408")
+		return ("Request Timeout.");
+	else if (code == "409")
+		return ("Conflict.");
+	else if (code == "410")
+		return ("Asset no longer exists.");
+	else if (code == "411")
+		return ("Length Required.");
+	else if (code == "412")
+		return ("Access to this resource has been denied.");
+	else if (code == "413")
+		return ("Request is too big.");
+	else if (code == "414")
+		return ("Request URL too large.");
+	else if (code == "415")
+		return ("Unsupported Media Type.");
+	else if (code == "500")
+		return ("Internal Server Error.");
+	else if (code == "501")
+		return ("Server do not support this request type.");
+	else if (code == "502")
+		return ("Bad Gateway server.");
+	else if (code == "503")
+		return ("Service Unavailable server.");
+	else if (code == "504")
+		return ("Gateway Timeout server.");
+	else if (code == "505")
+		return ("HTTP Version Not Supported.");
+	else
+		return ("");
 }

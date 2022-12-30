@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:06:34 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/29 16:02:14 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/30 16:41:59 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,6 +126,18 @@ void	client::close_client(fd_set *set)
 	close(this->_cli);
 	if (set)
 		FD_CLR(this->_cli, set);
+}
+
+void	client::reset_client(void)
+{
+	this->_response = std::vector<std::string>();
+	this->_header = std::map<std::string, std::string>();
+	this->_head = "";
+	this->_body = "";
+	this->_bodyLength = 0;
+	this->_ready = false;
+	this->_headerEnd = false;
+	this->_respIsCreate = false;
 }
 
 const char	*client::initError::what() const throw() { return ("client socket: error: init"); }

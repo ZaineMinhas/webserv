@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:02:19 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/29 14:55:12 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/30 16:21:51 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ struct client {
 	client	&operator=(const client &cli);
 
 	void	close_client(fd_set *set);
+	void	reset_client(void);
 
 	struct initError : public std::exception { virtual const char *what() const throw(); };
 	struct fcntlError : public std::exception { virtual const char *what() const throw(); };
