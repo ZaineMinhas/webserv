@@ -30,7 +30,7 @@ min-height: 100vh;
 p { font-size: 2em; }
 img {
 z-index: -1;
-rotate: 26deg;
+transform: rotate(26deg);
 min-width: 50vw;
 }
 .premier { margin-bottom: -25px; }
