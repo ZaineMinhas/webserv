@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:09 by ctirions          #+#    #+#             */
-/*   Updated: 2023/01/03 15:54:41 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/03 17:46:19 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,14 +100,17 @@ void	config::check_conf_file(std::string file, config &srv)
 
 void	config::add_server(serverBlock to_add) { this->_servers.push_back(to_add); }
 
+#include <iostream>
+
 void	config::stack_ports(void)
 {
 	for (std::vector<serverBlock>::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
 		std::vector<serverBlock>::iterator ite = _servers.begin();
-		for (; ite != it; ite++)
+		for (; ite != it; ite++) {
 			if (it->getListen().second == ite->getListen().second)
 				break ;
+			}
 		if (it == ite)
 			_ports.push_back(it->getListen().second);
 	}
