@@ -1,7 +1,6 @@
 import cgi, os
 
 path = "./website/site/uploads/"
-
 form = cgi.FieldStorage()
 fi = form['filename']
 
@@ -31,7 +30,7 @@ if fi.filename:
 					background: rgba(2, 255, 23, 0.5);
 					border-radius: 20px;
 					width: 450px;
-					padding: 3%;
+					padding: 4%;
 					text-align: center;
 				}
 				span {
@@ -67,7 +66,7 @@ if fi.filename:
 		<body>
 			<div>
 				<span>Image has been succesfully uploaded !</span><br/>
-				<a href="/upload_cgi.html">Upload a other image ?</a>
+				<a href="/upload_cgi.html">Upload an other image ?</a>
 				<a href="/uploads">See all images</a><br/>
 				<a class="home" href="/">Go back to home</a>
 			</div>
@@ -80,7 +79,7 @@ else:
 	<html>
 		<head>
 			<meta charset="utf-8"/>
-			<title>Uploaded!</title>
+			<title>Not uploaded!</title>
 			<style>
 				@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
 				body {
@@ -97,7 +96,7 @@ else:
 					background: rgba(255, 19, 19, 0.5);
 					border-radius: 20px;
 					width: 450px;
-					padding: 3%;
+					padding: 4%;
 					text-align: center;
 				}
 				span {
@@ -132,7 +131,7 @@ else:
 		<body>
 			<div>
 				<span>Image has been succesfully not uploaded !</span><br/>
-				<a href="./upload_cgi.html">Upload a image ?</a>
+				<a href="./upload_cgi.html">Upload an image ?</a>
 				<a href="/uploads">See all images</a><br/>
 				<a class="home" href="/">Go back to home</a>
 			</div>
