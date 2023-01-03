@@ -86,7 +86,7 @@ void	server::handle_client(config &srv)
 
 	while (1)
 	{
-		_timeout.tv_sec = 1;
+		_timeout.tv_sec = 30;
 		_timeout.tv_usec = 0;
 		this->_read_set = this->_tmp_set;
 
@@ -133,7 +133,7 @@ void	server::handle_client(config &srv)
 		{
 			if (FD_ISSET(it->_cli, &this->_write_set))
 			{
-				std::cout << "--------------" << std::endl << it->_head << std::endl;
+				// std::cout << it->_head << std::endl;
 				if (!it->_respIsCreate)
 				{
 					it->_response = responseHttp(it->_body, it->_header, srv.getServers()).createResponse();
