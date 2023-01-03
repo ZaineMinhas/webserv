@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:09 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/22 18:02:02 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/03 15:54:41 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,14 @@ void	config::add_server(serverBlock to_add) { this->_servers.push_back(to_add); 
 void	config::stack_ports(void)
 {
 	for (std::vector<serverBlock>::iterator it = _servers.begin(); it != _servers.end(); it++)
-		_ports.push_back(it->getListen().second);
+	{
+		std::vector<serverBlock>::iterator ite = _servers.begin();
+		for (; ite != it; ite++)
+			if (it->getListen().second == ite->getListen().second)
+				break ;
+		if (it == ite)
+			_ports.push_back(it->getListen().second);
+	}
 }
 
 void	config::check_double(void)
@@ -112,7 +119,7 @@ void	config::check_double(void)
 	{
 		std::vector<serverBlock>::iterator it2 = it + 1;
 		for (; it2 != _servers.end(); it2++) {
-			if (it->getListen().second == it2->getListen().second && it->getName() == it2->getName()) {
+			if (it->getListen().second == it2->getListen().second && it->getName() == it2->getName() && it->getListen().first == it2->getListen().first) {
 				it2--;
 				_servers.erase(it2 + 1);
 			}
