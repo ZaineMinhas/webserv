@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/04 15:35:44 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/04 16:39:48 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ bool    responseHttp::_getLocationIndex(void)
 			else if (it->getName().size() > this->_directories[id].getName().size())
 				id = this->_i_d;
 		}
-		else if (it->getName() == "/")
+		else if (it->getName() == "/" && id == -1)
 			id = this->_i_d;
 	}
 	id == -1 ? this->_i_d = this->_directories.size() : this->_i_d = id;
@@ -112,7 +112,7 @@ bool	responseHttp::_findFileName(void)
 	_methods = conf.methods;
 	_autoindex = conf.autoindex;
 	_redirect = conf.redirect;
-
+	
 	if (!_checkMethods())
 		return (false);
 	if (_header.at("method:") == "POST") {
@@ -158,6 +158,8 @@ bool	responseHttp::_getMime(void)
 			_mime = "image/png";
 		else if (fileType == ".jpeg" || fileType == ".jpg")
 			_mime = "image/jpeg";
+		else if (fileType == ".webp")
+			_mime = "image/webp";
 		else if (fileType == ".json")
 			_mime = "application/json";
 		else if (fileType == ".js")
