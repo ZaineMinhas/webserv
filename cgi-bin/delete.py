@@ -62,7 +62,7 @@ if "file" in form:
 			<body>
 				<div>
 					<span>Image has been succesfully deleted !</span><br/>
-					<a href="/upload_cgi.html">Delete an other image ?</a>
+					<a href="/delete.php">Delete an other image ?</a>
 					<a href="/uploads">See all images</a><br/>
 					<a class="home" href="/">Go back to home</a>
 				</div>
@@ -127,7 +127,7 @@ if "file" in form:
 			<body>
 				<div>
 					<span>Image has been succesfully not deleted !</span><br/>
-					<a href="./upload_cgi.html">Delete an image ?</a>
+					<a href="./delete.php">Delete an image ?</a>
 					<a href="/uploads">See all images</a><br/>
 					<a class="home" href="/">Go back to home</a>
 				</div>
@@ -192,7 +192,7 @@ else:
 		<body>
 			<div>
 				<span>Image has been succesfully not deleted !</span><br/>
-				<a href="./upload_cgi.html">Delete an image ?</a>
+				<a href="./delete.php">Delete an image ?</a>
 				<a href="/uploads">See all images</a><br/>
 				<a class="home" href="/">Go back to home</a>
 			</div>
