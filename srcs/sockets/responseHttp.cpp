@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/30 21:09:19 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/03 21:09:40 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -289,6 +289,13 @@ std::vector<std::string>    responseHttp::createResponse(void)
 			this->_createHeader("200");
 	if (!_redirect.second.empty())
 		return (_generateRedirect());
+	if (_header.at("method:") == "DELETE")
+	{
+		if (!remove(_fileName.c_str()))
+			_response = "HTTP/1.1 204 No Content\nContent-Length: 0\r\n\r\n";
+		else
+			errorPage("404");
+	}
 	this->_makeResponseList();
 	return (this->_responseList);
 }

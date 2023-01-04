@@ -86,7 +86,7 @@ void	server::handle_client(config &srv)
 
 	while (1)
 	{
-		_timeout.tv_sec = 1;
+		_timeout.tv_sec = 30;
 		_timeout.tv_usec = 0;
 		this->_read_set = this->_tmp_set;
 
