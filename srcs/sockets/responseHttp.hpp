@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/04 14:09:09 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/04 17:05:33 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ private:
     std::string                         _htmlTxt;
 	size_t							    _i_s;
   	size_t							    _i_d;
+    size_t                              _bodySize;
 	bool							    _autoindex;
 
     void        _getServerIndex();
