@@ -33,14 +33,14 @@ const hourHand = document.querySelector('.hourHand');
 			minute = minute.toString()
         
         time.innerHTML = '<span>' + '<strong>' + hour + '</strong>' + ' : ' + minute + ' : ' + '<small>' + second +'</small>'+ '</span>';
-		if (hour == 16 && minute == "43" && second == "30")
+		if (hour == 00 && minute == "42" && second == "19")
 			window.location.href = "https://github.com/TimourP"
     }
 
 	window.addEventListener("mousemove", () => {
 		if (Math.floor(Math.random() * 1000) == 17) {
 			is_open = true;
-			alert("tu veux baiser des meres chaudes dans ta region ?")
+			alert("Ça va?")
 		}
 		
 	})

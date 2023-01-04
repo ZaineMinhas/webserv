@@ -27,6 +27,7 @@ if "file" in form:
 						border-radius: 20px;
 						width: 450px;
 						padding: 4%;
+						padding-bottom: 5%;
 						text-align: center;
 					}
 					span {
@@ -63,7 +64,7 @@ if "file" in form:
 				<div>
 					<span>Image has been succesfully deleted !</span><br/>
 					<a href="/delete.php">Delete an other image ?</a>
-					<a href="/uploads">See all images</a><br/>
+					<a href="/images.php">See all images</a><br/>
 					<a class="home" href="/">Go back to home</a>
 				</div>
 			</body>
@@ -93,6 +94,7 @@ if "file" in form:
 						border-radius: 20px;
 						width: 450px;
 						padding: 4%;
+						padding-bottom: 5%;
 						text-align: center;
 					}
 					span {
@@ -128,7 +130,7 @@ if "file" in form:
 				<div>
 					<span>Image has been succesfully not deleted !</span><br/>
 					<a href="./delete.php">Delete an image ?</a>
-					<a href="/uploads">See all images</a><br/>
+					<a href="/images.php">See all images</a><br/>
 					<a class="home" href="/">Go back to home</a>
 				</div>
 			</body>
@@ -158,6 +160,7 @@ else:
 					border-radius: 20px;
 					width: 450px;
 					padding: 4%;
+					padding-bottom: 5%;
 					text-align: center;
 				}
 				span {
@@ -193,7 +196,7 @@ else:
 			<div>
 				<span>Image has been succesfully not deleted !</span><br/>
 				<a href="./delete.php">Delete an image ?</a>
-				<a href="/uploads">See all images</a><br/>
+				<a href="/images.php">See all images</a><br/>
 				<a class="home" href="/">Go back to home</a>
 			</div>
 		</body>
