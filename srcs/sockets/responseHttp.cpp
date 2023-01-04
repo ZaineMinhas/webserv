@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/04 15:35:44 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/04 17:04:40 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,7 @@ bool	responseHttp::_findFileName(void)
 	if (urlCompare(conf.path, conf.root) && !conf.index.empty()) // add index if exist
 		conf.path = urlJoin(conf.path, conf.index);
 
+	_bodySize = conf.bodySize;
 	_fileName = conf.path;
 	_methods = conf.methods;
 	_autoindex = conf.autoindex;
@@ -313,6 +314,8 @@ std::vector<std::string>    responseHttp::createResponse(void)
 		else
 			errorPage("404");
 	}
+	if (_htmlTxt.size() > _bodySize)
+		errorPage("413");
 	this->_makeResponseList();
 	return (this->_responseList);
 }
