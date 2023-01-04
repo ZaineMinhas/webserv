@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/03 21:09:40 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/04 15:35:44 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,8 +109,12 @@ bool	responseHttp::_findFileName(void)
 		conf.path = urlJoin(conf.path, conf.index);
 
 	_fileName = conf.path;
+	_methods = conf.methods;
 	_autoindex = conf.autoindex;
 	_redirect = conf.redirect;
+
+	if (!_checkMethods())
+		return (false);
 	if (_header.at("method:") == "POST") {
 		_htmlTxt = make_cgi(".py");
 		_createHeader("201");
@@ -122,6 +126,19 @@ bool	responseHttp::_findFileName(void)
 		return (false);
 	}
 	return (_getMime());
+}
+
+bool	responseHttp::_checkMethods(void)
+{
+	if (_header.at("method:") != "POST" && _header.at("method:") != "DELETE" && _header.at("method:") != "GET")
+		return (errorPage("400"));
+	std::vector<std::string>::iterator	it = _methods.begin();
+	for (; it != _methods.end(); it++)
+		if (*it == _header.at("method:"))
+			break ;
+	if (it == _methods.end())
+		return (errorPage("405"));
+	return (true);
 }
 
 bool	responseHttp::_getMime(void)

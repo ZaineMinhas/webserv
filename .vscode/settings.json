@@ -1,6 +1,9 @@
 {
     "files.associations": {
         "iosfwd": "cpp",
+        "string": "cpp",
+        "map": "cpp",
+        "vector": "cpp",
         "__bit_reference": "cpp",
         "__config": "cpp",
         "__debug": "cpp",
@@ -46,7 +49,6 @@
         "iterator": "cpp",
         "limits": "cpp",
         "locale": "cpp",
-        "map": "cpp",
         "memory": "cpp",
         "mutex": "cpp",
         "new": "cpp",
@@ -57,14 +59,12 @@
         "stack": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
-        "string": "cpp",
         "string_view": "cpp",
         "system_error": "cpp",
         "tuple": "cpp",
         "type_traits": "cpp",
         "typeinfo": "cpp",
         "unordered_map": "cpp",
-        "utility": "cpp",
-        "vector": "cpp"
+        "utility": "cpp"
     }
 }
