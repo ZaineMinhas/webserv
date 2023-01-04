@@ -8,11 +8,12 @@
 }
 
 body {
-	background-image: url(../images/star1.gif);
+	background-image: url("../images/star1.gif");
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	font-family: ostrich_sansbold;
+	overflow: hidden;
 }
 
 h1 {
@@ -34,20 +35,20 @@ p {
 	color: wheat;
 	font-size: 3em;
 	text-decoration: none;
-	margin-top: 5px;
+	margin-bottom: 1vh;
 }
 
 .credit {
 	font-size: 2.5em;
 	background-image: url("https://bestanimations.com/media/stars/2003945031lemat-colorful-stars-falling-gif.gif");
 	text-decoration: none;
-	text-shadow: 2px 2px 5px red;
+	text-shadow: 2px 2px 4px red;
 	position: absolute;
 	bottom: 10px;
 	right: 10px;
 	padding: 4px;
 	border-radius: 10px / 10px;
-	box-shadow: 0px 0px 5px 2px purple, -0px -0px 5px 2px purple;
+	box-shadow: 0px 0px 5px 2px purple, -0px -0px 4px 2px purple;
 }
 
 .credit:hover {
@@ -78,14 +79,14 @@ img {
 
 @keyframes neon
 {
-	0% { text-shadow: 2px 2px 5px cyan; }
-	69% { text-shadow: 2px 2px 5px cyan; }
-	70% { text-shadow: 2px 2px 5px red; }
-	75% { text-shadow: 2px 2px 5px cyan; }
-	76% { text-shadow: 2px 2px 5px red; }
-	80% { text-shadow: 2px 2px 5px cyan; }
-	95% { text-shadow: 2px 2px 5px red; }
-	100% { text-shadow: 2px 2px 5px cyan; }
+	0% { text-shadow: 2px 2px 4px cyan; }
+	69% { text-shadow: 2px 2px 4px cyan; }
+	70% { text-shadow: 2px 2px 4px red; }
+	75% { text-shadow: 2px 2px 4px cyan; }
+	76% { text-shadow: 2px 2px 4px red; }
+	80% { text-shadow: 2px 2px 4px cyan; }
+	95% { text-shadow: 2px 2px 4px red; }
+	100% { text-shadow: 2px 2px 4px cyan; }
 }
 
 @keyframes upDown { to { transform: translatey(10vh);} }

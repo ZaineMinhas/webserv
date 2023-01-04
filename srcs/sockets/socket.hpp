@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:02:19 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/05 17:05:18 by aliens           ###   ########.fr       */
+/*   Updated: 2022/12/30 16:21:51 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <fcntl.h>
 
 #include <vector>
+#include <map>
 #include <iostream>
 
 struct srvSocket {
@@ -45,11 +46,18 @@ struct srvSocket {
 };
 
 struct client {
-	int							_cli;
-	sockaddr_in					_from;
-	socklen_t					_fromlen;
-	std::vector<std::string>	_response;
-	ssize_t						_ret;
+	int									_cli;
+	sockaddr_in							_from;
+	socklen_t							_fromlen;
+	std::vector<std::string>			_response;	
+	std::map<std::string, std::string>	_header;
+	std::string							_head;
+	std::string							_body;
+	size_t								_bodyLength;
+	ssize_t								_ret;
+	bool								_ready;
+	bool								_headerEnd;
+	bool								_respIsCreate;
 
 	client(int srv, fd_set *set);
 	client(const client &cli);
@@ -58,6 +66,7 @@ struct client {
 	client	&operator=(const client &cli);
 
 	void	close_client(fd_set *set);
+	void	reset_client(void);
 
 	struct initError : public std::exception { virtual const char *what() const throw(); };
 	struct fcntlError : public std::exception { virtual const char *what() const throw(); };

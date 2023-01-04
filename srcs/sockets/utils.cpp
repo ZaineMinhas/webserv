@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/11 15:24:41 by ctirions          #+#    #+#             */
-/*   Updated: 2022/12/12 18:12:53 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/30 21:08:13 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ void	respConf::setLoc(directory loc)
 		index = loc.getIndex();
 	if (!loc.getMethods().empty())
 		methods = loc.getMethods();
+	if (!loc.getHttpRedirect().second.empty())
+		redirect = loc.getHttpRedirect();
 }
 
 bool	urlCompare(std::string url1, std::string url2)
@@ -56,4 +58,21 @@ std::string	rtrim(std::string str, std::string toDel)
 {
 	size_t	end = str.find_last_not_of(toDel);
 	return ((end != std::string::npos) ? str.substr(0, end + 1) : "");
+}
+
+size_t		stringToSize(std::string str)
+{
+	size_t				ret;
+	std::stringstream	ss(str);
+
+	ss >> ret;
+	return (ret);
+}
+
+std::string	sizeToString(size_t nb)
+{
+	std::stringstream	ss;
+
+	ss << nb;
+	return (ss.str());
 }

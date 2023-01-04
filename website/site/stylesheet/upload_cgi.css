@@ -7,6 +7,7 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	margin: auto;
 }
 
 h1 {
@@ -21,7 +22,7 @@ h1 {
 	width: 450px;
 }
 
-.material-symbols-rounded {
+.material-symbols-outlined {
 	position: relative;
 	top: 7px;
 }
@@ -30,9 +31,7 @@ h1 {
 	border: 5px rgba(255, 255, 255, 0) solid;
 	border-radius: 100px;
 	background:rgba(255, 255, 255, 0.7);
-	text-align: center;
-	width: 20em;
-	height: 2em;
+	align-items: center;
 }
 
 .button {
@@ -53,8 +52,4 @@ h1 {
 	background: white;
 	color: black;
 	cursor: pointer;
-}
-
-::placeholder {
-	color: unset;
 }

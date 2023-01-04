@@ -4,6 +4,7 @@
 	<head>
 		<meta charset="utf-8"/>
 		<title>Le site du cgi</title>
+		<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"/>
 		<link rel="stylesheet" href="./stylesheet/le_cgi.css"/>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" />
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" />
@@ -13,7 +14,7 @@
 	<body>
 		<div class="form">
 			<h1>Donne les infos !</h1>
-			<form action="./cgi.py">
+			<form action="/form.py" method="GET">
 				<span class="material-symbols-rounded">person</span>
 				<input class="input" type="text" placeholder="le nom de ton pote" id="pote" name="nom_du_pote"><br><br>
 				<span class="material-symbols-rounded">home</span>

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   serverBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 14:04:18 by ctirions          #+#    #+#             */
-/*   Updated: 2022/12/12 17:12:01 by ctirions         ###   ########.fr       */
+/*   Updated: 2022/12/30 21:06:25 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,7 @@ void	serverBlock::checkValues(void) {
 	if (this->_listen.first.empty())
 		this->_listen.first.assign("127.0.0.1");
 	if (!this->_listen.second)
-		this->_listen.second = 8080;
+		this->_listen.second = 1919;
 }
 
 ////////////////////

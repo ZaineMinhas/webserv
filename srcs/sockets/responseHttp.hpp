@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/13 15:53:42 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/03 21:05:13 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,51 +16,57 @@
 #include "server.hpp"
 #include "utils.hpp"
 #include <dirent.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 class responseHttp
 {
 private:
-    std::vector<std::string>        _responseList;
-    std::vector<serverBlock>        _servers;
-    std::vector<directory>          _directories;
-    std::vector<std::string>        _request;
-    std::string						_response;
-	std::string						_mime;
-	std::pair<std::string, size_t>	_host;
-	std::string						_fileName;
-    std::string                     _htmlTxt;
-	size_t							_i_s;
-  	size_t							_i_d;
-	bool							_autoindex;
+    std::vector<std::string>            _responseList;
+    std::vector<serverBlock>            _servers;
+    std::vector<directory>              _directories;
+    std::map<std::string, std::string>  _header;
+    std::string						    _response;
+	std::string						    _mime;
+    std::string                         _body;
+	std::pair<std::string, size_t>	    _host;
+	std::pair<size_t, std::string>	    _redirect;
+	std::string						    _fileName;
+    std::string                         _htmlTxt;
+	size_t							    _i_s;
+  	size_t							    _i_d;
+	bool							    _autoindex;
 
     void        _getServerIndex();
-    void        _getLocationIndex();
-    std::string _getMsgCode(std::string code);
+    bool        _getLocationIndex();
 
-  	bool	_createAutoIndex(void);
-    bool    _findFileName();
-	bool	_getMime(void);
-    bool    _createHeader(std::string msg);
-    bool    _addHtml();
+	std::vector<std::string>	_generateRedirect(void);
+  	bool						_createAutoIndex(void);
+    bool    					_findFileName(void);
+	bool						_getMime(void);
+    bool    					_createHeader(std::string msg);
+    bool    					_addHtml(void);
 
-    void    _makeResponseList();
+    void    _makeResponseList(void);
 
-    char    **_createEnv();
+    char    **_createEnv(void);
 
 public:
-    responseHttp(std::vector<std::string> request, std::vector<serverBlock> servers);
-    ~responseHttp();
+    responseHttp(std::string body, std::map<std::string, std::string> request, std::vector<serverBlock> servers);
+    ~responseHttp(void);
 
-    std::vector<std::string>    createResponse();
+    std::vector<std::string>    createResponse(void);
 
-    const char  *toSend() const;
-    int           size() const;
+    const char  *toSend(void) const;
+    int         size(void) const;
     
-    std::string getResponse() const;
+    std::string getResponse(void) const;
     
     bool    errorPage(std::string code);
     
-    void    make_cgi();
+    std::string    make_cgi(std::string ext);
+    
+    static std::string getMsgCode(std::string code);
 };
 
 #endif
