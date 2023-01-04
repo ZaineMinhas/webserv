@@ -8,15 +8,24 @@
 	</head>
 	<body>
 		<?php
-				if (is_dir('./website/site/uploads'))
-				{
-					$files = scandir('./website/site/uploads');
-					foreach ($files as $file)
-						if (!($file == "." || $file == ".."))
-							echo "<a href='/delete.py?file=$file'><img src='./uploads/$file'/></a><br/>";
-				}
-				else
-					echo "<div>There is no images.</div>";
+			function dir_is_empty($dirname)
+			{
+				if (!is_dir($dirname))
+					return false;
+				$res = scandir($dirname);
+				if ($res === false)
+					return false;
+				return (!(count($res) == 2));
+			}
+			if (dir_is_empty('./website/site/uploads'))
+			{
+				$files = scandir('./website/site/uploads');
+				foreach ($files as $file)
+					if (!($file == "." || $file == ".."))
+						echo "<a href='/delete.py?file=$file'><img src='./uploads/$file'/></a><br/>";
+			}
+			else
+				echo "<div>There is no images.</div>";
 		?>
 		<a class="webserv" href="./index.html">Webserv</a>
 	</body>

@@ -31,6 +31,7 @@ if fi.filename:
 					border-radius: 20px;
 					width: 450px;
 					padding: 4%;
+					padding-bottom: 5%;
 					text-align: center;
 				}
 				span {
@@ -67,7 +68,7 @@ if fi.filename:
 			<div>
 				<span>Image has been succesfully uploaded !</span><br/>
 				<a href="/upload_cgi.html">Upload an other image ?</a>
-				<a href="/uploads">See all images</a><br/>
+				<a href="/images.php">See all images</a><br/>
 				<a class="home" href="/">Go back to home</a>
 			</div>
 		</body>
@@ -97,6 +98,7 @@ else:
 					border-radius: 20px;
 					width: 450px;
 					padding: 4%;
+					padding-bottom: 5%;
 					text-align: center;
 				}
 				span {
@@ -132,7 +134,7 @@ else:
 			<div>
 				<span>Image has been succesfully not uploaded !</span><br/>
 				<a href="./upload_cgi.html">Upload an image ?</a>
-				<a href="/uploads">See all images</a><br/>
+				<a href="/images.php">See all images</a><br/>
 				<a class="home" href="/">Go back to home</a>
 			</div>
 		</body>
