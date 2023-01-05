@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/05 15:07:17 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/05 16:34:51 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,32 @@ bool	responseHttp::_createAutoIndex(void)
 	else
 		return (errorPage("404"));
 	_createHeader("200");
+	return (false);
+}
+
+bool	responseHttp::_acceptable(std::string Accept)
+{
+	Accept = Accept.substr(0, Accept.rfind(";"));
+	std::vector<std::string> accepts;
+	std::string	tmp;
+	size_t pos = 0;
+	while ((pos = Accept.find(",")) != std::string::npos)
+	{
+		tmp = Accept.substr(0, pos);
+		accepts.push_back(tmp);
+		Accept.erase(0, pos + 1);
+	}
+	accepts.push_back(Accept);
+	for (std::vector<std::string>::iterator it = accepts.begin(); it != accepts.end(); it++)
+	{
+		if (_mime == *it)
+			return (true);
+		else if (*it == "*/*")
+			return (true);
+		else if (it->substr(0, it->find("/")) == _mime.substr(0, _mime.find("/")))
+			if (it->substr(it->find("/")) == "/*")
+				return (true);
+	}
 	return (false);
 }
 
@@ -185,6 +211,8 @@ bool	responseHttp::_getMime(void)
 			_createAutoIndex();
 		return (false);	
 	}
+	if (!_acceptable(_header.at("Accept:")))
+		return (errorPage("406"));
 	return (true);
 }
 

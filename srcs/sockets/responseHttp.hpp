@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/05 14:51:45 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/05 15:31:13 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ private:
 	bool						_getMime(void);
     bool    					_createHeader(std::string msg);
     bool    					_addHtml(void);
+    bool                        _acceptable(std::string Accept);
 
     void    _makeResponseList(void);
 
