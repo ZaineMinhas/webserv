@@ -73,7 +73,7 @@ server::server(std::vector<size_t> ports)
 		this->_servers.push_back(srv);
 	}
 
-	std::cout << " WEBSERV START " << std::endl;
+	std::cout << "WEBSERV START" << std::endl;
 }
 
 server::~server()
@@ -159,8 +159,6 @@ void	server::handle_client(config &srv)
 			{
 				if (!it->_respIsCreate)
 				{
-					std::cout << it->_head << std::endl;
-					std::cout << "######################" << std::endl;
 					it->_response = responseHttp(it->_body, it->_header, srv.getServers()).createResponse();
 					it->_respIsCreate = true;
 				}
@@ -209,7 +207,6 @@ void	server::handle_client(config &srv)
 						it->_header = split(it->_head);
 						it->_header.at("file:") = urlDecode(it->_header.at("file:"));
 						if (it->_header.at("method:") == "POST")
-						// std::cout << it->_header.at("file:") << std::endl;
 						{
 							if (it->_header.find("Content-Length:") != it->_header.end())
 								it->_bodyLength = stringToSize(it->_header.at("Content-Length:"));
