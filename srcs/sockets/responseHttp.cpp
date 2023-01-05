@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/04 17:04:40 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/05 13:26:06 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -311,10 +311,15 @@ std::vector<std::string>    responseHttp::createResponse(void)
 		return (_generateRedirect());
 	if (_header.at("method:") == "DELETE")
 	{
+		std::cout << _htmlTxt << std::endl;
 		if (!remove(_fileName.c_str()))
 			_response = "HTTP/1.1 204 No Content\nContent-Length: 0\r\n\r\n";
 		else
+		{
+			std::cout << "coucou!!!!!!!!!!!4" << std::endl;
+
 			errorPage("404");
+		}
 	}
 	if (_htmlTxt.size() > _bodySize)
 		errorPage("413");
@@ -346,6 +351,7 @@ bool	responseHttp::errorPage(std::string code)
 				}
 		}
 	}
+	std::cout << _htmlTxt << " | " << code << std::endl;
 	this->_addHtml();
 	this->_createHeader(code);
 	return (false);

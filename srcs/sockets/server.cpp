@@ -135,7 +135,8 @@ void	server::handle_client(config &srv)
 			{
 				if (!it->_respIsCreate)
 				{
-					// std::cout << it->_head << std::endl;
+					std::cout << it->_head << std::endl;
+					std::cout << "##############################" << std::endl;
 					it->_response = responseHttp(it->_body, it->_header, srv.getServers()).createResponse();
 					it->_respIsCreate = true;
 				}
@@ -144,7 +145,7 @@ void	server::handle_client(config &srv)
 					it->reset_client();
 					break ;
 				}
-
+				std::cout << it->_response[0];
 				std::string	ret = *it->_response.begin();
 				int len = ret.size();
 				it->_ret = send(it->_cli, ret.c_str(), len, 0);
@@ -183,8 +184,13 @@ void	server::handle_client(config &srv)
 						it->_body = it->_head.substr(it->_head.find("\r\n\r\n") + 4);
 						it->_head = it->_head.substr(0, it->_head.find("\r\n\r\n"));
 						it->_header = split(it->_head);
+						// for (std::map<std::string, std::string>::iterator ite = it->_header.begin(); ite != it->_header.end(); ite++)
+						// 	std::cout << ite->first << ite->second << std::endl;
 						if (it->_header.at("method:") == "POST")
-							it->_bodyLength = stringToSize(it->_header.at("Content-Length:"));
+						{
+							if (it->_header.find("Content-Length:") != it->_header.end())
+								it->_bodyLength = stringToSize(it->_header.at("Content-Length:"));
+						}
 						else
 							it->_bodyLength = 0;
 					}
