@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/05 16:34:51 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/05 17:22:41 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,37 +85,13 @@ bool	responseHttp::_createAutoIndex(void)
 	return (false);
 }
 
-bool	responseHttp::_acceptable(std::string Accept)
-{
-	Accept = Accept.substr(0, Accept.rfind(";"));
-	std::vector<std::string> accepts;
-	std::string	tmp;
-	size_t pos = 0;
-	while ((pos = Accept.find(",")) != std::string::npos)
-	{
-		tmp = Accept.substr(0, pos);
-		accepts.push_back(tmp);
-		Accept.erase(0, pos + 1);
-	}
-	accepts.push_back(Accept);
-	for (std::vector<std::string>::iterator it = accepts.begin(); it != accepts.end(); it++)
-	{
-		if (_mime == *it)
-			return (true);
-		else if (*it == "*/*")
-			return (true);
-		else if (it->substr(0, it->find("/")) == _mime.substr(0, _mime.find("/")))
-			if (it->substr(it->find("/")) == "/*")
-				return (true);
-	}
-	return (false);
-}
-
 bool	responseHttp::_findFileName(void)
 {
 	std::string	path = _header.at("file:");
 	respConf	conf;
 	conf.setServ(_servers[_i_s]);
+	if (_header.at("version:") != "HTTP/1.1")
+		return (errorPage("505"));
 	if (_i_d != _servers[_i_s].getDirectories().size()) // if location
 	{
 		directory	loc = _servers[_i_s].getDirectories()[_i_d];
@@ -140,9 +116,13 @@ bool	responseHttp::_findFileName(void)
 	_autoindex = conf.autoindex;
 	_redirect = conf.redirect;
 
+	if (_fileName.size() > 2083)
+		return (errorPage("414"));
 	if (!_checkMethods())
 		return (false);
 	if (_header.at("method:") == "POST") {
+		if (_header.find("Content-Length:") == _header.end())
+			return (errorPage("411"));
 		_htmlTxt = make_cgi(".py");
 		_createHeader("201");
 		return (false);
@@ -157,6 +137,10 @@ bool	responseHttp::_findFileName(void)
 
 bool	responseHttp::_checkMethods(void)
 {
+	std::string allMethods[6] = {"HEAD", "PUT", "CONNECT", "OPTIONS", "TRACE", "PATCH"};
+	for (int i = 0; i < 9; i++)
+		if (allMethods[i] == _header.at("method:"))
+			return (errorPage("501"));
 	if (_header.at("method:") != "POST" && _header.at("method:") != "DELETE" && _header.at("method:") != "GET")
 		return (errorPage("400"));
 	std::vector<std::string>::iterator	it = _methods.begin();
@@ -211,8 +195,6 @@ bool	responseHttp::_getMime(void)
 			_createAutoIndex();
 		return (false);	
 	}
-	if (!_acceptable(_header.at("Accept:")))
-		return (errorPage("406"));
 	return (true);
 }
 

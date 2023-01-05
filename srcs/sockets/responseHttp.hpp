@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/05 15:31:13 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/05 16:47:54 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ private:
 	bool						_getMime(void);
     bool    					_createHeader(std::string msg);
     bool    					_addHtml(void);
-    bool                        _acceptable(std::string Accept);
 
     void    _makeResponseList(void);
 
