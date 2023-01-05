@@ -4,6 +4,7 @@
 	<head>
 		<meta charset="utf-8"/>
 		<title>Delete cgi</title>
+		<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"/>
 		<link rel="stylesheet" href="./stylesheet/delete.css"/>
 	</head>
 	<body>

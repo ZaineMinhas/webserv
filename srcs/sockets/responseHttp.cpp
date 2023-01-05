@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/05 13:26:06 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/05 15:07:17 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ bool	responseHttp::_findFileName(void)
 	_methods = conf.methods;
 	_autoindex = conf.autoindex;
 	_redirect = conf.redirect;
-	
+
 	if (!_checkMethods())
 		return (false);
 	if (_header.at("method:") == "POST") {
@@ -138,7 +138,10 @@ bool	responseHttp::_checkMethods(void)
 		if (*it == _header.at("method:"))
 			break ;
 	if (it == _methods.end())
+	{
+		_unauthorized = true;
 		return (errorPage("405"));
+	}
 	return (true);
 }
 
@@ -225,8 +228,6 @@ void	responseHttp::_makeResponseList(void)
 	}
 	_responseList.push_back(_response);
 	_response.clear();
-	// for (std::vector<std::string>::iterator it = _responseList.begin(); it != _responseList.end(); it++)
-	// 	std::cout << "LINE : " << it->c_str() << " END" << std::endl;
 }
 
 char	**responseHttp::_createEnv()
@@ -291,7 +292,7 @@ char	**responseHttp::_createEnv()
 
 /////////////////////////////////////////////////////////////////
 
-responseHttp::responseHttp(std::string body, std::map<std::string, std::string> header, std::vector<serverBlock> servers) : _servers(servers), _header(header), _body(body), _i_s(0), _i_d(0) {}
+responseHttp::responseHttp(std::string body, std::map<std::string, std::string> header, std::vector<serverBlock> servers) : _servers(servers), _header(header), _body(body), _i_s(0), _i_d(0), _unauthorized(false) {}
 
 responseHttp::~responseHttp(void) {}
 
@@ -309,17 +310,12 @@ std::vector<std::string>    responseHttp::createResponse(void)
 			this->_createHeader("200");
 	if (!_redirect.second.empty())
 		return (_generateRedirect());
-	if (_header.at("method:") == "DELETE")
+	if (_header.at("method:") == "DELETE" && !_unauthorized)
 	{
-		std::cout << _htmlTxt << std::endl;
 		if (!remove(_fileName.c_str()))
 			_response = "HTTP/1.1 204 No Content\nContent-Length: 0\r\n\r\n";
 		else
-		{
-			std::cout << "coucou!!!!!!!!!!!4" << std::endl;
-
 			errorPage("404");
-		}
 	}
 	if (_htmlTxt.size() > _bodySize)
 		errorPage("413");
@@ -351,7 +347,6 @@ bool	responseHttp::errorPage(std::string code)
 				}
 		}
 	}
-	std::cout << _htmlTxt << " | " << code << std::endl;
 	this->_addHtml();
 	this->_createHeader(code);
 	return (false);
