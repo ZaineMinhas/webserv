@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/03 21:09:40 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/05 17:22:41 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ bool    responseHttp::_getLocationIndex(void)
 			else if (it->getName().size() > this->_directories[id].getName().size())
 				id = this->_i_d;
 		}
-		else if (it->getName() == "/")
+		else if (it->getName() == "/" && id == -1)
 			id = this->_i_d;
 	}
 	id == -1 ? this->_i_d = this->_directories.size() : this->_i_d = id;
@@ -90,6 +90,8 @@ bool	responseHttp::_findFileName(void)
 	std::string	path = _header.at("file:");
 	respConf	conf;
 	conf.setServ(_servers[_i_s]);
+	if (_header.at("version:") != "HTTP/1.1")
+		return (errorPage("505"));
 	if (_i_d != _servers[_i_s].getDirectories().size()) // if location
 	{
 		directory	loc = _servers[_i_s].getDirectories()[_i_d];
@@ -108,10 +110,19 @@ bool	responseHttp::_findFileName(void)
 	if (urlCompare(conf.path, conf.root) && !conf.index.empty()) // add index if exist
 		conf.path = urlJoin(conf.path, conf.index);
 
+	_bodySize = conf.bodySize;
 	_fileName = conf.path;
+	_methods = conf.methods;
 	_autoindex = conf.autoindex;
 	_redirect = conf.redirect;
+
+	if (_fileName.size() > 2083)
+		return (errorPage("414"));
+	if (!_checkMethods())
+		return (false);
 	if (_header.at("method:") == "POST") {
+		if (_header.find("Content-Length:") == _header.end())
+			return (errorPage("411"));
 		_htmlTxt = make_cgi(".py");
 		_createHeader("201");
 		return (false);
@@ -122,6 +133,26 @@ bool	responseHttp::_findFileName(void)
 		return (false);
 	}
 	return (_getMime());
+}
+
+bool	responseHttp::_checkMethods(void)
+{
+	std::string allMethods[6] = {"HEAD", "PUT", "CONNECT", "OPTIONS", "TRACE", "PATCH"};
+	for (int i = 0; i < 9; i++)
+		if (allMethods[i] == _header.at("method:"))
+			return (errorPage("501"));
+	if (_header.at("method:") != "POST" && _header.at("method:") != "DELETE" && _header.at("method:") != "GET")
+		return (errorPage("400"));
+	std::vector<std::string>::iterator	it = _methods.begin();
+	for (; it != _methods.end(); it++)
+		if (*it == _header.at("method:"))
+			break ;
+	if (it == _methods.end())
+	{
+		_unauthorized = true;
+		return (errorPage("405"));
+	}
+	return (true);
 }
 
 bool	responseHttp::_getMime(void)
@@ -141,6 +172,8 @@ bool	responseHttp::_getMime(void)
 			_mime = "image/png";
 		else if (fileType == ".jpeg" || fileType == ".jpg")
 			_mime = "image/jpeg";
+		else if (fileType == ".webp")
+			_mime = "image/webp";
 		else if (fileType == ".json")
 			_mime = "application/json";
 		else if (fileType == ".js")
@@ -205,8 +238,6 @@ void	responseHttp::_makeResponseList(void)
 	}
 	_responseList.push_back(_response);
 	_response.clear();
-	// for (std::vector<std::string>::iterator it = _responseList.begin(); it != _responseList.end(); it++)
-	// 	std::cout << "LINE : " << it->c_str() << " END" << std::endl;
 }
 
 char	**responseHttp::_createEnv()
@@ -271,7 +302,7 @@ char	**responseHttp::_createEnv()
 
 /////////////////////////////////////////////////////////////////
 
-responseHttp::responseHttp(std::string body, std::map<std::string, std::string> header, std::vector<serverBlock> servers) : _servers(servers), _header(header), _body(body), _i_s(0), _i_d(0) {}
+responseHttp::responseHttp(std::string body, std::map<std::string, std::string> header, std::vector<serverBlock> servers) : _servers(servers), _header(header), _body(body), _i_s(0), _i_d(0), _unauthorized(false) {}
 
 responseHttp::~responseHttp(void) {}
 
@@ -289,13 +320,15 @@ std::vector<std::string>    responseHttp::createResponse(void)
 			this->_createHeader("200");
 	if (!_redirect.second.empty())
 		return (_generateRedirect());
-	if (_header.at("method:") == "DELETE")
+	if (_header.at("method:") == "DELETE" && !_unauthorized)
 	{
 		if (!remove(_fileName.c_str()))
 			_response = "HTTP/1.1 204 No Content\nContent-Length: 0\r\n\r\n";
 		else
 			errorPage("404");
 	}
+	if (_htmlTxt.size() > _bodySize)
+		errorPage("413");
 	this->_makeResponseList();
 	return (this->_responseList);
 }

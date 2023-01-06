@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   serverBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 14:04:18 by ctirions          #+#    #+#             */
-/*   Updated: 2022/12/30 21:06:25 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/04 16:09:25 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,12 @@ void	serverBlock::setMethods(std::string &methods)
 	{
 		if (s != "GET" && s != "POST" && s != "DELETE")
 			throw (config::badConfFile("methods"));
-		_methods.push_back(s);
+		std::vector<std::string>::iterator	it = _methods.begin();
+		for (; it != _methods.end(); it++)
+			if (s == *it)
+				break ;
+		if (it == _methods.end())
+			_methods.push_back(s);
 	}
 }
 
@@ -187,7 +192,12 @@ void	directory::setMethods(std::string &methods)
 	{
 		if (s != "GET" && s != "POST" && s != "DELETE")
 			throw (config::badConfFile("methods"));
-		_methods.push_back(s);
+		std::vector<std::string>::iterator	it = _methods.begin();
+		for (; it != _methods.end(); it++)
+			if (s == *it)
+				break ;
+		if (it == _methods.end())
+			_methods.push_back(s);
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/03 21:05:13 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/05 16:47:54 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ class responseHttp
 {
 private:
     std::vector<std::string>            _responseList;
+    std::vector<std::string>            _methods;
     std::vector<serverBlock>            _servers;
     std::vector<directory>              _directories;
     std::map<std::string, std::string>  _header;
@@ -35,12 +36,15 @@ private:
     std::string                         _htmlTxt;
 	size_t							    _i_s;
   	size_t							    _i_d;
+    size_t                              _bodySize;
 	bool							    _autoindex;
+	bool							    _unauthorized;
 
     void        _getServerIndex();
     bool        _getLocationIndex();
 
 	std::vector<std::string>	_generateRedirect(void);
+    bool                        _checkMethods(void);
   	bool						_createAutoIndex(void);
     bool    					_findFileName(void);
 	bool						_getMime(void);

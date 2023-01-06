@@ -39,6 +39,30 @@ static std::map<std::string, std::string>	split(std::string buff)
 	return (ret);
 }
 
+static std::string	urlDecode(std::string fileName)
+{
+    std::string result;
+    result.reserve(fileName.size());
+    
+    for (std::size_t i = 0; i < fileName.size(); ++i)
+    {
+        int ch = fileName[i];
+        
+        if (ch == '%' && (i + 2) < fileName.size())
+        {
+            std::string	hex = fileName.substr(i + 1, 2);
+            int	dec = static_cast<char>(std::strtol(hex.c_str(), nullptr, 16));
+            result.push_back(dec);
+            i += 2;
+        }
+        else if (ch == '+')
+            result.push_back(' ');
+        else
+			result.push_back(ch);
+	}
+	return (result);
+}
+
 server::server(std::vector<size_t> ports)
 {
 	FD_ZERO(&this->_tmp_set);
@@ -49,7 +73,7 @@ server::server(std::vector<size_t> ports)
 		this->_servers.push_back(srv);
 	}
 
-	std::cout << " WEBSERV START " << std::endl;
+	std::cout << "WEBSERV START" << std::endl;
 }
 
 server::~server()
@@ -133,7 +157,6 @@ void	server::handle_client(config &srv)
 		{
 			if (FD_ISSET(it->_cli, &this->_write_set))
 			{
-				// std::cout << it->_head << std::endl;
 				if (!it->_respIsCreate)
 				{
 					it->_response = responseHttp(it->_body, it->_header, srv.getServers()).createResponse();
@@ -144,7 +167,6 @@ void	server::handle_client(config &srv)
 					it->reset_client();
 					break ;
 				}
-
 				std::string	ret = *it->_response.begin();
 				int len = ret.size();
 				it->_ret = send(it->_cli, ret.c_str(), len, 0);
@@ -183,8 +205,12 @@ void	server::handle_client(config &srv)
 						it->_body = it->_head.substr(it->_head.find("\r\n\r\n") + 4);
 						it->_head = it->_head.substr(0, it->_head.find("\r\n\r\n"));
 						it->_header = split(it->_head);
+						it->_header.at("file:") = urlDecode(it->_header.at("file:"));
 						if (it->_header.at("method:") == "POST")
-							it->_bodyLength = stringToSize(it->_header.at("Content-Length:"));
+						{
+							if (it->_header.find("Content-Length:") != it->_header.end())
+								it->_bodyLength = stringToSize(it->_header.at("Content-Length:"));
+						}
 						else
 							it->_bodyLength = 0;
 					}
