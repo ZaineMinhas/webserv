@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/11 15:24:41 by ctirions          #+#    #+#             */
-/*   Updated: 2023/01/04 16:21:44 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/06 15:59:18 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,11 @@ bool	urlCompare(std::string url1, std::string url2)
 std::string	urlJoin(std::string url, std::string toAdd)
 {
 	if (url.find_last_of("/") == url.size() - 1 || !toAdd.find("/"))
+	{
+		if (url.find_last_of("/") == url.size() - 1 && !toAdd.find("/"))
+			return (url.substr(0, url.size() - 1) + toAdd);
 		return (url + toAdd);
+	}
 	return (url + "/" + toAdd);
 }
 
