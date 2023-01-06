@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 14:04:18 by ctirions          #+#    #+#             */
-/*   Updated: 2023/01/04 16:09:25 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/06 15:31:21 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,12 +143,14 @@ void	serverBlock::add_directory(const directory &to_add, std::string &name) {
 }
 
 void	serverBlock::checkValues(void) {
-	if (this->_name.empty())
-		this->_name.assign("localhost");
-	if (this->_listen.first.empty())
-		this->_listen.first.assign("127.0.0.1");
-	if (!this->_listen.second)
-		this->_listen.second = 1919;
+	if (_name.empty())
+		_name.assign("localhost");
+	if (_listen.first.empty())
+		_listen.first.assign("127.0.0.1");
+	if (!_listen.second)
+		_listen.second = 1919;
+	if (_root.empty())
+		_root = "./";
 }
 
 ////////////////////
