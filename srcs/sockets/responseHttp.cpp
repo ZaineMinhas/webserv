@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/06 15:19:44 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/06 16:26:44 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,58 +38,65 @@ void    responseHttp::_getServerIndex(void)
 
 bool    responseHttp::_getLocationIndex(void)
 {
-	std::string	url = this->_header.at("file:") + "/";
+	std::string	url = _header.at("file:") + "/";
 	if (_i_s == _servers.size())	
 		return (false); // create an error of bad resquest
-    this->_directories = this->_servers[this->_i_s].getDirectories();
+    _directories = _servers[_i_s].getDirectories();
 	int	id = -1;
 
-	for (std::vector<directory>::iterator it = this->_directories.begin(); it != this->_directories.end(); it++, this->_i_d++)
+	for (std::vector<directory>::iterator it = _directories.begin(); it != _directories.end(); it++, _i_d++)
 	{	
 		if (url.find(it->getName() + "/") != std::string::npos)
 		{
 			if (id == -1)
-				id = this->_i_d;
-			else if (it->getName().size() > this->_directories[id].getName().size())
-				id = this->_i_d;
+				id = _i_d;
+			else if (it->getName().size() > _directories[id].getName().size())
+				id = _i_d;
 		}
 		else if (it->getName() == "/" && id == -1)
-			id = this->_i_d;
+			id = _i_d;
 	}
-	id == -1 ? this->_i_d = this->_directories.size() : this->_i_d = id;
+	id == -1 ? _i_d = _directories.size() : _i_d = id;
 	return (true);
 }
 
 std::vector<std::string>	responseHttp::_generateRedirect(void)
 {
 	if (_redirect.first == 308)
-		_response = "HTTP/1.1 308 Permanent Redirect\nLocation: " + _redirect.second + "\r\n\r\n";
+		_response = "HTTP/1.1 308 Permanent Redirect\nLocation: " + _redirect.second + "\n\r\n\r\n\r";
 	else
-		_response = "HTTP/1.1 " + sizeToString(_redirect.first) + " Moved Permanently\nLocation: " + _redirect.second + "\r\n\r\n";
+		_response = "HTTP/1.1 " + sizeToString(_redirect.first) + " Moved Permanently\nLocation: " + _redirect.second + "\n\r\n\r\n\r";
 	_makeResponseList();
 	return (_responseList);
 }
 
 bool	responseHttp::_createAutoIndex(void)
 {
+
 	struct dirent	*d;
 	DIR				*dr;
 	dr = opendir(_fileName.c_str());
-	std::string	tmp = _fileName.substr(0, _fileName.rfind("/"));
+	std::string	tmp = _fileName.substr(0, _fileName.rfind("/") + 1);
+	std::cout << "file1 : " << tmp << std::endl;
 	_htmlTxt = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='utf-8'/>\n<link rel='shortcut icon' type='image/x-icon' href='/images/favicon.ico'/>\n<title>Index</title>\n</head>\n<body>\n<h1>Index of " + tmp.substr(tmp.rfind("/")) + " :</h1>\n<hr/><ul>\n";
-	std::string	dir = _servers[_i_s].getDirectories()[_i_d].getName() + "/";
-	if (dir.empty())
-		dir = _fileName;
+	std::cout << "file2 : " << tmp << std::endl;
+	std::string	dir = tmp;
 	if (dr)
 	{
 		for (d = readdir(dr); d; d = readdir(dr))
+		{
+			std::cout << dir << " | " << std::string(d->d_name) << std::endl;
+			if (dir == "//")
+				dir = "/";
 			_htmlTxt += "<li><a href='" + dir + std::string(d->d_name) + "'>" + std::string(d->d_name) + "</a></li>\n";
+		}
 		_htmlTxt += "</ul>\n</body>\n</html>";
 		closedir(dr);
 	}
 	else
 		return (errorPage("404"));
 	_createHeader("200");
+	std::cout << "file : " << _fileName << std::endl;
 	return (false);
 }
 
@@ -108,13 +115,9 @@ bool	responseHttp::_findFileName(void)
 			conf.path = urlJoin(conf.path, path.substr(loc.getName().size()));
 		else
 			conf.path = urlJoin(conf.path, path);
-		// set errors pages
 	}
 	else
-	{
 		conf.path += rtrim(path, "/");
-		// set errors pages	
-	}
 	if (urlCompare(conf.path, conf.root) && !conf.index.empty()) // add index if exist
 		conf.path = urlJoin(conf.path, conf.index);
 
@@ -174,6 +177,12 @@ bool	responseHttp::_getMime(void)
 			_mime = "text/css";
 		else if (fileType == ".html")
 			_mime = "text/html";
+		else if (fileType == ".txt")
+			_mime = "text/plain";
+		else if (fileType == ".cpp")
+			_mime = "text/plain";
+		else if (fileType == ".conf")
+			_mime = "text/plain";
 		else if (fileType == ".gif")
 			_mime = "image/gif";
 		else if (fileType == ".png")
@@ -208,7 +217,7 @@ bool	responseHttp::_getMime(void)
 
 bool    responseHttp::_createHeader(std::string code)
 {
-	this->_response = this->_header.at("version:") + " " + code + " " + this->getMsgCode(code);
+	_response = _header.at("version:") + " " + code + " " + getMsgCode(code);
 
 	std::stringstream	length;
 
@@ -222,7 +231,7 @@ bool    responseHttp::_createHeader(std::string code)
 
 bool    responseHttp::_addHtml(void)
 {
-	std::ifstream	ftxt(this->_fileName.c_str());
+	std::ifstream	ftxt(_fileName.c_str());
 
 	if (ftxt) {
 		std::stringstream	ss;
@@ -231,7 +240,7 @@ bool    responseHttp::_addHtml(void)
 		ftxt.close();
 	}
 	else
-		return (this->errorPage("404")); // No page to return --> ERROR
+		return (errorPage("404")); // No page to return --> ERROR
 	return (true);
 }
 
@@ -314,18 +323,18 @@ responseHttp::responseHttp(std::string body, std::map<std::string, std::string> 
 
 responseHttp::~responseHttp(void) {}
 
-const char  *responseHttp::toSend(void) const { return(this->_response.c_str()); }
-std::string	responseHttp::getResponse(void) const { return (this->_response); }
-int      	responseHttp::size(void) const { return(this->_response.size()); }
+const char  *responseHttp::toSend(void) const { return(_response.c_str()); }
+std::string	responseHttp::getResponse(void) const { return (_response); }
+int      	responseHttp::size(void) const { return(_response.size()); }
 
 std::vector<std::string>    responseHttp::createResponse(void)
 {
-	this->_getServerIndex();
-	if (!this->_getLocationIndex())
-		return (this->_responseList);
-	if (this->_findFileName())
-		if (this->_addHtml())
-			this->_createHeader("200");
+	_getServerIndex();
+	if (!_getLocationIndex())
+		return (_responseList);
+	if (_findFileName())
+		if (_addHtml())
+			_createHeader("200");
 	if (!_redirect.second.empty())
 		return (_generateRedirect());
 	if (_header.at("method:") == "DELETE" && !_unauthorized)
@@ -337,20 +346,21 @@ std::vector<std::string>    responseHttp::createResponse(void)
 	}
 	if (_htmlTxt.size() > _bodySize)
 		errorPage("413");
-	this->_makeResponseList();
-	return (this->_responseList);
+	_makeResponseList();
+	return (_responseList);
 }
 
 bool	responseHttp::errorPage(std::string code)
 {
-	this->_fileName.clear();
-	this->_response.clear();
+	_mime = "text/html";
+	_fileName.clear();
+	_response.clear();
 
 	if (!_servers[_i_s].getErrorPages()[stringToSize(code)].empty())
 		_fileName = _servers[_i_s].getErrorPages()[stringToSize(code)];
 	else
 	{
-		this->_fileName = "./error_pages";
+		_fileName = "./error_pages";
 		struct dirent	*d;
 		DIR				*dr;
 		dr = opendir(_fileName.c_str());
@@ -359,14 +369,14 @@ bool	responseHttp::errorPage(std::string code)
 			for (d = readdir(dr); d; d = readdir(dr))
 				if (std::string(d->d_name).find(code) != std::string::npos)
 				{
-					this->_fileName += "/";
-					this->_fileName += d->d_name;
+					_fileName += "/";
+					_fileName += d->d_name;
 					break ;
 				}
 		}
 	}
-	this->_addHtml();
-	this->_createHeader(code);
+	_addHtml();
+	_createHeader(code);
 	return (false);
 }
 
@@ -381,7 +391,7 @@ std::string	responseHttp::make_cgi(std::string ext)
 	std::string	str;
 	pid_t		pid;
 
-	env = this->_createEnv();
+	env = _createEnv();
 	if (pipe(fd_in) == -1 || pipe(fd_out) == -1)
 		return ("");
 	
