@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/04 17:05:33 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/05 16:47:54 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ private:
   	size_t							    _i_d;
     size_t                              _bodySize;
 	bool							    _autoindex;
+	bool							    _unauthorized;
 
     void        _getServerIndex();
     bool        _getLocationIndex();

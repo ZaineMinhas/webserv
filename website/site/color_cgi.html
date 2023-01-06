@@ -3,16 +3,17 @@
 <html>
 	<head>
 		<meta charset="utf-8"/>
-		<title>Le JoJo cgi</title>
-		<link rel="stylesheet" href="./stylesheet/jojo_cgi.css">
+		<title>Color cgi</title>
+		<link rel="stylesheet" href="./stylesheet/color_cgi.css">
+		<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"/>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0"/>
 	</head>
 	<body>
 		<div class="form">
 			<h1>Donne une couleur !</h1>
-			<form action="/jojo.py" method="GET">
+			<form action="/color.py" method="GET">
 				<span class="material-symbols-outlined">palette</span>
-				<input class="input" type="text" placeholder="couleur" name="color"><br><br>
+				<input class="input" type="color" placeholder="couleur" name="color"><br><br>
 				<input class="button" type="submit" value="Submit">
 			</form> 
 		</div>

@@ -3,6 +3,7 @@
 		<meta charset="utf-8"/>
 		<title>Delete cgi</title>
 		<link rel="stylesheet" href="./stylesheet/images.css"/>
+		<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"/>
 	</head>
 	<body>
 		<?php
@@ -19,8 +20,13 @@
 			{
 				$files = scandir('./website/site/uploads');
 				foreach ($files as $file)
+				{
 					if (!($file == "." || $file == ".."))
+					{
+						$file = urlencode($file);
 						echo "<a href='./uploads/$file'><img src='./uploads/$file'/></a>";
+					}
+				}
 			}
 			else
 				echo "<div>There is no images.</div>";
