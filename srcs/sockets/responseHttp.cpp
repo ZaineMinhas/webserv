@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
 /*   Updated: 2023/01/06 16:26:44 by ctirions         ###   ########.fr       */
@@ -19,12 +19,20 @@ void    responseHttp::_getServerIndex(void)
 {
 	std::string	host = _header.at("Host:");
 
-	_host.first = host.substr(0, host.find(":"));
-	std::stringstream	ss(host.substr(host.find(":") + 1, host.size() - host.find(":") + 1));
-	ss >> _host.second;
-	
+	if (host.find(":") != std::string::npos)
+	{
+		_host.first = host.substr(0, host.find(":"));
+		std::stringstream	ss(host.substr(host.find(":") + 1, host.size() - host.find(":") + 1));
+		ss >> _host.second;
+	}
+	else
+	{
+		_host.first = host.substr(0, host.size() - 1);
+		_host.second = 80;
+	}
+
 	for (std::vector<serverBlock>::iterator it = _servers.begin(); it != _servers.end(); it++, _i_s++)
-		if (_host == it->getListen() || (_host.first == it->getName() && _host.second == it->getListen().second))
+		if ((_host.first == it->getListen().first && _host.second == it->getListen().second) || (_host.first == it->getName() && _host.second == it->getListen().second))
 			break ;
 }
 
