@@ -159,6 +159,7 @@ void	server::handle_client(config &srv)
 			{
 				if (!it->_respIsCreate)
 				{
+					// std::cout << it->_head << std::endl << "######################" << std::endl;
 					it->_response = responseHttp(it->_body, it->_header, srv.getServers()).createResponse();
 					it->_respIsCreate = true;
 				}
