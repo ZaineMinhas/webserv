@@ -15,6 +15,7 @@ if fi.filename:
 		<head>
 			<meta charset="utf-8"/>
 			<title>Uploaded!</title>
+			<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"/>
 			<style>
 				@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
 				body {
@@ -81,6 +82,7 @@ else:
 		<head>
 			<meta charset="utf-8"/>
 			<title>Not uploaded!</title>
+			<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"/>
 			<style>
 				@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
 				body {
