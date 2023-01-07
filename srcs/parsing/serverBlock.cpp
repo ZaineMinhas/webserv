@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 14:04:18 by ctirions          #+#    #+#             */
-/*   Updated: 2023/01/07 16:16:53 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/07 16:42:34 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -273,4 +273,6 @@ void	directory::checkValues(void) {
 		std::string	path("./website/site/uploads/");
 		setUpload(path);
 	}
+	else if (_upload.find("/") != _upload.size() - 1)
+		_upload += "/";
 }

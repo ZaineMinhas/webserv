@@ -4,14 +4,14 @@
 	<head>
 		<meta charset="utf-8"/>
 		<title>Upload</title>
-		<link href="./stylesheet/upload_cgi.css" rel="stylesheet"/>
+		<link href="/stylesheet/upload_cgi.css" rel="stylesheet"/>
 		<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"/>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
 	</head>
 	<body>
 		<div class="form">
 			<h1>Donne le fichier !</h1>
-			<form enctype="multipart/form-data" action="./upload.py" method="POST">
+			<form enctype="multipart/form-data" action="/upload.py" method="POST">
 				<span class="material-symbols-outlined">upload_file</span>
 				<input class="input" id="inp" type="file" name="filename" accept="image/*"><br><br>
 				<input class="button" type="submit" value="Submit">

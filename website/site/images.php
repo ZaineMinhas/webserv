@@ -2,7 +2,7 @@
 	<head>
 		<meta charset="utf-8"/>
 		<title>Delete cgi</title>
-		<link rel="stylesheet" href="./stylesheet/images.css"/>
+		<link rel="stylesheet" href="/stylesheet/images.css"/>
 		<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"/>
 	</head>
 	<body>
@@ -24,13 +24,13 @@
 					if (!($file == "." || $file == ".."))
 					{
 						$file = urlencode($file);
-						echo "<a href='./uploads/$file'><img src='./uploads/$file'/></a>";
+						echo "<a href='/uploads/$file'><img src='/uploads/$file'/></a>";
 					}
 				}
 			}
 			else
 				echo "<div>There is no images.</div>";
 		?>
-		<a class="webserv" href="./index.html">Webserv</a>
+		<a class="webserv" href="/">Webserv</a>
 	</body>
 </html>

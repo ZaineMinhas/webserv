@@ -9,7 +9,7 @@
 			$selectedBg = "$bg[$i]";
 		?>
 		<style>
-			body { background-image: url("./images/<?php echo $selectedBg; ?>"); }
+			body { background-image: url("/images/<?php echo $selectedBg; ?>"); }
 		</style>
 	</head>
 	<body>
