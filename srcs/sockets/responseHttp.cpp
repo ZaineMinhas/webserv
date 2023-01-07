@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/07 16:14:31 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/07 16:27:04 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -265,12 +265,13 @@ char	**responseHttp::_createEnv()
 
 	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
 
+	env.push_back("UPLOAD_DIR=" + _upload);
+	
 	if (_header.at("method:") == "POST") {
 		env.push_back("PATH_INFO=" + _body);
 		env.push_back("QUERY_STRING=" + _body);
 		env.push_back("CONTENT_LENGTH=" + _header.at("Content-Length:"));
 		env.push_back("CONTENT_TYPE=" + _header.at("Content-Type:"));
-		env.push_back("UPLOAD_DIR=" + _upload);
 	}
 	else {
 		env.push_back("PATH_INFO=" + _fileName.substr(_fileName.find("?") + 1));

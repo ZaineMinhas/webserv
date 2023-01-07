@@ -18,9 +18,9 @@
 					return false;
 				return (!(count($res) == 2));
 			}
-			if (dir_is_empty('./website/site/uploads'))
+			if (dir_is_empty($_SERVER['UPLOAD_DIR']))
 			{
-				$files = scandir('./website/site/uploads');
+				$files = scandir($_SERVER['UPLOAD_DIR']);
 				foreach ($files as $file)
 					if (!($file == "." || $file == ".."))
 						echo "<a href='/delete.py?file=$file'><img src='./uploads/$file'/></a><br/>";
