@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   serverBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 14:04:18 by ctirions          #+#    #+#             */
-/*   Updated: 2023/01/06 15:31:21 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/07 16:16:53 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,6 +177,7 @@ directory	&directory::operator=(const directory &src) {
 	_http_redirect = src._http_redirect;
 	_autoindex = src._autoindex;
 	_autoindexIsSet = src._autoindexIsSet;
+	_upload = src._upload;
 	return (*this);
 }
 
@@ -226,6 +227,9 @@ void	directory::setAutoindex(std::string &autoindex)
 		throw (config::badConfFile("autoindex"));
 }
 
+void	directory::setUpload(std::string &upload) { _upload = upload; }
+
+
 /*___ getters ___*/
 
 std::string						directory::getName(void) { return (_name); }
@@ -235,6 +239,7 @@ std::vector<std::string>		directory::getMethods(void) { return (_methods); }
 std::pair<size_t, std::string>	directory::getHttpRedirect(void) { return (_http_redirect); }
 bool							directory::getAutoindex(void) { return (_autoindex); }
 bool							directory::getAutoindexIsSet(void) { return (_autoindexIsSet); }
+std::string						directory::getUpload(void) { return (_upload); }
 
 /*___ utils ___*/
 
@@ -252,6 +257,11 @@ void	directory::set(std::string &key, std::string &value)
 		setHttpRedirect(value);
 	else if (key == "autoindex")
 		setAutoindex(value);
+	else if (key == "upload") {
+		std::string	meth("POST");
+		setUpload(value);
+		setMethods(meth);
+	}
 	else
 		throw (config::badConfFile(std::string("bad key: ") + key));
 }
@@ -259,4 +269,8 @@ void	directory::set(std::string &key, std::string &value)
 void	directory::checkValues(void) {
 	if (_name.empty())
 		throw (config::badConfFile("location name"));
+	if (_upload.empty()) {
+		std::string	path("./website/site/uploads/");
+		setUpload(path);
+	}
 }

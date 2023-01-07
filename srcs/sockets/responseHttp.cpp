@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/06 16:26:44 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/07 16:14:31 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,9 +77,7 @@ bool	responseHttp::_createAutoIndex(void)
 	DIR				*dr;
 	dr = opendir(_fileName.c_str());
 	std::string	tmp = _fileName.substr(0, _fileName.rfind("/") + 1);
-	std::cout << "file1 : " << tmp << std::endl;
 	_htmlTxt = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset='utf-8'/>\n<link rel='shortcut icon' type='image/x-icon' href='/images/favicon.ico'/>\n<title>Index</title>\n</head>\n<body>\n<h1>Index of " + tmp.substr(tmp.rfind("/")) + " :</h1>\n<hr/><ul>\n";
-	std::cout << "file2 : " << tmp << std::endl;
 	std::string	dir = tmp;
 	if (dr)
 	{
@@ -96,7 +94,6 @@ bool	responseHttp::_createAutoIndex(void)
 	else
 		return (errorPage("404"));
 	_createHeader("200");
-	std::cout << "file : " << _fileName << std::endl;
 	return (false);
 }
 
@@ -126,6 +123,7 @@ bool	responseHttp::_findFileName(void)
 	_methods = conf.methods;
 	_autoindex = conf.autoindex;
 	_redirect = conf.redirect;
+	_upload = conf.upload;
 
 	if (_fileName.size() > 2083)
 		return (errorPage("414"));
@@ -272,6 +270,7 @@ char	**responseHttp::_createEnv()
 		env.push_back("QUERY_STRING=" + _body);
 		env.push_back("CONTENT_LENGTH=" + _header.at("Content-Length:"));
 		env.push_back("CONTENT_TYPE=" + _header.at("Content-Type:"));
+		env.push_back("UPLOAD_DIR=" + _upload);
 	}
 	else {
 		env.push_back("PATH_INFO=" + _fileName.substr(_fileName.find("?") + 1));
@@ -319,7 +318,7 @@ char	**responseHttp::_createEnv()
 
 /////////////////////////////////////////////////////////////////
 
-responseHttp::responseHttp(std::string body, std::map<std::string, std::string> header, std::vector<serverBlock> servers) : _servers(servers), _header(header), _body(body), _i_s(0), _i_d(0), _unauthorized(false) {}
+responseHttp::responseHttp(std::string body, std::map<std::string, std::string> header, std::vector<serverBlock> servers) : _header(header), _servers(servers), _body(body), _i_s(0), _i_d(0), _unauthorized(false) {}
 
 responseHttp::~responseHttp(void) {}
 

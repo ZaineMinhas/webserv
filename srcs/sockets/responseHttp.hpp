@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:15:55 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/05 16:47:54 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/07 16:07:00 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,17 @@
 class responseHttp
 {
 private:
+    std::map<std::string, std::string>  _header;
+	std::pair<std::string, size_t>	    _host;
+	std::pair<size_t, std::string>	    _redirect;
     std::vector<std::string>            _responseList;
     std::vector<std::string>            _methods;
     std::vector<serverBlock>            _servers;
     std::vector<directory>              _directories;
-    std::map<std::string, std::string>  _header;
     std::string						    _response;
 	std::string						    _mime;
+	std::string						    _upload;
     std::string                         _body;
-	std::pair<std::string, size_t>	    _host;
-	std::pair<size_t, std::string>	    _redirect;
 	std::string						    _fileName;
     std::string                         _htmlTxt;
 	size_t							    _i_s;

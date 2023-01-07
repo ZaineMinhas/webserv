@@ -1,6 +1,6 @@
 import cgi, os
 
-path = "./website/site/uploads/"
+path = os.environ['UPLOAD_DIR']
 form = cgi.FieldStorage()
 fi = form['filename']
 

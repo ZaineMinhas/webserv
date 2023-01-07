@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/31 16:00:26 by ctirions          #+#    #+#             */
-/*   Updated: 2022/12/12 15:21:14 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/07 15:59:29 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,7 @@ private:
 	std::pair<size_t, std::string>			_http_redirect;
 	bool									_autoindex;
 	bool									_autoindexIsSet;
+	std::string								_upload;
 
 public:
 
@@ -113,6 +114,7 @@ public:
 	void	setMethods(std::string &methods);
 	void	setHttpRedirect(std::string &redirects);
 	void	setAutoindex(std::string &autoindex);
+	void	setUpload(std::string &upload);
 
 	/*___ getters ___*/
 
@@ -123,6 +125,7 @@ public:
 	std::pair<size_t, std::string>			getHttpRedirect(void);
 	bool									getAutoindex(void);
 	bool									getAutoindexIsSet(void);
+	std::string								getUpload(void);
 
 	/*___ utils ___*/
 

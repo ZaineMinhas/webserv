@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/11 15:24:41 by ctirions          #+#    #+#             */
-/*   Updated: 2023/01/06 15:59:18 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/07 16:07:57 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ void	respConf::setServ(serverBlock serv)
 
 void	respConf::setLoc(directory loc)
 {
+	upload = loc.getUpload();
 	if (loc.getAutoindexIsSet())
 		autoindex = loc.getAutoindex();
 	if (!loc.getRoot().empty())

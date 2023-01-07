@@ -51,7 +51,7 @@ static std::string	urlDecode(std::string fileName)
         if (ch == '%' && (i + 2) < fileName.size())
         {
             std::string	hex = fileName.substr(i + 1, 2);
-            int	dec = static_cast<char>(std::strtol(hex.c_str(), nullptr, 16));
+            int	dec = static_cast<char>(std::strtol(hex.c_str(), NULL, 16));
             result.push_back(dec);
             i += 2;
         }
