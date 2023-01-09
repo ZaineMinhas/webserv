@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:06:34 by aliens            #+#    #+#             */
-/*   Updated: 2022/12/30 16:41:59 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/09 17:59:20 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,7 @@ client::client(const client &cli)
 	this->_ready = cli._ready;
 	this->_headerEnd = cli._headerEnd;
 	this->_respIsCreate = cli._respIsCreate;
+	this->_error = cli._error;
 }
 
 client	&client::operator=(const client &cli)
@@ -118,6 +119,7 @@ client	&client::operator=(const client &cli)
 	this->_ready = cli._ready;
 	this->_headerEnd = cli._headerEnd;
 	this->_respIsCreate = cli._respIsCreate;
+	this->_error = cli._error;
 	return (*this);
 }
 
@@ -138,6 +140,7 @@ void	client::reset_client(void)
 	this->_ready = false;
 	this->_headerEnd = false;
 	this->_respIsCreate = false;
+	this->_error = false;
 }
 
 const char	*client::initError::what() const throw() { return ("client socket: error: init"); }

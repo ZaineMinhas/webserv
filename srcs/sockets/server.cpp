@@ -161,10 +161,14 @@ void	server::handle_client(config &srv)
 				{
 					// std::cout << it->_head << std::endl << "######################" << std::endl;
 					it->_response = responseHttp(it->_body, it->_header, srv.getServers()).createResponse();
+					if ((it->_response[0].find("200") != std::string::npos && it->_response[0].find("200") < it->_response[0].find("\n")) || (it->_response[0].find("201") != std::string::npos && it->_response[0].find("201") < it->_response[0].find("\n")))
+						it->_error = true;
 					it->_respIsCreate = true;
 				}
 				if (it->_response.empty())
 				{
+					if (it->_error)
+						it->close_client(&_tmp_set);
 					it->reset_client();
 					break ;
 				}
