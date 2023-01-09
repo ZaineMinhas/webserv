@@ -139,16 +139,21 @@ void	server::handle_client(config &srv)
 				it->close_client(&this->_tmp_set);
 			}
 			_clients.erase(_clients.begin(), _clients.end());
+			select_socket = this->_servers.back()._socket;
 		}
 
 		for (std::vector<srvSocket>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
 		{
 			if (FD_ISSET(it->_socket, &this->_read_set))
 			{
-				client	cli(it->_socket, &this->_tmp_set);
-				this->_clients.push_back(cli);
-				if (select_socket < cli._cli)
-					select_socket = cli._cli;
+				try
+				{
+					client	cli(it->_socket, &this->_tmp_set);
+					this->_clients.push_back(cli);
+					if (select_socket < cli._cli)
+						select_socket = cli._cli;
+				}
+				catch (std::exception &e) {std::cout << e.what() << std::endl;}
 				break;
 			}
 		}
@@ -174,6 +179,7 @@ void	server::handle_client(config &srv)
 				}
 				std::string	ret = *it->_response.begin();
 				size_t len = ret.size();
+				// system("leaks webserv");
 				it->_ret = send(it->_cli, ret.c_str(), len, 0);
 				if (it->_ret <= 0)
 				{

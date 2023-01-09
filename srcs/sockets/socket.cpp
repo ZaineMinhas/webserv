@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens < aliens@student.s19.be >           +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:06:34 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/09 17:59:20 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/09 19:50:04 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,8 @@ const char	*srvSocket::optError::what() const throw() { return ("server socket: 
 const char	*srvSocket::bindError::what() const throw() { return ("server socket: error: bind"); }
 const char	*srvSocket::listenError::what() const throw() { return ("server socket: error: listen"); }
 
+#include <cerrno>
+
 client::client(int srv, fd_set *set)
 {
 	this->_ret = 0;
@@ -75,6 +77,7 @@ client::client(int srv, fd_set *set)
 	this->_respIsCreate = false;
 	
 	this->_fromlen = sizeof(this->_from);
+
 	if ((this->_cli = accept(srv, (sockaddr *)&this->_from, &this->_fromlen)) == -1)
 		throw (client::initError());
 	
