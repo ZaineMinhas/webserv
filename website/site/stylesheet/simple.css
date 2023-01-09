@@ -1,47 +1,7 @@
 @font-face {
-	font-family: 'lobster_1.3regular';
-	src: url('../fonts/Lobster/lobster_1.3-webfont.woff2') format('woff2'),
-		 url('../fonts/Lobster/lobster_1.3-webfont.woff') format('woff');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
 	font-family: 'montserrat_alternatesregular';
 	src: url('../fonts/montserrat/montserratalternates-regular-webfont.woff2') format('woff2'),
 		 url('../fonts/montserrat/montserratalternates-regular-webfont.woff') format('woff');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'ostrich_sansbold';
-	src: url('../fonts/Ostrich_Sans/ostrichsans-bold-webfont.woff2') format('woff2'),
-		 url('../fonts/Ostrich_Sans/ostrichsans-bold-webfont.woff') format('woff');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'poppinsregular';
-	src: url('../fonts/Poppins/poppins-regular-webfont.woff2') format('woff2'),
-		 url('../fonts/Poppins/poppins-regular-webfont.woff') format('woff');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'seasideresortnfregular';
-	src: url('../fonts/SeasideResort/seasrn__-webfont.woff2') format('woff2'),
-		 url('../fonts/SeasideResort/seasrn__-webfont.woff') format('woff');
-	font-weight: normal;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'source_sans_proregular';
-	src: url('../fonts/Source_Sans_Pro/sourcesanspro-regular-webfont.woff2') format('woff2'),
-		 url('../fonts/Source_Sans_Pro/sourcesanspro-regular-webfont.woff') format('woff');
 	font-weight: normal;
 	font-style: normal;
 }

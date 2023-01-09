@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/09 15:57:25 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/09 17:34:19 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ bool    responseHttp::_getLocationIndex(void)
 		return (errorPage("400"));
 	std::string	url = _header.at("file:") + "/";
 	if (_i_s == _servers.size())	
-		return (false); // create an error of bad resquest
+		return (false);
     _directories = _servers[_i_s].getDirectories();
 	int	id = -1;
 
@@ -389,12 +389,14 @@ bool	responseHttp::errorPage(std::string code)
 		if (dr)
 		{
 			for (d = readdir(dr); d; d = readdir(dr))
+			{
 				if (std::string(d->d_name).find(code) != std::string::npos)
 				{
 					_fileName += "/";
 					_fileName += d->d_name;
 					break ;
 				}
+			}
 		}
 	}
 	_addHtml();

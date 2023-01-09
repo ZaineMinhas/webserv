@@ -171,7 +171,7 @@ void	server::handle_client(config &srv)
 				std::string	ret = *it->_response.begin();
 				size_t len = ret.size();
 				it->_ret = send(it->_cli, ret.c_str(), len, 0);
-				if (it->_ret < 0)
+				if (it->_ret <= 0)
 				{
 					it->close_client(&this->_tmp_set);
 					this->_clients.erase(it);
@@ -179,6 +179,7 @@ void	server::handle_client(config &srv)
 				}
 				
 				it->_response.erase(it->_response.begin());
+				usleep(1);
 				break ;
 			}
 		}
@@ -196,7 +197,7 @@ void	server::handle_client(config &srv)
 					this->_clients.erase(it);
 					break ;
 				}
-
+				usleep(1);
 				if (!it->_headerEnd)
 				{
 					it->_head += std::string(buffer, it->_ret);
@@ -206,7 +207,7 @@ void	server::handle_client(config &srv)
 						it->_body = it->_head.substr(it->_head.find("\r\n\r\n") + 4);
 						it->_head = it->_head.substr(0, it->_head.find("\r\n\r\n"));
 						it->_header = split(it->_head);
-						if (it->_header.find("file:") == it->_header.end() || it->_header.find("method:") == it->_header.end())
+						if (it->_header.empty() || it->_header.find("file:") == it->_header.end() || it->_header.find("method:") == it->_header.end())
 						{
 							std::string	htmlTxt;
 							std::string	response;
@@ -220,6 +221,7 @@ void	server::handle_client(config &srv)
 							int len = response.size();
 							it->_ret = send(it->_cli, response.c_str(), len, 0);
 							it->close_client(&this->_tmp_set);
+							_clients.erase(it);
 							break ;
 						}
 						it->_header.at("file:") = urlDecode(it->_header.at("file:"));
@@ -244,7 +246,7 @@ void	server::handle_client(config &srv)
 					send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
 				break;
 			}
-		}	
+		}
 	}
 }
 
