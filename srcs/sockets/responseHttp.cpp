@@ -6,7 +6,7 @@
 /*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/07 16:27:04 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/09 15:57:25 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,12 @@
 
 void    responseHttp::_getServerIndex(void)
 {
+	if (_header.find("Host:") == _header.end())
+	{
+		_i_s = _servers.size();
+		errorPage("400");
+		return ;
+	}
 	std::string	host = _header.at("Host:");
 
 	if (host.find(":") != std::string::npos)
@@ -38,6 +44,8 @@ void    responseHttp::_getServerIndex(void)
 
 bool    responseHttp::_getLocationIndex(void)
 {
+	if (_header.find("file:") == _header.end())
+		return (errorPage("400"));
 	std::string	url = _header.at("file:") + "/";
 	if (_i_s == _servers.size())	
 		return (false); // create an error of bad resquest
@@ -83,7 +91,6 @@ bool	responseHttp::_createAutoIndex(void)
 	{
 		for (d = readdir(dr); d; d = readdir(dr))
 		{
-			std::cout << dir << " | " << std::string(d->d_name) << std::endl;
 			if (dir == "//")
 				dir = "/";
 			_htmlTxt += "<li><a href='" + dir + std::string(d->d_name) + "'>" + std::string(d->d_name) + "</a></li>\n";
@@ -102,6 +109,8 @@ bool	responseHttp::_findFileName(void)
 	std::string	path = _header.at("file:");
 	respConf	conf;
 	conf.setServ(_servers[_i_s]);
+	if (_header.find("version:") == _header.end())
+		return (errorPage("400"));
 	if (_header.at("version:") != "HTTP/1.1")
 		return (errorPage("505"));
 	if (_i_d != _servers[_i_s].getDirectories().size()) // if location
@@ -127,6 +136,8 @@ bool	responseHttp::_findFileName(void)
 
 	if (_fileName.size() > 2083)
 		return (errorPage("414"));
+	if (_header.find("method:") == _header.end())
+		return (errorPage("400"));
 	if (!_checkMethods())
 		return (false);
 	if (_header.at("method:") == "POST") {
@@ -215,6 +226,8 @@ bool	responseHttp::_getMime(void)
 
 bool    responseHttp::_createHeader(std::string code)
 {
+	if (_header.find("version:") == _header.end())
+		return (errorPage("400"));
 	_response = _header.at("version:") + " " + code + " " + getMsgCode(code);
 
 	std::stringstream	length;
@@ -270,6 +283,10 @@ char	**responseHttp::_createEnv()
 	if (_header.at("method:") == "POST") {
 		env.push_back("PATH_INFO=" + _body);
 		env.push_back("QUERY_STRING=" + _body);
+		if (_header.find("Content-Length:") == _header.end() ||  _header.find("Content-Type:") == _header.end()) {
+			errorPage("400");
+			return (NULL);
+		}
 		env.push_back("CONTENT_LENGTH=" + _header.at("Content-Length:"));
 		env.push_back("CONTENT_TYPE=" + _header.at("Content-Type:"));
 	}
@@ -299,11 +316,16 @@ char	**responseHttp::_createEnv()
 
 	env.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	env.push_back("SERVER_SOFTWARE=JoJo_SERVER/0.1");
-	env.push_back("HTPP_ACCEPT=" + _header.at("Accept:")); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
-	env.push_back("HTPP_ACCEPT_LANGUAGE=" + _header.at("Accept-Language:")); // bien verifier que c'est le bon indice pour toute les requetes @!!!!!!!!!
+
+	if (_header.find("Accept:") == _header.end() ||  _header.find("Accept-Language:") == _header.end() || _header.find("User-Agent:") == _header.end() || _header.find("Referer:") == _header.end())
+	{
+		errorPage("400");
+		return (NULL);
+	}
+	env.push_back("HTPP_ACCEPT=" + _header.at("Accept:"));
+	env.push_back("HTPP_ACCEPT_LANGUAGE=" + _header.at("Accept-Language:"));
 	env.push_back("HTTP_USER_AGENT=" + _header.at("User-Agent:"));
-	if (_header.find("Referer:") != _header.end())
-		env.push_back("HTTP_REFERER=" + _header.at("Referer:"));
+	env.push_back("HTTP_REFERER=" + _header.at("Referer:"));
 
 	ret = new char *[env.size() + 1];
 	int i = 0;
@@ -356,7 +378,7 @@ bool	responseHttp::errorPage(std::string code)
 	_fileName.clear();
 	_response.clear();
 
-	if (!_servers[_i_s].getErrorPages()[stringToSize(code)].empty())
+	if (_i_s != _servers.size() && !_servers[_i_s].getErrorPages()[stringToSize(code)].empty())
 		_fileName = _servers[_i_s].getErrorPages()[stringToSize(code)];
 	else
 	{
@@ -391,7 +413,8 @@ std::string	responseHttp::make_cgi(std::string ext)
 	std::string	str;
 	pid_t		pid;
 
-	env = _createEnv();
+	if (!(env = _createEnv()))
+		return ("");
 	if (pipe(fd_in) == -1 || pipe(fd_out) == -1)
 		return ("");
 	

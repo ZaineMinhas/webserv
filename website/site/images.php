@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<meta charset="utf-8"/>
-		<title>Delete cgi</title>
+		<title>Images</title>
 		<link rel="stylesheet" href="/stylesheet/images.css"/>
 		<link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"/>
 	</head>

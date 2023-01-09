@@ -169,7 +169,7 @@ void	server::handle_client(config &srv)
 					break ;
 				}
 				std::string	ret = *it->_response.begin();
-				int len = ret.size();
+				size_t len = ret.size();
 				it->_ret = send(it->_cli, ret.c_str(), len, 0);
 				if (it->_ret < 0)
 				{
@@ -206,14 +206,32 @@ void	server::handle_client(config &srv)
 						it->_body = it->_head.substr(it->_head.find("\r\n\r\n") + 4);
 						it->_head = it->_head.substr(0, it->_head.find("\r\n\r\n"));
 						it->_header = split(it->_head);
+						if (it->_header.find("file:") == it->_header.end() || it->_header.find("method:") == it->_header.end())
+						{
+							std::string	htmlTxt;
+							std::string	response;
+							std::ifstream		ftxt(std::string("./error_pages/400.html").c_str());
+							std::stringstream	ss;
+							ss << ftxt.rdbuf();
+							htmlTxt = ss.str();
+							ftxt.close();
+			
+							response = "HTTP/1.1 400 " + responseHttp::getMsgCode("400") + "\nContent-Length: " + sizeToString(htmlTxt.size()) + "\nContent-Type: text/html" +  "\r\n\r\n" + htmlTxt +"\r\n";
+							int len = response.size();
+							it->_ret = send(it->_cli, response.c_str(), len, 0);
+							it->close_client(&this->_tmp_set);
+							break ;
+						}
 						it->_header.at("file:") = urlDecode(it->_header.at("file:"));
 						if (it->_header.at("method:") == "POST")
 						{
 							if (it->_header.find("Content-Length:") != it->_header.end())
 								it->_bodyLength = stringToSize(it->_header.at("Content-Length:"));
+							else
+								it->_bodyLength = 0;
 						}
 						else
-							it->_bodyLength = 0;
+							it->_bodyLength = 0;						
 					}
 					else
 					 	send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
