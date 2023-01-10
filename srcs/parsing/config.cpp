@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:09 by ctirions          #+#    #+#             */
-/*   Updated: 2023/01/03 17:46:19 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/10 16:17:03 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,11 +122,18 @@ void	config::check_double(void)
 	{
 		std::vector<serverBlock>::iterator it2 = it + 1;
 		for (; it2 != _servers.end(); it2++) {
+			std::cout << "1" << std::endl;
 			if (it->getListen().second == it2->getListen().second && it->getName() == it2->getName() && it->getListen().first == it2->getListen().first) {
-				it2--;
-				_servers.erase(it2 + 1);
+				_servers.erase(it2);
+				it2 = _servers.begin();
+				if ((it2 + 1) == _servers.end())
+					std::cout << "coucou" << std::endl;
+				it = _servers.begin();
+
 			}
 		}
+		if (it + 1 == _servers.end())
+			break ;
 	}
 }
 

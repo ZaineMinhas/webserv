@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:06:34 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/09 19:50:04 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/10 15:25:56 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,6 @@ const char	*srvSocket::fcntlError::what() const throw() { return ("server socket
 const char	*srvSocket::optError::what() const throw() { return ("server socket: error: setsockopt"); }
 const char	*srvSocket::bindError::what() const throw() { return ("server socket: error: bind"); }
 const char	*srvSocket::listenError::what() const throw() { return ("server socket: error: listen"); }
-
-#include <cerrno>
 
 client::client(int srv, fd_set *set)
 {

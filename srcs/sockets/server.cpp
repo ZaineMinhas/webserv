@@ -245,15 +245,11 @@ void	server::handle_client(config &srv)
 						else
 							it->_bodyLength = 0;						
 					}
-					else
-					 	send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
 				}
 				else
 					it->_body += std::string(buffer, it->_ret);
 				if (it->_body.size() >= it->_bodyLength && it->_headerEnd)
 					it->_ready = true;
-				else
-					send(it->_cli, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
 				break;
 			}
 		}

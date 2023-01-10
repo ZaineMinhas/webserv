@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   responseHttp.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
+/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/09 19:02:10 by aliens           ###   ########.fr       */
+/*   Updated: 2023/01/10 15:23:42 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,12 +144,14 @@ bool	responseHttp::_findFileName(void)
 		if (_header.find("Content-Length:") == _header.end())
 			return (errorPage("411"));
 		_htmlTxt = make_cgi(".py");
-		_createHeader("201");
+		if (!_htmlTxt.empty())
+			_createHeader("201");
 		return (false);
 	}
 	else if (_fileName.find(".py") != std::string::npos || _fileName.find(".php") != std::string::npos) {
 		_htmlTxt = make_cgi(_fileName.find(".py") != std::string::npos ? ".py" : ".php");
-		_createHeader("200");
+		if (!_htmlTxt.empty())
+			_createHeader("200");
 		return (false);
 	}
 	return (_getMime());
@@ -455,12 +457,23 @@ std::string	responseHttp::make_cgi(std::string ext)
 		av[2] = NULL;
 
 		execve(av[0], av, env);
+		for (int i = 0; env[i]; i++)
+			delete env[i];
+		delete env;
+		
 		exit(1);
 	}
 	if (dup2(fd_in[0], STDIN_FILENO) == -1)
 		return ("");
-	if (_header.at("method:") == "POST")
-		write(fd_in[1], _body.c_str(), _body.size());
+	if (_header.at("method:") == "POST") {
+		if (write(fd_in[1], _body.c_str(), _body.size()) <= 0) {
+			errorPage("500");
+			for (int i = 0; env[i]; i++)
+				delete env[i];
+			delete env;
+			return ("");
+		}
+	}
 
 	close(fd_out[1]);
 	close(fd_in[0]);
@@ -473,7 +486,10 @@ std::string	responseHttp::make_cgi(std::string ext)
 	while (ret > 0)
 	{
 		ret = read(fd_out[0], buffer, 1024);
-		buffer[ret] = '\0';
+		if (ret == -1)
+			buffer[0] = '\0';
+		else
+			buffer[ret] = '\0';
 		str += std::string(buffer);
 	}
 	close(fd_out[0]);
