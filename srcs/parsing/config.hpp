@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:28 by ctirions          #+#    #+#             */
-/*   Updated: 2022/11/22 16:23:32 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/10 17:05:37 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,10 @@ public:
 	};
 
 	struct	emptyConfFile : public std::exception { virtual const char	*what() const throw(); };
+	struct	emptyServer : public std::exception { virtual const char	*what() const throw(); };
+	struct	emptyValue : public std::exception { virtual const char	*what() const throw(); };
 	struct	badFileName : public std::exception { virtual const char	*what() const throw(); };
+	struct	badPort : public std::exception { virtual const char	*what() const throw(); };
 	struct	badInitialization : public std::exception { virtual const char	*what() const throw(); };
 };
 

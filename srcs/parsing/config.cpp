@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 16:05:09 by ctirions          #+#    #+#             */
-/*   Updated: 2023/01/10 16:18:47 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/10 17:48:52 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,8 @@ void	config::check_conf_file(std::string file, config &srv)
 		main = get_next_value(txt);
 		if (main.key == "server")
 		{
+			if (main.value.empty() || main.value.find_first_not_of(" \n\r\t\f\v") == std::string::npos)
+				throw (config::emptyServer());
 			srv.add_server(serverBlock());
 			while (!serv.key.empty() || serv.i)
 			{
@@ -61,6 +63,8 @@ void	config::check_conf_file(std::string file, config &srv)
 				serv = get_next_value(main.value);
 				if (serv.key == "location")
 				{
+					if (serv.value.empty() || serv.value.find_first_not_of(" \n\r\t\f\v") == std::string::npos)
+						throw (config::badConfFile("empty location"));
 					srv._servers.back().add_directory(directory(), serv.name);
 					while (!location.key.empty() || location.i)
 					{
@@ -86,7 +90,7 @@ void	config::check_conf_file(std::string file, config &srv)
 			}
 		}
 		else
-			throw (config::badConfFile(std::string("bad block name: ") + main.key));
+			throw (config::badConfFile(std::string("each block must be separate by at least one empty line, bad block name: ") + main.key));
 		try {
 			txt = txt.substr(main.next_val);
 		}
@@ -138,5 +142,8 @@ void	config::check_double(void)
 /*___ exceptions ___*/
 
 const char	*config::emptyConfFile::what() const throw() { return ("Empty configuration file."); }
+const char	*config::emptyServer::what() const throw() { return ("Empty server in configuration file."); }
+const char	*config::emptyValue::what() const throw() { return ("Empty value in configuration file."); }
 const char	*config::badFileName::what() const throw() { return ("Put a correct file name!"); }
+const char	*config::badPort::what() const throw() { return ("Put a correct port!"); }
 const char	*config::badInitialization::what() const throw() { return ("Erro occuring when initialize our webserv."); }

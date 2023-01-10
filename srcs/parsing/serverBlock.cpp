@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   serverBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ctirions <ctirions@student.s19.be>         +#+  +:+       +#+        */
+/*   By: aliens <aliens@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/01 14:04:18 by ctirions          #+#    #+#             */
-/*   Updated: 2023/01/07 16:42:34 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/10 17:45:37 by aliens           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,9 +69,16 @@ void	serverBlock::setListen(std::string &listen)
 		else
 			_listen.second = atol(s.c_str());
 	}
+	if (_listen.second <= 2)
+		throw (config::badPort());
 }
 
-void	serverBlock::setBodySize(std::string &size) { _body_size = atol(size.c_str()); }
+void	serverBlock::setBodySize(std::string &size) {
+	for (size_t i = 0; i < size.size(); i++)
+		if (isalpha(size[i]) || size[i] == '-')
+			throw (config::badConfFile("body size"));
+	_body_size = atol(size.c_str());
+}
 void	serverBlock::setDirectories(std::vector<directory> &directories) { _directories = directories; }
 
 void	serverBlock::setMethods(std::string &methods)
@@ -135,6 +142,8 @@ void	serverBlock::set(std::string &key, std::string &value)
 		setErrorPages(value);
 	else
 		throw (config::badConfFile(std::string("bad key: ") + key));
+	if (value.empty())
+		throw (config::emptyValue());
 }
 
 void	serverBlock::add_directory(const directory &to_add, std::string &name) {
@@ -264,6 +273,8 @@ void	directory::set(std::string &key, std::string &value)
 	}
 	else
 		throw (config::badConfFile(std::string("bad key: ") + key));
+	if (value.empty())
+		throw (config::emptyValue());
 }
 
 void	directory::checkValues(void) {
