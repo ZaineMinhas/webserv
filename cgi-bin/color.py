@@ -62,6 +62,7 @@ print("""\
 					}
 					color {
 						color: %s;
+						text-shadow: 1px 1px black;
 					}
 			</style>
 		</head>
