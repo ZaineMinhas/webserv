@@ -6,7 +6,7 @@
 /*   By: ctirions <ctirions@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/23 14:20:33 by aliens            #+#    #+#             */
-/*   Updated: 2023/01/10 15:23:42 by ctirions         ###   ########.fr       */
+/*   Updated: 2023/01/10 16:31:59 by ctirions         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,12 @@ void    responseHttp::_getServerIndex(void)
 
 bool    responseHttp::_getLocationIndex(void)
 {
-	if (_header.find("file:") == _header.end())
-		return (errorPage("400"));
-	std::string	url = _header.at("file:") + "/";
-	if (_i_s == _servers.size())	
+	if (_header.find("file:") == _header.end() || _i_s == _servers.size()) {
+		errorPage("400");
+		_makeResponseList();
 		return (false);
+	}
+	std::string	url = _header.at("file:") + "/";
     _directories = _servers[_i_s].getDirectories();
 	int	id = -1;
 
